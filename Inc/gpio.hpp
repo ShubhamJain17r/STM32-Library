@@ -36,8 +36,24 @@ enum class Pull : std::uint8_t
 class Pin
 {
 private:
-	uint8_t pinNumber;
-	GPIO_TypeDef* port;
+	std::uint8_t pinNumber_;
+	GPIO_TypeDef* port_;
+
+	void setMode(Mode);
+	void setOutputType(OutputType);
+	void setOutputSpeed(OutputSpeed);
+	void setPull(Pull);
+	void setAlternateFunction(std::uint8_t);
+
+public:
+	constexpr Pin(std::uint8_t pinNumber, GPIO_TypeDef* port) :
+		pinNumber_(pinNumber), port_(port) {}
+
+	void configureInput(Pull pull) const;
+	void configureOutput(OutputType outputType, OutputSpeed outputSpeed, Pull pull) const;
+	void configureAternate(OutputType outputType, OutputSpeed outputSpeed, Pull pull, std::uint8_t AFType) const;
+	void configureAnalog() const;
+
 };
 
 }	// gpio namespace

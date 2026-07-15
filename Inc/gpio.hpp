@@ -41,19 +41,19 @@ private:
 	std::uint8_t pinNumber_;
 	GPIO_TypeDef* port_;
 
-	void setMode(Mode);
-	void setOutputType(OutputType);
-	void setOutputSpeed(OutputSpeed);
-	void setPull(Pull);
-	void setAlternateFunction(std::uint8_t);
+	void setMode(Mode) const;
+	void setOutputType(OutputType) const;
+	void setOutputSpeed(OutputSpeed) const;
+	void setPull(Pull) const;
+	void setAlternateFunction(std::uint8_t) const;
 
 public:
 	constexpr Pin(std::uint8_t pinNumber, GPIO_TypeDef* port) :
 		pinNumber_(pinNumber), port_(port) {}
 
-	void configureInput(Pull pull) const;
-	void configureOutput(OutputType outputType, OutputSpeed outputSpeed, Pull pull) const;
-	void configureAternate(OutputType outputType, OutputSpeed outputSpeed, Pull pull, std::uint8_t AFType) const;
+	void configureInput(Pull) const;
+	void configureOutput(OutputType, OutputSpeed, Pull) const;
+	void configureAternate(OutputType, OutputSpeed, Pull, std::uint8_t) const;
 	void configureAnalog() const;
 
 };

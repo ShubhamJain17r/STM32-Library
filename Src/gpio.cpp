@@ -27,19 +27,19 @@ void Pin::setAlternateFunction(std::uint8_t AFType) const
 	setFourBitField(port_->AFR[pinNumber_ / 8], (pinNumber_ % 8) * 4, AFType);
 }
 
-void configureInput(Pull pull) const
+void Pin::configureInput(Pull pull) const
 {	setMode(Mode::INPUT);
 	setPull(pull);
 }
 
-void configureOutput(OutputType outputType, OutputSpeed outputSpeed, Pull pull) const
+void Pin::configureOutput(OutputType outputType, OutputSpeed outputSpeed, Pull pull) const
 {	setMode(Mode::OUTPUT);
 	setOutputType(outputType);
 	setOutputSpeed(outputSpeed);
 	setPull(pull);
 }
 
-void configureAternate(OutputType outputType, OutputSpeed outputSpeed, Pull pull, std::uint8_t AFType) const
+void Pin::configureAternate(OutputType outputType, OutputSpeed outputSpeed, Pull pull, std::uint8_t AFType) const
 {	setMode(Mode::ALTERNATE);
 	setOutputType(outputType);
 	setOutputSpeed(outputSpeed);
@@ -47,7 +47,31 @@ void configureAternate(OutputType outputType, OutputSpeed outputSpeed, Pull pull
 	setAlternateFunction(AFType);
 }
 
-void configureAnalog() const
+void Pin::configureAnalog() const
 {	setMode(Mode::ANALOG);}
+
+bool Pin::isHigh() const
+{
+
+}
+
+bool Pin::isLow() const
+{
+
+}
+
+void Pin::toggle() const
+{
+
+}
+void Pin::write(PinState state) const
+{
+
+}
+
+PinState Pin::read() const
+{
+
+}
 
 } // gpio namespace

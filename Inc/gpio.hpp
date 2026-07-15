@@ -6,6 +6,12 @@
 namespace gpio
 {
 
+enum class PinState : std::uint8_t
+{
+	LOW = 0,
+	HIGH
+};
+
 enum class Mode : std::uint8_t
 {
 	INPUT = 0,
@@ -56,6 +62,12 @@ public:
 	void configureAternate(OutputType, OutputSpeed, Pull, std::uint8_t) const;
 	void configureAnalog() const;
 
+	bool isHigh() const;
+	bool isLow() const;
+
+	void toggle() const;
+	void write(PinState) const;
+	PinState read() const;
 };
 
 }	// gpio namespace

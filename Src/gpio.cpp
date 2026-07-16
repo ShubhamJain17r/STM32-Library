@@ -1,30 +1,32 @@
 #include "gpio.hpp"
+#include "registers.hpp"
 
 namespace gpio
 {
 
 void Pin::setMode(Mode mode) const
 {
-//	setTwoBitField(port_->MODER, pinNumber_ * 2, mode);
+	reg::setTwoBitFieldValue(port_->MODER, pinNumber_ * 2, mode);
 }
 
 void Pin::setOutputType(OutputType outputType) const
 {
-//	setBitValue(port_->OTYPER, pinNumber_, outputType);
+	reg::setBitValue(port_->OTYPER, pinNumber_, outputType);
 }
 
 void Pin::setOutputSpeed(OutputSpeed outputSpeed) const
 {
-//	setTwoBitField(port_->OSPEEDR, pinNumber_ * 2, outputSpeed);
+	reg::setTwoBitFieldValue(port_->OSPEEDR, pinNumber_ * 2, outputSpeed);
 }
 
 void Pin::setPull(Pull pull) const
 {
-//	setTwoBitField(port_->PUPDR, pinNumber_ * 2, pull);
+	reg::setTwoBitFieldValue(port_->PUPDR, pinNumber_ * 2, pull);
 }
+
 void Pin::setAlternateFunction(std::uint8_t AFType) const
 {
-//	setFourBitField(port_->AFR[pinNumber_ / 8], (pinNumber_ % 8) * 4, AFType);
+	reg::setFourBitFieldValue(port_->AFR[pinNumber_ / 8], (pinNumber_ % 8) * 4, outputSpeed);
 }
 
 void Pin::configureInput(Pull pull) const
@@ -52,40 +54,40 @@ void Pin::configureAnalog() const
 
 bool Pin::isHigh() const
 {
-//	return (read() == PinState::HIGH);
+	return reg::readBit(port_->ODR, pinNumber_) == true;
 }
 
 bool Pin::isLow() const
 {
-//	return (read() == PinState::LOW);
+	return reg::readBit(port_->ODR, pinNumber_) == false;
 }
 
 void Pin::toggle() const
 {
-//	if (isLow())
-//	{
-//		write(PinState::HIGH);
-//	}
-//	else
-//	{
-//		write(PinState::LOW);
-//	}
+	if (isLow())
+	{
+		write(PinState::HIGH);
+	}
+	else
+	{
+		write(PinState::LOW);
+	}
 }
 void Pin::write(PinState state) const
 {
-//	if (state == PinState::HIGH)
-//	{
-//		setBit(port_->BSRR, pinNumber_);
-//	}
-//	else
-//	{
-//		setBit(port_->BSRR, pinNumber_ + 16);
-//	}
+	if (state == PinState::HIGH)
+	{
+		reg::write(port_->BSRR, reg::singleBitMask(pinNumber_));
+	}
+	else
+	{
+		reg::write(port_->BSRR, reg::singleBitMask(pinNumber_ + 1));
+	}
 }
 
 PinState Pin::read() const
 {
-//	return
+	return static_cast<PinState>(reg::readBit(port_->IDR, pinNumber_));
 }
 
 } // gpio namespace

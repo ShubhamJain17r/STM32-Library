@@ -96,6 +96,11 @@ inline void setNBitFieldValue(volatile uint32_t& reg, uint8_t startBit, uint8_t 
 	writeORedValue(reg, value, startBit);
 }
 
+inline void setBitValue(volatile uint32_t& reg, uint8_t startBit, uint32_t value)
+{
+	setNBitFieldValue(reg, startBit, 1, value);
+}
+
 inline void setTwoBitFieldValue(volatile uint32_t& reg, uint8_t startBit, uint32_t value)
 {
 	setNBitFieldValue(reg, startBit, 2, value);

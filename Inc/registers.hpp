@@ -28,13 +28,11 @@ inline void write(volatile std::uint32_t &reg, std::uint32_t value) noexcept {
 	reg = value;
 }
 
-template<typename T>
-inline void setShiftedValue(volatile std::uint32_t &reg, T value) noexcept {
+inline void setShiftedValue(volatile std::uint32_t &reg, std::uint32_t value) noexcept {
 	reg |= value;
 }
 
-template<typename T>
-inline void setShiftedValue(volatile std::uint32_t &reg, T value,
+inline void setShiftedValue(volatile std::uint32_t &reg, std::uint32_t value,
 		std::uint8_t shift) noexcept {
 	reg |= (value << shift);
 }

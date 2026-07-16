@@ -96,4 +96,34 @@ inline void setNBitFieldValue(volatile uint32_t& reg, uint8_t startBit, uint8_t 
 	writeORedValue(reg, value, startBit);
 }
 
+inline void setTwoBitFieldValue(volatile uint32_t& reg, uint8_t startBit, uint32_t value)
+{
+	setNBitFieldValue(reg, startBit, 2, value);
+}
+
+inline void setThreeBitFieldValue(volatile uint32_t& reg, uint8_t startBit, uint32_t value)
+{
+	setNBitFieldValue(reg, startBit, 3, value);
+}
+
+inline void setFourBitFieldValue(volatile uint32_t& reg, uint8_t startBit, uint32_t value)
+{
+	setNBitFieldValue(reg, startBit, 4, value);
+}
+
+inline void setFiveBitFieldValue(volatile uint32_t& reg, uint8_t startBit, uint32_t value)
+{
+	setNBitFieldValue(reg, startBit, 5, value);
+}
+
+inline void setSixBitFieldValue(volatile uint32_t& reg, uint8_t startBit, uint32_t value)
+{
+	setNBitFieldValue(reg, startBit, 6, value);
+}
+
+inline void setSevenBitFieldValue(volatile uint32_t& reg, uint8_t startBit, uint32_t value)
+{
+	setNBitFieldValue(reg, startBit, 7, value);
+}
+
 } // reg namespace

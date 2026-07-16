@@ -28,7 +28,8 @@ inline void write(volatile std::uint32_t &reg, std::uint32_t value) noexcept {
 	reg = value;
 }
 
-inline void setShiftedValue(volatile std::uint32_t &reg, std::uint32_t value) noexcept {
+inline void setShiftedValue(volatile std::uint32_t &reg,
+		std::uint32_t value) noexcept {
 	reg |= value;
 }
 
@@ -51,7 +52,8 @@ inline void resetBit(volatile std::uint32_t &reg, std::uint8_t bit) noexcept {
 	reg &= ~singleBitMask(bit);
 }
 
-inline bool readBit(const volatile std::uint32_t &reg, std::uint8_t bit) noexcept {
+inline bool readBit(const volatile std::uint32_t &reg,
+		std::uint8_t bit) noexcept {
 	return (reg & singleBitMask(bit)) != 0;
 }
 
@@ -79,18 +81,18 @@ inline void resetBits(volatile std::uint32_t &reg, std::uint8_t width,
 	reg &= ~bitMask(width, shift);
 }
 
-inline std::uint32_t readBits(const volatile std::uint32_t &reg, std::uint8_t width, std::uint8_t shift) noexcept
-{
+inline std::uint32_t readBits(const volatile std::uint32_t &reg,
+		std::uint8_t width, std::uint8_t shift) noexcept {
 	return (reg & bitMask(width, shift) >> shift);
 }
 
 // ------------------------- bit field operations --------------------------
 
 template<typename T>
-inline void setNBitFieldValue(volatile std::uint32_t &reg, std::uint8_t startBit,
-		std::uint8_t width, T value) noexcept {
+inline void setNBitFieldValue(volatile std::uint32_t &reg,
+		std::uint8_t startBit, std::uint8_t width, T value) noexcept {
 	resetBits(reg, width, startBit);
-	setShiftedValue(reg, value, startBit);
+	setShiftedValue(reg, static_cast<std::uint32_t>(value), startBit);
 }
 
 template<typename T>
@@ -100,38 +102,38 @@ inline void setBitValue(volatile std::uint32_t &reg, std::uint8_t startBit,
 }
 
 template<typename T>
-inline void setTwoBitFieldValue(volatile std::uint32_t &reg, std::uint8_t startBit,
-		T value) noexcept {
+inline void setTwoBitFieldValue(volatile std::uint32_t &reg,
+		std::uint8_t startBit, T value) noexcept {
 	setNBitFieldValue(reg, startBit, 2, value);
 }
 
 template<typename T>
-inline void setThreeBitFieldValue(volatile std::uint32_t &reg, std::uint8_t startBit,
-		T value) noexcept {
+inline void setThreeBitFieldValue(volatile std::uint32_t &reg,
+		std::uint8_t startBit, T value) noexcept {
 	setNBitFieldValue(reg, startBit, 3, value);
 }
 
 template<typename T>
-inline void setFourBitFieldValue(volatile std::uint32_t &reg, std::uint8_t startBit,
-		T value) noexcept {
+inline void setFourBitFieldValue(volatile std::uint32_t &reg,
+		std::uint8_t startBit, T value) noexcept {
 	setNBitFieldValue(reg, startBit, 4, value);
 }
 
 template<typename T>
-inline void setFiveBitFieldValue(volatile std::uint32_t &reg, std::uint8_t startBit,
-		T value) noexcept {
+inline void setFiveBitFieldValue(volatile std::uint32_t &reg,
+		std::uint8_t startBit, T value) noexcept {
 	setNBitFieldValue(reg, startBit, 5, value);
 }
 
 template<typename T>
-inline void setSixBitFieldValue(volatile std::uint32_t &reg, std::uint8_t startBit,
-		T value) noexcept {
+inline void setSixBitFieldValue(volatile std::uint32_t &reg,
+		std::uint8_t startBit, T value) noexcept {
 	setNBitFieldValue(reg, startBit, 6, value);
 }
 
 template<typename T>
-inline void setSevenBitFieldValue(volatile std::uint32_t &reg, std::uint8_t startBit,
-		T value) noexcept {
+inline void setSevenBitFieldValue(volatile std::uint32_t &reg,
+		std::uint8_t startBit, T value) noexcept {
 	setNBitFieldValue(reg, startBit, 7, value);
 }
 

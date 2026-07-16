@@ -5,27 +5,27 @@
 
 namespace gpio {
 
-enum class PinState : uint8_t {
+enum class PinState : std::uint8_t {
 	LOW = 0, HIGH
 };
 
-enum class Mode : uint8_t {
+enum class Mode : std::uint8_t {
 	INPUT = 0, OUTPUT, ALTERNATE, ANALOG
 };
 
-enum class OutputType : uint8_t {
+enum class OutputType : std::uint8_t {
 	PUSH_PULL = 0, OPEN_DRAIN
 };
 
-enum class OutputSpeed : uint8_t {
+enum class OutputSpeed : std::uint8_t {
 	LOW = 0, MEDIUM, FAST, HIGH
 };
 
-enum class Pull : uint8_t {
+enum class Pull : std::uint8_t {
 	NONE = 0, UP, DOWN
 };
 
-enum class AlternateFunction : uint8_t {
+enum class AlternateFunction : std::uint8_t {
 	AF0,
 	AF1,
 	AF2,
@@ -46,8 +46,8 @@ enum class AlternateFunction : uint8_t {
 
 class Pin {
 private:
-	uint8_t pinNumber_;
-	GPIO_TypeDef *port_;
+	std::uint8_t pinNumber_;
+	GPIO_TypeDef* const port_;
 
 	void setMode(Mode) const;
 	void setOutputType(OutputType) const;
@@ -56,7 +56,7 @@ private:
 	void setAlternateFunction(AlternateFunction) const;
 
 public:
-	constexpr Pin(uint8_t pinNumber, GPIO_TypeDef *port) :
+	constexpr Pin(std::uint8_t pinNumber, GPIO_TypeDef *port) :
 			pinNumber_(pinNumber), port_(port) {
 	}
 
@@ -78,6 +78,9 @@ public:
 	void toggle() const;
 	void write(PinState) const;
 	PinState read() const;
+
+	void set() const;
+	void reset() const;
 };
 
 }	// gpio namespace

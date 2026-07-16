@@ -51,30 +51,39 @@ void Pin::configureAnalog() const {
 }
 
 bool Pin::isHigh() const {
-	return reg::readBit(port_->IDR, pinNumber_) == true;
+	return reg::readBit(port_->IDR, pinNumber_);
 }
 
 bool Pin::isLow() const {
-	return reg::readBit(port_->IDR, pinNumber_) == false;
+	return !(reg::readBit(port_->IDR, pinNumber_));
 }
 
 void Pin::toggle() const {
 	if (reg::readBit(port_->ODR, pinNumber_)) {
-		write(PinState::LOW);
+		reset();
 	} else {
-		write(PinState::HIGH);
+		set();
 	}
 }
+
 void Pin::write(PinState state) const {
 	if (state == PinState::HIGH) {
-		reg::write(port_->BSRR, reg::singleBitMask(pinNumber_));
+		set();
 	} else {
-		reg::write(port_->BSRR, reg::singleBitMask(pinNumber_ + 16));
+		reset();
 	}
 }
 
 PinState Pin::read() const {
 	return static_cast<PinState>(reg::readBit(port_->IDR, pinNumber_));
+}
+
+void Pin::set() const {
+	reg::write(port_->BSRR, reg::singleBitMask(pinNumber_));
+}
+
+void Pin::reset() const {
+	reg::write(port_->BSRR, reg::singleBitMask(pinNumber_ + 16));
 }
 
 } // gpio namespace

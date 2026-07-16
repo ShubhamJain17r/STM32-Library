@@ -1,5 +1,5 @@
-#include "gpio.hpp"
-#include "registers.hpp"
+#include "gpio/gpio.hpp"
+#include "common/registers.hpp"
 
 namespace gpio {
 

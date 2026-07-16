@@ -24,9 +24,9 @@ void Pin::setPull(Pull pull) const
 	reg::setTwoBitFieldValue(port_->PUPDR, pinNumber_ * 2, pull);
 }
 
-void Pin::setAlternateFunction(std::uint8_t AFType) const
+void Pin::setAlternateFunction(AlternateFunction AFType) const
 {
-	reg::setFourBitFieldValue(port_->AFR[pinNumber_ / 8], (pinNumber_ % 8) * 4, outputSpeed);
+	reg::setFourBitFieldValue(port_->AFR[pinNumber_ / 8], (pinNumber_ % 8) * 4, AFType);
 }
 
 void Pin::configureInput(Pull pull) const
@@ -41,7 +41,7 @@ void Pin::configureOutput(OutputType outputType, OutputSpeed outputSpeed, Pull p
 	setPull(pull);
 }
 
-void Pin::configureAternate(OutputType outputType, OutputSpeed outputSpeed, Pull pull, std::uint8_t AFType) const
+void Pin::configureAlternate(AlternateFunction AFType, OutputType outputType, OutputSpeed outputSpeed, Pull pull) const
 {	setMode(Mode::ALTERNATE);
 	setOutputType(outputType);
 	setOutputSpeed(outputSpeed);
@@ -54,23 +54,23 @@ void Pin::configureAnalog() const
 
 bool Pin::isHigh() const
 {
-	return reg::readBit(port_->ODR, pinNumber_) == true;
+	return reg::readBit(port_->IDR, pinNumber_) == true;
 }
 
 bool Pin::isLow() const
 {
-	return reg::readBit(port_->ODR, pinNumber_) == false;
+	return reg::readBit(port_->IDR, pinNumber_) == false;
 }
 
 void Pin::toggle() const
 {
-	if (isLow())
+	if (reg::readBit(port_->ODR, pinNumber_))
 	{
-		write(PinState::HIGH);
+	    write(PinState::LOW);
 	}
 	else
 	{
-		write(PinState::LOW);
+	    write(PinState::HIGH);
 	}
 }
 void Pin::write(PinState state) const
@@ -81,7 +81,7 @@ void Pin::write(PinState state) const
 	}
 	else
 	{
-		reg::write(port_->BSRR, reg::singleBitMask(pinNumber_ + 1));
+		reg::write(port_->BSRR, reg::singleBitMask(pinNumber_ + 16));
 	}
 }
 

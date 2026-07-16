@@ -41,7 +41,7 @@ inline void writeORedValue(volatile uint32_t& reg, uint32_t value)
 
 inline void writeORedValue(volatile uint32_t& reg, uint32_t value, uint8_t shift)
 {
-	reg |= bitMask(value, shift);
+	reg |= (value << shift);
 }
 
 inline void reset(volatile uint32_t& reg)
@@ -64,6 +64,11 @@ inline void resetBit(volatile uint32_t& reg, uint8_t bit)
 inline bool readBit(const volatile uint32_t& reg, uint8_t bit)
 {
 	return (reg & singleBitMask(bit)) != 0;
+}
+
+inline void toggleBit(volatile uint32_t& reg, uint8_t bit)
+{
+	reg ^= singleBitMask(bit);
 }
 
 // ------------------------- multi bit operations --------------------------

@@ -41,6 +41,26 @@ enum class Pull : std::uint8_t
 	DOWN
 };
 
+enum class AlternateFunction : uint8_t
+{
+    AF0,
+    AF1,
+    AF2,
+    AF3,
+    AF4,
+    AF5,
+    AF6,
+    AF7,
+    AF8,
+    AF9,
+    AF10,
+    AF11,
+    AF12,
+    AF13,
+    AF14,
+    AF15
+};
+
 class Pin
 {
 private:
@@ -51,15 +71,25 @@ private:
 	void setOutputType(OutputType) const;
 	void setOutputSpeed(OutputSpeed) const;
 	void setPull(Pull) const;
-	void setAlternateFunction(std::uint8_t) const;
+	void setAlternateFunction(AlternateFunction) const;
 
 public:
 	constexpr Pin(std::uint8_t pinNumber, GPIO_TypeDef* port) :
 		pinNumber_(pinNumber), port_(port) {}
 
-	void configureInput(Pull) const;
-	void configureOutput(OutputType, OutputSpeed, Pull) const;
-	void configureAternate(OutputType, OutputSpeed, Pull, std::uint8_t) const;
+	void configureInput(Pull pull = Pull::NONE) const;
+
+	void configureOutput(
+	    OutputType outputType = OutputType::PUSH_PULL,
+	    OutputSpeed outputSpeed = OutputSpeed::LOW,
+	    Pull pull = Pull::NONE) const;
+
+	void configureAlternate(
+		AlternateFunction,
+	    OutputType outputType = OutputType::PUSH_PULL,
+	    OutputSpeed outputSpeed = OutputSpeed::LOW,
+	    Pull pull = Pull::NONE) const;
+
 	void configureAnalog() const;
 
 	bool isHigh() const;

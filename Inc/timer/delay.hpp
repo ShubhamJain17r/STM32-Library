@@ -6,7 +6,11 @@
 namespace timer
 {
 
-void initSysTick(void);
+extern volatile uint32_t tick_count;
+
+uint32_t getTickCount();
+
+void initSysTick();
 
 void delay_ms(std::uint32_t);
 

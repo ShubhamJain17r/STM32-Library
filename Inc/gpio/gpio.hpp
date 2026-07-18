@@ -83,4 +83,6 @@ public:
 	void reset() const;
 };
 
+std::uint8_t GPIO_syscfg_map(GPIO_TypeDef* port);
+
 }	// gpio namespace

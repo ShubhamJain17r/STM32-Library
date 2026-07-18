@@ -77,4 +77,9 @@ void Pin::reset() const {
     port_->BSRR = reg::singleBitMask(pinNumber_ + 16);
 }
 
+std::uint32_t GPIO_syscfg_map(GPIO_TypeDef* port) {
+	return (reinterpret_cast<std::uint32_t>(port) - GPIOA_BASE) / 0x400;
+}
+
+
 } // namespace gpio

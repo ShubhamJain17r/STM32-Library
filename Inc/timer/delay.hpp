@@ -1,16 +1,16 @@
 #pragma once
 
-#include "stm32f446xx.h"
 #include <cstdint>
 
 namespace timer {
 
-extern volatile uint32_t tick_count;
+extern volatile std::uint32_t tick_count;
 
 void initSysTick();
+void delay_ms(std::uint32_t ms);
 
-inline uint32_t getTickCount();
-
-void delay_ms(std::uint32_t);
-
+inline std::uint32_t getTickCount() {
+    return tick_count;
 }
+
+} // namespace timer

@@ -1,5 +1,6 @@
 #include "gpio/gpio.hpp"
 #include "common/registers.hpp"
+#include "rcc/rcc.hpp"
 
 namespace gpio {
 
@@ -24,13 +25,13 @@ void Pin::setAlternateFunction(AlternateFunction AFType) const {
 }
 
 void Pin::configureInput(Pull pull) const {
-	enableClock_GPIO(port_);
+    rcc::enableClock_GPIO(port_);
     setMode(Mode::INPUT);
     setPull(pull);
 }
 
 void Pin::configureOutput(OutputType outputType, OutputSpeed outputSpeed, Pull pull) const {
-	enableClock_GPIO(port_);
+    rcc::enableClock_GPIO(port_);
     setMode(Mode::OUTPUT);
     setOutputType(outputType);
     setOutputSpeed(outputSpeed);
@@ -38,7 +39,7 @@ void Pin::configureOutput(OutputType outputType, OutputSpeed outputSpeed, Pull p
 }
 
 void Pin::configureAlternate(AlternateFunction AFType, OutputType outputType, OutputSpeed outputSpeed, Pull pull) const {
-	enableClock_GPIO(port_);
+    rcc::enableClock_GPIO(port_);
     setMode(Mode::ALTERNATE);
     setOutputType(outputType);
     setOutputSpeed(outputSpeed);
@@ -47,55 +48,8 @@ void Pin::configureAlternate(AlternateFunction AFType, OutputType outputType, Ou
 }
 
 void Pin::configureAnalog() const {
-	enableClock_GPIO(port_);
+    rcc::enableClock_GPIO(port_);
     setMode(Mode::ANALOG);
 }
-
-inline bool Pin::isHigh() const {
-    return reg::readBit(port_->IDR, pinNumber_);
-}
-
-inline bool Pin::isLow() const {
-    return !isHigh();
-}
-
-inline void Pin::toggle() const {
-    // Atomic bitwise toggle operation calculation using BSRR register mechanics
-    std::uint32_t odr = port_->ODR;
-    port_->BSRR = ((odr & reg::singleBitMask(pinNumber_)) << 16) | (~odr & reg::singleBitMask(pinNumber_));
-}
-
-inline void Pin::write(PinState state) const {
-    if (state == PinState::HIGH) set(); else reset();
-}
-
-inline PinState Pin::read() const {
-    return static_cast<PinState>(reg::readBit(port_->IDR, pinNumber_));
-}
-
-inline void Pin::set() const {
-    port_->BSRR = reg::singleBitMask(pinNumber_);
-}
-
-inline void Pin::reset() const {
-    port_->BSRR = reg::singleBitMask(pinNumber_ + 16);
-}
-
-constexpr std::uint8_t Pin::getPinNumber() const {
-	return pinNumber_;
-}
-
-constexpr GPIO_TypeDef* Pin::getPort() const {
-	return port_;
-}
-
-inline std::uint32_t GPIO_syscfg_map(const GPIO_TypeDef* port) noexcept {
-    if (port < GPIOA || port > GPIOH) {
-        return 0;
-    }
-
-    return (reinterpret_cast<std::uintptr_t>(port) - GPIOA_BASE) / 0x400;
-}
-
 
 } // namespace gpio

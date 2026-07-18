@@ -8,7 +8,7 @@ std::array<ExternalInterrupt*, 16> ExternalInterrupt::active_instances{nullptr};
 
 void ExternalInterrupt::setCallback(Edge triggerEdge, callback::Callback func) {
     if (triggerEdge == Edge::BOTH) {
-        callbacks_[0] = func; // Set both to the same function if requested
+        callbacks_[0] = func;
         callbacks_[1] = func;
     } else {
         callbacks_[static_cast<std::size_t>(triggerEdge)] = func;
@@ -17,15 +17,15 @@ void ExternalInterrupt::setCallback(Edge triggerEdge, callback::Callback func) {
 
 void ExternalInterrupt::handleISR() const {
     if (reg::readBit(EXTI->PR, pinNumber_)) {
+        // Write 1 to clear pending flag
         EXTI->PR = reg::singleBitMask(pinNumber_);
 
-        // Sample input data register state to identify current physical status
         bool pin_is_low = !reg::readBit(port_->IDR, pinNumber_);
 
         if (pin_is_low && callbacks_[1]) {
-            callbacks_[1](); // Fire Falling Edge
+            callbacks_[1]();
         } else if (!pin_is_low && callbacks_[0]) {
-            callbacks_[0](); // Fire Rising Edge
+            callbacks_[0]();
         }
     }
 }
@@ -61,13 +61,12 @@ void ExternalInterrupt::enableNVIC() const {
     NVIC_EnableIRQ(irq);
 }
 
-constexpr void ExternalInterrupt::register_instance() {
+void ExternalInterrupt::register_instance() {
     active_instances[pinNumber_] = this;
 }
 
 } // namespace exti
 
-// --- Global Vector ISR Interface ---
 extern "C" {
 void EXTI0_IRQHandler(void)    { if(exti::ExternalInterrupt::active_instances[0])  exti::ExternalInterrupt::active_instances[0]->handleISR(); }
 void EXTI1_IRQHandler(void)    { if(exti::ExternalInterrupt::active_instances[1])  exti::ExternalInterrupt::active_instances[1]->handleISR(); }
@@ -90,4 +89,4 @@ void EXTI15_10_IRQHandler(void) {
         }
     }
 }
-}
+} // extern "C"

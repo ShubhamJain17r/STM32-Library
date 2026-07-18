@@ -48,10 +48,9 @@ inline void resetBits(volatile std::uint32_t &reg, std::uint8_t width, std::uint
 }
 
 inline std::uint32_t readBits(const volatile std::uint32_t &reg, std::uint8_t width, std::uint8_t shift) noexcept {
-    return (reg & bitMask(width, shift)) >> shift; // Precedence fix applied
+    return (reg & bitMask(width, shift)) >> shift;
 }
 
-// Unified template replacing all 1-7 bit specific functions
 template <std::uint8_t Width, typename T>
 inline void setBitField(volatile std::uint32_t &reg, std::uint8_t shift, T value) noexcept {
     reg = (reg & ~bitMask(Width, shift)) | ((static_cast<std::uint32_t>(value) & bitMask(Width)) << shift);

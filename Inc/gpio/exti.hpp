@@ -2,6 +2,7 @@
 
 #include "stm32f446xx.h"
 #include <cstdint>
+#include <array>
 
 #include "common/callback.hpp"
 #include "gpio/gpio.hpp"
@@ -22,18 +23,21 @@ public:
 	constexpr ExternalInterrupt(std::uint8_t pinNumber, GPIO_TypeDef *port, Edge edge) :
 				pinNumber_(pinNumber), port_(port), edge_(edge) {
 		register_instances();
+		init();
 	}
 
-	void setCallback(Edge, callback::Callback);
+	void setCallback(callback::Callback);
 
 	void handleISR();
 
 private:
-    void enable_nvic();
+	void init();
 
-    void register_instance();
+    void enableNVIC();
 
-    std::array<Callback, 3> callbacks_{}; // RISING, FALLING, BOTH
+    void register_instances();
+
+    std::array<callback::Callback, 3> callbacks_{}; // RISING, FALLING, BOTH
 
 public:
     // Static Dispatcher System

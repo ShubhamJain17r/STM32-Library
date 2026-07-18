@@ -1,5 +1,4 @@
 #include "timer/delay.hpp"
-
 #include "common/registers.hpp"
 #include "rcc/rcc.hpp"
 
@@ -7,34 +6,30 @@ namespace timer {
 
 volatile uint32_t tick_count = 0;
 
-void initSysTick()		// 1 ms interrupt
-{
-	reg::write(SysTick->LOAD, (rcc::SYSCLK_MHz * 1000UL) - 1UL);
-	reg::write(SysTick->VAL, 0UL);
+void initSysTick() {
+    SysTick->LOAD = (rcc::SYSCLK_MHz * 1000UL) - 1UL;
+    SysTick->VAL  = 0UL;
 
-	reg::reset(SysTick->CTRL);
-	reg::setBit(SysTick->CTRL, 2);
-	reg::setBit(SysTick->CTRL, 1);
-	reg::setBit(SysTick->CTRL, 0);
+    // Explicit register bit definition configurations
+    SysTick->CTRL = SysTick_CTRL_CLKSOURCE_Msk |
+                    SysTick_CTRL_TICKINT_Msk   |
+                    SysTick_CTRL_ENABLE_Msk;
 }
 
 std::uint32_t getTickCount(void) {
-	return tick_count;
+    return tick_count;
 }
 
 void delay_ms(std::uint32_t ms) {
-	const std::uint32_t last_tick = getTickCount();
-
-	while ((getTickCount() - last_tick) < ms)
-		;
+    const std::uint32_t last_tick = getTickCount();
+    // Safe overflow calculations subtraction method
+    while ((getTickCount() - last_tick) < ms);
 }
 
 } // namespace timer
 
 extern "C" {
-
 void SysTick_Handler(void) {
-	timer::tick_count++;
+    timer::tick_count++;
 }
-
-} // extern "C"
+}

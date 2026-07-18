@@ -32,4 +32,4 @@ extern "C" {
 void SysTick_Handler(void) {
     timer::tick_count++;
 }
-}
+} // extern "C"

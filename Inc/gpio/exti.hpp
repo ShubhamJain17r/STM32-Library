@@ -24,7 +24,7 @@ public:
 		register_instances();
 	}
 
-	void setCallback(InterruptEdge, Callback);
+	void setCallback(Edge, callback::Callback);
 
 	void handleISR();
 

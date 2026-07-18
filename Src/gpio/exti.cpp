@@ -49,20 +49,20 @@ void ExternalInterrupt::init() {
 void ExternalInterrupt::enableNVIC() const {
     IRQn_Type irq;
 
-    if      (Pin::pinNumber_ == 0) irq = EXTI0_IRQn;
-    else if (Pin::pinNumber_ == 1) irq = EXTI1_IRQn;
-    else if (Pin::pinNumber_ == 2) irq = EXTI2_IRQn;
-    else if (Pin::pinNumber_ == 3) irq = EXTI3_IRQn;
-    else if (Pin::pinNumber_ == 4) irq = EXTI4_IRQn;
-    else if (Pin::pinNumber_ >= 5 && Pin::pinNumber_ <= 9)   irq = EXTI9_5_IRQn;
-    else if (Pin::pinNumber_ >= 10 && Pin::pinNumber_ <= 15) irq = EXTI15_10_IRQn;
+    if      (pinNumber_ == 0) irq = EXTI0_IRQn;
+    else if (pinNumber_ == 1) irq = EXTI1_IRQn;
+    else if (pinNumber_ == 2) irq = EXTI2_IRQn;
+    else if (pinNumber_ == 3) irq = EXTI3_IRQn;
+    else if (pinNumber_ == 4) irq = EXTI4_IRQn;
+    else if (pinNumber_ >= 5 && pinNumber_ <= 9)   irq = EXTI9_5_IRQn;
+    else if (pinNumber_ >= 10 && pinNumber_ <= 15) irq = EXTI15_10_IRQn;
     else return;
 
     NVIC_EnableIRQ(irq);
 }
 
-void ExternalInterrupt::register_instance() {
-    active_instances[Pin::pinNumber_] = this;
+constexpr void ExternalInterrupt::register_instance() {
+    active_instances[pinNumber_] = this;
 }
 
 } // namespace exti

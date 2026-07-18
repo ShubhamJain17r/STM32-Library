@@ -30,7 +30,7 @@ public:
 
 private:
     void enableNVIC() const;
-    void register_instance();
+    constexpr void register_instance();
 
     std::uint8_t pinNumber_;
     GPIO_TypeDef* port_;

@@ -80,6 +80,9 @@ public:
 
 	inline void set() const;
 	inline void reset() const;
+
+	constexpr std::uint8_t getPinNumber() const;
+	constexpr GPIO_TypeDef* getPort() const;
 };
 
 inline std::uint32_t GPIO_syscfg_map(const GPIO_TypeDef* port) noexcept;

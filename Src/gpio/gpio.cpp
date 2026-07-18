@@ -24,11 +24,13 @@ void Pin::setAlternateFunction(AlternateFunction AFType) const {
 }
 
 void Pin::configureInput(Pull pull) const {
+	enableClock_GPIO(port_);
     setMode(Mode::INPUT);
     setPull(pull);
 }
 
 void Pin::configureOutput(OutputType outputType, OutputSpeed outputSpeed, Pull pull) const {
+	enableClock_GPIO(port_);
     setMode(Mode::OUTPUT);
     setOutputType(outputType);
     setOutputSpeed(outputSpeed);
@@ -36,6 +38,7 @@ void Pin::configureOutput(OutputType outputType, OutputSpeed outputSpeed, Pull p
 }
 
 void Pin::configureAlternate(AlternateFunction AFType, OutputType outputType, OutputSpeed outputSpeed, Pull pull) const {
+	enableClock_GPIO(port_);
     setMode(Mode::ALTERNATE);
     setOutputType(outputType);
     setOutputSpeed(outputSpeed);
@@ -44,6 +47,7 @@ void Pin::configureAlternate(AlternateFunction AFType, OutputType outputType, Ou
 }
 
 void Pin::configureAnalog() const {
+	enableClock_GPIO(port_);
     setMode(Mode::ANALOG);
 }
 
@@ -75,6 +79,14 @@ inline void Pin::set() const {
 
 inline void Pin::reset() const {
     port_->BSRR = reg::singleBitMask(pinNumber_ + 16);
+}
+
+constexpr std::uint8_t Pin::getPinNumber() const {
+	return pinNumber_;
+}
+
+constexpr GPIO_TypeDef* Pin::getPort() const {
+	return port_;
 }
 
 inline std::uint32_t GPIO_syscfg_map(const GPIO_TypeDef* port) noexcept {

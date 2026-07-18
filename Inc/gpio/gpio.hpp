@@ -45,10 +45,11 @@ enum class AlternateFunction : std::uint8_t {
 };
 
 class Pin {
-private:
+protected:
 	std::uint8_t pinNumber_;
 	GPIO_TypeDef *const port_;
 
+private:
 	void setMode(Mode) const;
 	void setOutputType(OutputType) const;
 	void setOutputSpeed(OutputSpeed) const;
@@ -57,8 +58,7 @@ private:
 
 public:
 	constexpr Pin(std::uint8_t pinNumber, GPIO_TypeDef *port) :
-			pinNumber_(pinNumber), port_(port) {
-	}
+			pinNumber_(pinNumber), port_(port) {}
 
 	void configureInput(Pull pull = Pull::NONE) const;
 

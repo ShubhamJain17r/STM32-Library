@@ -24,7 +24,14 @@ std::uint32_t getTickCount(void)
 	return tick_count;
 }
 
+void delay_ms(std::uint32_t ms)
+{
+	const std::uint32_t last_tick = getTickCount();
+
+	while ((getTickCount() - last_tick) < ms);
 }
+
+} // namespace timer
 
 extern "C"
 {
@@ -34,4 +41,4 @@ void SysTick_Handler(void)
 	timer::tick_count++;
 }
 
-}
+} // extern "C"

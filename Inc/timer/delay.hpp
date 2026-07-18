@@ -8,9 +8,9 @@ namespace timer
 
 extern volatile uint32_t tick_count;
 
-uint32_t getTickCount();
-
 void initSysTick();
+
+uint32_t getTickCount();
 
 void delay_ms(std::uint32_t);
 

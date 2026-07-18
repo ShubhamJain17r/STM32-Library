@@ -2,43 +2,14 @@
 
 #include "common/registers.hpp"
 
-namespace rcc
-{
+namespace rcc {
 
-void enableClock_GPIO(GPIO_TypeDef* port)
-{
-	if(port == GPIOA)
-	{
-		reg::setBit(RCC->AHB1ENR, 0);
-	}
-	else if(port == GPIOB)
-	{
-		reg::setBit(RCC->AHB1ENR, 1);
-	}
-	else if(port == GPIOC)
-	{
-		reg::setBit(RCC->AHB1ENR, 2);
-	}
-	else if(port == GPIOD)
-	{
-		reg::setBit(RCC->AHB1ENR, 3);
-	}
-	else if(port == GPIOE)
-	{
-		reg::setBit(RCC->AHB1ENR, 4);
-	}
-	else if(port == GPIOF)
-	{
-		reg::setBit(RCC->AHB1ENR, 5);
-	}
-	else if(port == GPIOG)
-	{
-		reg::setBit(RCC->AHB1ENR, 6);
-	}
-	else if(port == GPIOH)
-	{
-		reg::setBit(RCC->AHB1ENR, 7);
+void enableClock_GPIO(GPIO_TypeDef *port) {
+	// Calculate difference between target port and base GPIOA address
+	std::uint32_t port_index = (reinterpret_cast<std::uint32_t>(port)
+			- GPIOA_BASE) / 0x400;
+	if (port_index <= 7) { // Validate range (GPIOA to GPIOH)
+		reg::setBit(RCC->AHB1ENR, port_index);
 	}
 }
-
 }

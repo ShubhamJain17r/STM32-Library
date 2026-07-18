@@ -3,8 +3,7 @@
 #include "stm32f446xx.h"
 #include <cstdint>
 
-namespace timer
-{
+namespace timer {
 
 extern volatile uint32_t tick_count;
 

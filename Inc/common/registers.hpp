@@ -83,58 +83,16 @@ inline void resetBits(volatile std::uint32_t &reg, std::uint8_t width,
 
 inline std::uint32_t readBits(const volatile std::uint32_t &reg,
 		std::uint8_t width, std::uint8_t shift) noexcept {
-	return (reg & bitMask(width, shift) >> shift);
+	return (reg & bitMask(width, shift)) >> shift;
 }
 
 // ------------------------- bit field operations --------------------------
 
-template<typename T>
-inline void setNBitFieldValue(volatile std::uint32_t &reg,
-		std::uint8_t startBit, std::uint8_t width, T value) noexcept {
-	resetBits(reg, width, startBit);
-	setShiftedValue(reg, static_cast<std::uint32_t>(value), startBit);
-}
-
-template<typename T>
-inline void setBitValue(volatile std::uint32_t &reg, std::uint8_t startBit,
+template<std::uint8_t Width, typename T>
+inline void setBitField(volatile std::uint32_t &reg, std::uint8_t shift,
 		T value) noexcept {
-	setNBitFieldValue(reg, startBit, 1, value);
-}
-
-template<typename T>
-inline void setTwoBitFieldValue(volatile std::uint32_t &reg,
-		std::uint8_t startBit, T value) noexcept {
-	setNBitFieldValue(reg, startBit, 2, value);
-}
-
-template<typename T>
-inline void setThreeBitFieldValue(volatile std::uint32_t &reg,
-		std::uint8_t startBit, T value) noexcept {
-	setNBitFieldValue(reg, startBit, 3, value);
-}
-
-template<typename T>
-inline void setFourBitFieldValue(volatile std::uint32_t &reg,
-		std::uint8_t startBit, T value) noexcept {
-	setNBitFieldValue(reg, startBit, 4, value);
-}
-
-template<typename T>
-inline void setFiveBitFieldValue(volatile std::uint32_t &reg,
-		std::uint8_t startBit, T value) noexcept {
-	setNBitFieldValue(reg, startBit, 5, value);
-}
-
-template<typename T>
-inline void setSixBitFieldValue(volatile std::uint32_t &reg,
-		std::uint8_t startBit, T value) noexcept {
-	setNBitFieldValue(reg, startBit, 6, value);
-}
-
-template<typename T>
-inline void setSevenBitFieldValue(volatile std::uint32_t &reg,
-		std::uint8_t startBit, T value) noexcept {
-	setNBitFieldValue(reg, startBit, 7, value);
+	resetBits(reg, Width, shift);
+	setShiftedValue(reg, static_cast<std::uint32_t>(value), shift);
 }
 
 } // reg namespace

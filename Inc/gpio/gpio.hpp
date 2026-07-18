@@ -47,7 +47,7 @@ enum class AlternateFunction : std::uint8_t {
 class Pin {
 private:
 	std::uint8_t pinNumber_;
-	GPIO_TypeDef* const port_;
+	GPIO_TypeDef *const port_;
 
 	void setMode(Mode) const;
 	void setOutputType(OutputType) const;

@@ -4,7 +4,7 @@
 namespace gpio {
 
 void Pin::setMode(Mode mode) const {
-	reg::setTwoBitFieldValue(port_->MODER, pinNumber_ * 2, mode);
+	reg::setBitField<2>(port_->MODER, pinNumber_ * 2, mode);
 }
 
 void Pin::setOutputType(OutputType outputType) const {
@@ -12,15 +12,15 @@ void Pin::setOutputType(OutputType outputType) const {
 }
 
 void Pin::setOutputSpeed(OutputSpeed outputSpeed) const {
-	reg::setTwoBitFieldValue(port_->OSPEEDR, pinNumber_ * 2, outputSpeed);
+	reg::setBitField<2>(port_->OSPEEDR, pinNumber_ * 2, outputSpeed);
 }
 
 void Pin::setPull(Pull pull) const {
-	reg::setTwoBitFieldValue(port_->PUPDR, pinNumber_ * 2, pull);
+	reg::setBitField<2>(port_->PUPDR, pinNumber_ * 2, pull);
 }
 
 void Pin::setAlternateFunction(AlternateFunction AFType) const {
-	reg::setFourBitFieldValue(port_->AFR[pinNumber_ / 8], (pinNumber_ % 8) * 4,
+	reg::setBitField<4>(port_->AFR[pinNumber_ / 8], (pinNumber_ % 8) * 4,
 			AFType);
 }
 

@@ -1,15 +1,15 @@
-/*
- * rcc.hpp
- *
- *  Created on: 17-Jul-2026
- *      Author: shubh
- */
+#pragma once
 
-#ifndef RCC_RCC_HPP_
-#define RCC_RCC_HPP_
+#include "stm32f446xx.h"
+#include <cstdint>
 
+namespace rcc
+{
 
+// temporarily using sysclk variable as 16MHz. Later using function to determine sysclk and bus clocks
+const std::uint32_t SYSCLK = 16000000;
+const std::uint32_t SYSCLK_MHz = 16;
 
+void enableClock_GPIO(GPIO_TypeDef*);
 
-
-#endif /* RCC_RCC_HPP_ */
+}

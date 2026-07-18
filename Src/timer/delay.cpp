@@ -1,4 +1,4 @@
-#include "timer/delay.cpp"
+#include "timer/delay.hpp"
 
 #include "common/registers.hpp"
 #include "rcc/rcc.hpp"

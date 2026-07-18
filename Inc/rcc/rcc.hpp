@@ -11,4 +11,6 @@ const std::uint8_t SYSCLK_MHz = 16;
 
 void enableClock_GPIO(GPIO_TypeDef*);
 
+void enableClock_SYSCFG();
+
 }

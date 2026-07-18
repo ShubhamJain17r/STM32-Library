@@ -3,46 +3,44 @@
 #include "stm32f446xx.h"
 #include <cstdint>
 #include <array>
-
 #include "common/callback.hpp"
 #include "gpio/gpio.hpp"
 
 namespace exti {
 
-enum class Edge {
-	RISING,
-	FALLING,
-	BOTH
+enum class Edge : std::uint8_t {
+    RISING,
+    FALLING,
+    BOTH
 };
 
-class ExternalInterrupt : private gpio::Pin {
+class ExternalInterrupt {
+public:
+    // Accept a configuration pin handle directly
+    constexpr ExternalInterrupt(const gpio::Pin& pin, Edge edge)
+        : pinNumber_(pin.getPinNumber()), port_(pin.getPort()), edge_(edge) {
+        register_instance();
+    }
+
+    void init();
+
+    // Explicit API to bind functions to explicit edges
+    void setCallback(Edge triggerEdge, callback::Callback func);
+    void handleISR() const;
+
 private:
-	Edge edge_;
+    void enableNVIC() const;
+    void register_instance();
+
+    std::uint8_t pinNumber_;
+    GPIO_TypeDef* port_;
+    Edge edge_;
+
+    // Explicit allocations for distinct edge triggers
+    std::array<callback::Callback, 2> callbacks_{};
 
 public:
-	constexpr ExternalInterrupt(std::uint8_t pinNumber, GPIO_TypeDef *port, Edge edge) :
-				pinNumber_(pinNumber), port_(port), edge_(edge) {
-		register_instances();
-		init();
-	}
-
-	void setCallback(callback::Callback);
-
-	void handleISR();
-
-private:
-	void init();
-
-    void enableNVIC();
-
-    void register_instances();
-
-    std::array<callback::Callback, 3> callbacks_{}; // RISING, FALLING, BOTH
-
-public:
-    // Static Dispatcher System
-    static std::array<ExternalInterrupt*, 16> active_instances; // For gpio pin 0-15
-
+    static std::array<ExternalInterrupt*, 16> active_instances;
 };
 
-}
+} // namespace exti

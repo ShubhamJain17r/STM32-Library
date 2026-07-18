@@ -16,7 +16,7 @@ void initSysTick() {
                     SysTick_CTRL_ENABLE_Msk;
 }
 
-std::uint32_t getTickCount(void) {
+inline std::uint32_t getTickCount(void) {
     return tick_count;
 }
 

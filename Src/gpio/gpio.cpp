@@ -47,38 +47,42 @@ void Pin::configureAnalog() const {
     setMode(Mode::ANALOG);
 }
 
-bool Pin::isHigh() const {
+inline bool Pin::isHigh() const {
     return reg::readBit(port_->IDR, pinNumber_);
 }
 
-bool Pin::isLow() const {
+inline bool Pin::isLow() const {
     return !isHigh();
 }
 
-void Pin::toggle() const {
+inline void Pin::toggle() const {
     // Atomic bitwise toggle operation calculation using BSRR register mechanics
     std::uint32_t odr = port_->ODR;
     port_->BSRR = ((odr & reg::singleBitMask(pinNumber_)) << 16) | (~odr & reg::singleBitMask(pinNumber_));
 }
 
-void Pin::write(PinState state) const {
+inline void Pin::write(PinState state) const {
     if (state == PinState::HIGH) set(); else reset();
 }
 
-PinState Pin::read() const {
+inline PinState Pin::read() const {
     return static_cast<PinState>(reg::readBit(port_->IDR, pinNumber_));
 }
 
-void Pin::set() const {
+inline void Pin::set() const {
     port_->BSRR = reg::singleBitMask(pinNumber_);
 }
 
-void Pin::reset() const {
+inline void Pin::reset() const {
     port_->BSRR = reg::singleBitMask(pinNumber_ + 16);
 }
 
-std::uint32_t GPIO_syscfg_map(GPIO_TypeDef* port) {
-	return (reinterpret_cast<std::uint32_t>(port) - GPIOA_BASE) / 0x400;
+inline std::uint32_t GPIO_syscfg_map(const GPIO_TypeDef* port) noexcept {
+    if (port < GPIOA || port > GPIOH) {
+        return 0;
+    }
+
+    return (reinterpret_cast<std::uintptr_t>(port) - GPIOA_BASE) / 0x400;
 }
 
 

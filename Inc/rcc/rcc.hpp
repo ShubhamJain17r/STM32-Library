@@ -9,8 +9,8 @@ namespace rcc {
 const std::uint32_t SYSCLK = 16000000;
 const std::uint8_t SYSCLK_MHz = 16;
 
-void enableClock_GPIO(GPIO_TypeDef*);
+inline void enableClock_GPIO(GPIO_TypeDef*);
 
-void enableClock_SYSCFG();
+inline void enableClock_SYSCFG();
 
 }

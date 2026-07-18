@@ -9,7 +9,7 @@ extern volatile uint32_t tick_count;
 
 void initSysTick();
 
-uint32_t getTickCount();
+inline uint32_t getTickCount();
 
 void delay_ms(std::uint32_t);
 

@@ -45,11 +45,10 @@ enum class AlternateFunction : std::uint8_t {
 };
 
 class Pin {
-protected:
+private:
 	std::uint8_t pinNumber_;
 	GPIO_TypeDef *const port_;
 
-private:
 	void setMode(Mode) const;
 	void setOutputType(OutputType) const;
 	void setOutputSpeed(OutputSpeed) const;
@@ -72,17 +71,17 @@ public:
 
 	void configureAnalog() const;
 
-	bool isHigh() const;
-	bool isLow() const;
+	inline bool isHigh() const;
+	inline bool isLow() const;
 
-	void toggle() const;
-	void write(PinState) const;
-	PinState read() const;
+	inline void toggle() const;
+	inline void write(PinState) const;
+	inline PinState read() const;
 
-	void set() const;
-	void reset() const;
+	inline void set() const;
+	inline void reset() const;
 };
 
-std::uint8_t GPIO_syscfg_map(GPIO_TypeDef* port);
+inline std::uint32_t GPIO_syscfg_map(const GPIO_TypeDef* port) noexcept;
 
 }	// gpio namespace

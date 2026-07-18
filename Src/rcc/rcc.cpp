@@ -11,4 +11,10 @@ void enableClock_GPIO(GPIO_TypeDef *port) {
 		reg::setBit(RCC->AHB1ENR, port_index);
 	}
 }
+
+void enableClock_SYSCFG()
+{
+	reg::setBit(RCC->APB2ENR, 14);
 }
+
+} // namespace rcc

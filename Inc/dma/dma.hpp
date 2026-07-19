@@ -1,4 +1,6 @@
 #pragma once
+
+#include "stm32f446xx.h"
 #include <cstdint>
 
 namespace dma {
@@ -54,5 +56,7 @@ enum class TransferDirection : std::uint8_t {
     MEMORY_TO_PERIPHERAL,
     MEMORY_TO_MEMORY
 };
+
+
 
 } // namespace dma

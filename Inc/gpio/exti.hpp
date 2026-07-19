@@ -16,10 +16,21 @@ enum class Edge : std::uint8_t {
 
 class ExternalInterrupt {
 public:
-	ExternalInterrupt(const gpio::Pin& pin, Edge edge)
-	    : pinNumber_(pin.getPinNumber()), port_(pin.getPort()), edge_(edge) {
-	    registerInstance();
-	}
+    ExternalInterrupt() = delete;
+
+    ExternalInterrupt(const gpio::Pin& pin, Edge edge)
+    	    : pinNumber_(pin.getPinNumber()), port_(pin.getPort()), edge_(edge) {
+    	    registerInstance();
+    	}
+
+    ExternalInterrupt(const ExternalInterrupt&) = delete;
+    ExternalInterrupt& operator=(const ExternalInterrupt&) = delete;
+
+    ExternalInterrupt(ExternalInterrupt&&) noexcept = default;
+    ExternalInterrupt& operator=(ExternalInterrupt&&) noexcept = default;
+
+public:
+
 
     void init();
     void setCallback(Edge triggerEdge, callback::Callback func);

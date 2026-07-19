@@ -3,75 +3,59 @@
 #include "stm32f446xx.h"
 #include <cstdint>
 
+#include "dma/dma_types.hpp"
+
 namespace dma {
 
-enum class StatusFlag
+class DmaStream
 {
-	TRANSFER_COMPLETE,
-	HALF_TRANSFER_COMPLETE,
-	TRANSFER_ERROR,
-	DIRECT_MODE_ERROR,
-	FIFO_MODE_ERROR
-};
+private:
+	DMA_TypeDef* dmaBase_;
+	DMA_Stream_TypeDef* stream_;
 
-enum class Channel : std::uint8_t {
-    CH0 = 0, CH1, CH2, CH3, CH4, CH5, CH6, CH7
-};
+public:
+	DmaStream() = delete;
 
-enum class BurstType : std::uint8_t {
-    SINGLE = 0, INCR4, INCR8, INCR16
-};
+	DmaStream(DMA_TypeDef* dmaBase, DMA_Stream_TypeDef* stream) : dmaBase_(dmaBase), stream_(stream) {}
 
-enum class CurrentTarget
-{
-	MEMORY0, MEMORY1
-};
+	~DmaStream() = default;
 
-enum class Priority : std::uint8_t {
-    LOW = 0, MEDIUM, HIGH, VERY_HIGH
-};
+	DmaStream(const DmaStream&) = delete;
+	DmaStream& operator=(const DmaStream&) = delete;
 
-enum class DataSize : std::uint8_t {
-    BYTE = 0, HALF_WORD, WORD
-};
+	DmaStream(DmaStream&&) noexcept = default;
+	DmaStream& operator=(DmaStream&&) noexcept = default;
 
-enum class FifoStatus : std::uint8_t {
-    LESS_THAN_QUARTER     = 0b000, // 0 < fifo_level < 1/4
-    QUARTER_TO_HALF       = 0b001, // 1/4 <= fifo_level < 1/2
-    HALF_TO_THREE_QUARTER = 0b010, // 1/2 <= fifo_level < 3/4
-    THREE_QUARTER_TO_FULL = 0b011, // 3/4 <= fifo_level < full
-    EMPTY                 = 0b100, // FIFO is empty
-    FULL                  = 0b101  // FIFO is full
-};
+private:
 
-enum class FifoThreshold : std::uint8_t {
-    QUARTER = 0,
-    HALF,
-    THREE_QUARTERS,
-    FULL
-};
+	void disableStream();
+	void clearFlags();
 
-enum class TransferDirection : std::uint8_t {
-    PERIPHERAL_TO_MEMORY,
-    MEMORY_TO_PERIPHERAL,
-    MEMORY_TO_MEMORY
-};
+	void configurePeripheralAddress(const volatile std::uint32_t& periphAddr);
+	void configureMemoryAddress(const std::uint32_t& memoryAddr);
+	void configureNDTR(std::uint16_t N);
 
-/**
- * @brief Aggregate configuration structure for a DMA Stream initialization.
- * Passed by const reference to achieve zero-copy stack footprint.
- */
-struct StreamConfig {
-    Channel channel;
-    TransferDirection direction;
-    Priority priority;
-    DataSize periphDataSize;
-    DataSize memDataSize;
-    bool periphIncrement;
-    bool memIncrement;
-    bool circularMode;
-    FifoThreshold fifoThreshold; // Added from your FIFO settings
-    bool useFifo;
+	void configureChannel(Channel);
+
+	void configureFlowController(FlowController);
+
+	void setPriority(Priority);
+
+	void configureDirectMode();
+	void configureCircularMode();
+	void configureDoubleBufferMode();
+
+	void configureDirection(TransferDirection);
+
+	void configureDataSize(DataSize);
+
+	void configurePeripheralIncrement(bool);
+	void configureMemoryIncrement(bool);
+
+	void enableStream();
+
+public:
+	void init(const StreamConfig&);
 };
 
 } // namespace dma

@@ -3,7 +3,7 @@
 
 namespace rcc {
 
-void enableClock_GPIO(const GPIO_TypeDef *port) {
+void enableGpioClock(const GPIO_TypeDef *port) {
     if (port < GPIOA || port > GPIOH) {
         return;
     }

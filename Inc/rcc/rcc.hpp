@@ -9,9 +9,9 @@ namespace rcc {
 constexpr std::uint32_t SYSCLK = 16000000;
 constexpr std::uint8_t SYSCLK_MHz = 16;
 
-void enableClock_GPIO(const GPIO_TypeDef* port);
+void enableGpioClock(const GPIO_TypeDef* port);
 
-inline void enableClock_SYSCFG() {
+inline void enableSyscfgClock() {
     reg::setBit(RCC->APB2ENR, 14);
 }
 

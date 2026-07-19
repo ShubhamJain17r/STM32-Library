@@ -56,4 +56,12 @@ inline void setBitField(volatile std::uint32_t &reg, std::uint8_t shift, T value
     reg = (reg & ~bitMask(Width, shift)) | ((static_cast<std::uint32_t>(value) & bitMask(Width)) << shift);
 }
 
+inline void waitUntilSet(volatile std::uint32_t &reg, std::uint8_t bit) noexcept {
+    while(!readBit(reg, bit));
+}
+
+inline void waitUntilReset(volatile std::uint32_t &reg, std::uint8_t bit) noexcept {
+    while(readBit(reg, bit));
+}
+
 } // namespace reg

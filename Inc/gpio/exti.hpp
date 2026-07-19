@@ -18,7 +18,7 @@ class ExternalInterrupt {
 public:
 	ExternalInterrupt(const gpio::Pin& pin, Edge edge)
 	    : pinNumber_(pin.getPinNumber()), port_(pin.getPort()), edge_(edge) {
-	    register_instance();
+	    registerInstance();
 	}
 
     void init();
@@ -27,7 +27,7 @@ public:
 
 private:
     void enableNVIC() const;
-    void register_instance();
+    void registerInstance();
 
     std::uint8_t pinNumber_;
     GPIO_TypeDef* port_;

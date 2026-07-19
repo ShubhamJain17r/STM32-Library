@@ -33,7 +33,7 @@ void ExternalInterrupt::handleISR() const {
 void ExternalInterrupt::init() {
     rcc::enableClock_SYSCFG();
 
-    reg::setBitField<4>(SYSCFG->EXTICR[pinNumber_ / 4], (pinNumber_ % 4) * 4, gpio::GPIO_syscfg_map(port_));
+    reg::setBitField<4>(SYSCFG->EXTICR[pinNumber_ / 4], (pinNumber_ % 4) * 4, gpio::mapSyscfgGpio(port_));
     reg::setBit(EXTI->IMR, pinNumber_);
 
     if (edge_ == Edge::RISING || edge_ == Edge::BOTH) {
@@ -61,7 +61,7 @@ void ExternalInterrupt::enableNVIC() const {
     NVIC_EnableIRQ(irq);
 }
 
-void ExternalInterrupt::register_instance() {
+void ExternalInterrupt::registerInstance() {
     active_instances[pinNumber_] = this;
 }
 

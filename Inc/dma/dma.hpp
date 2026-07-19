@@ -57,6 +57,21 @@ enum class TransferDirection : std::uint8_t {
     MEMORY_TO_MEMORY
 };
 
-
+/**
+ * @brief Aggregate configuration structure for a DMA Stream initialization.
+ * Passed by const reference to achieve zero-copy stack footprint.
+ */
+struct StreamConfig {
+    Channel channel;
+    TransferDirection direction;
+    Priority priority;
+    DataSize periphDataSize;
+    DataSize memDataSize;
+    bool periphIncrement;
+    bool memIncrement;
+    bool circularMode;
+    FifoThreshold fifoThreshold; // Added from your FIFO settings
+    bool useFifo;
+};
 
 } // namespace dma

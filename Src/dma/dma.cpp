@@ -16,7 +16,7 @@ void DmaStream::clearAllFlags() noexcept
     switch (stream_idx & 0x03U) {
         case 0: bit_shift = 0;  break; // Stream 0 or 4
         case 1: bit_shift = 6;  break; // Stream 1 or 5
-        case 2: bit_shift = 16; break; // Stream 2 or 6 (Account for the 4-bit hardware gap)
+        case 2: bit_shift = 16; break; // Stream 2 or 6
         case 3: bit_shift = 22; break; // Stream 3 or 7
         default: return;
     }

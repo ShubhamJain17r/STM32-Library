@@ -30,8 +30,6 @@ public:
     ExternalInterrupt& operator=(ExternalInterrupt&&) noexcept = default;
 
 public:
-
-
     void init();
     void setCallback(Edge triggerEdge, callback::Callback func);
     void handleISR() const;

@@ -17,7 +17,7 @@ void ExternalInterrupt::setCallback(Edge triggerEdge, callback::Callback func) {
 
 void ExternalInterrupt::handleISR() const {
     if (reg::readBit(EXTI->PR, pinNumber_)) {
-        // Write 1 to clear pending flag
+
         EXTI->PR = reg::singleBitMask(pinNumber_);
 
         bool pin_is_low = !reg::readBit(port_->IDR, pinNumber_);

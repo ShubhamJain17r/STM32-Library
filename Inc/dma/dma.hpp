@@ -46,7 +46,7 @@ public:
     static std::array<std::array<DmaStream*, 8>, 2> active_instances;
 
 private:
-    void clearAllFlags() noexcept;
+    void clearAllFlags() const noexcept;
     void enableNVIC() const;
     void registerInstance();
 

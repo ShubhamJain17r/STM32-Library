@@ -75,7 +75,7 @@ bool DmaStream::getDirectModeErrorStatus() const noexcept {
     return reg::readBit(reg_val, getFlagShift(idx) + 2);
 }
 
-void DmaStream::clearAllFlags() noexcept {
+void DmaStream::clearAllFlags() const noexcept {
     std::uint8_t streamIdx = getStreamId(dmaBase_, stream_);
     constexpr std::uint32_t ALL_FLAGS_MASK = 0x3DU;
     const std::uint32_t clear_value = ALL_FLAGS_MASK << getFlagShift(streamIdx);

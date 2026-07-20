@@ -5,7 +5,6 @@ namespace dma {
 
 enum class Event
 {
-	CONFIG_ERROR,
 	TRANSFER_COMPLETE,
 	HALF_TRANSFER_COMPLETE,
 	TRANSFER_ERROR,

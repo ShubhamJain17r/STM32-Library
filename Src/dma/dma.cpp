@@ -82,6 +82,10 @@ void DmaStream::init(const StreamConfig& config)
 {
 	rcc::enableDmaClock(dmaBase_);
 
+	disableStream();
+
+	clearAllFlags();
+
 	configureChannel(config.channel);
 	configureFlowController(config.flowController);
 	configurePriority(config.priority);
@@ -135,6 +139,11 @@ void DmaStream::enableNVIC() const
 void DmaStream::registerInstance()
 {
 	active_instances[getDmaId(dmaBase_)][getStreamId(dmaBase_, stream_)] = this;
+}
+
+void DmaStream::handleISR() const
+{
+
 }
 
 } // namespace dma

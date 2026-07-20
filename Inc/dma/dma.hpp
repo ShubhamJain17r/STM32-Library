@@ -10,127 +10,65 @@
 
 namespace dma {
 
-class DmaStream
-{
+class DmaStream {
 private:
-	DMA_TypeDef* dmaBase_;
-	DMA_Stream_TypeDef* stream_;
-	OperationalMode activeMode_;
-
-	std::array<callback::Callback, 5> callbacks_{};
+    DMA_TypeDef* dmaBase_;
+    DMA_Stream_TypeDef* stream_;
+    OperationalMode activeMode_;
+    std::array<callback::Callback, 5> callbacks_{};
 
 public:
-	DmaStream() = delete;
+    DmaStream() = delete;
+    DmaStream(DMA_TypeDef* dmaBase, DMA_Stream_TypeDef* stream, OperationalMode activeMode = OperationalMode::NORMAL)
+        : dmaBase_(dmaBase), stream_(stream), activeMode_(activeMode) {
+        registerInstance();
+    }
 
-	DmaStream(DMA_TypeDef* dmaBase, DMA_Stream_TypeDef* stream, OperationalMode activeMode = OperationalMode::NORMAL) : dmaBase_(dmaBase), stream_(stream), activeMode_(activeMode) {
-		registerInstance();
-	}
+    ~DmaStream() = default;
 
-	~DmaStream() = default;
+    DmaStream(const DmaStream&) = delete;
+    DmaStream& operator=(const DmaStream&) = delete;
+    DmaStream(DmaStream&&) noexcept = default;
+    DmaStream& operator=(DmaStream&&) noexcept = default;
 
-	DmaStream(const DmaStream&) = delete;
-	DmaStream& operator=(const DmaStream&) = delete;
+    void init(const StreamConfig&) const;
+    void setupTransaction(std::uint32_t periphAddr, std::uint32_t mem0Addr, std::uint16_t dataLength, std::uint32_t mem1Addr = 0) noexcept;
 
-	DmaStream(DmaStream&&) noexcept = default;
-	DmaStream& operator=(DmaStream&&) noexcept = default;
+    inline void enableStream() const { reg::setBit(stream_->CR, DMA_SxCR_EN_Pos); }
+    inline void disableStream() const {
+        reg::resetBit(stream_->CR, DMA_SxCR_EN_Pos);
+        reg::waitUntilReset(stream_->CR, DMA_SxCR_EN_Pos);
+    }
+
+    void setCallback(Event event, callback::Callback func);
+    void handleISR() const;
+
+    static std::array<std::array<DmaStream*, 8>, 2> active_instances;
 
 private:
-	void clearAllFlags() noexcept;
-
+    void clearAllFlags() noexcept;
     void enableNVIC() const;
-
     void registerInstance();
 
-	inline void configureChannel(Channel ch) const
-	{
-		reg::setBitField<3>(stream_->CR, DMA_SxCR_CHSEL_Pos, ch);
-	}
+    inline void configureChannel(Channel ch) const { reg::setBitField<3>(stream_->CR, DMA_SxCR_CHSEL_Pos, ch); }
+    inline void configureFlowController(FlowController fc) const { reg::setBitField<1>(stream_->CR, DMA_SxCR_PFCTRL_Pos, fc); }
+    inline void configurePriority(Priority pl) const { reg::setBitField<2>(stream_->CR, DMA_SxCR_PL_Pos, pl); }
+    inline void setDirectMode() const { reg::resetBit(stream_->FCR, DMA_SxFCR_DMDIS_Pos); }
+    inline void setCircularMode() const { reg::setBit(stream_->CR, DMA_SxCR_CIRC_Pos); }
+    inline void setDoubleBufferMode() const { reg::setBit(stream_->CR, DMA_SxCR_DBM_Pos); }
+    inline void configureDirection(TransferDirection dr) const { reg::setBitField<2>(stream_->CR, DMA_SxCR_DIR_Pos, dr); }
 
-	inline void configureFlowController(FlowController fc) const
-	{
-		reg::setBitField<1>(stream_->CR, DMA_SxCR_PFCTRL_Pos, fc);
-	}
+    inline void configureMemoryDataSize(DataSize sz) const { reg::setBitField<2>(stream_->CR, DMA_SxCR_MSIZE_Pos, sz); }
+    inline void configurePeripheralDataSize(DataSize sz) const { reg::setBitField<2>(stream_->CR, DMA_SxCR_PSIZE_Pos, sz); }
 
-	inline void configurePriority(Priority pl) const
-	{
-		reg::setBitField<2>(stream_->CR, DMA_SxCR_PL_Pos, pl);
-	}
+    inline void configurePeripheralIncrement(bool increment) const { reg::setBitField<1>(stream_->CR, DMA_SxCR_PINC_Pos, increment); }
+    inline void configureMemoryIncrement(bool increment) const { reg::setBitField<1>(stream_->CR, DMA_SxCR_MINC_Pos, increment); }
 
-	inline void setDirectMode() const
-	{
-		reg::resetBit(stream_->FCR, DMA_SxFCR_DMDIS_Pos);
-	}
-
-	inline void setCircularMode() const
-	{
-		reg::setBit(stream_->CR, DMA_SxCR_CIRC_Pos);
-	}
-
-	inline void setDoubleBufferMode() const
-	{
-		reg::setBit(stream_->CR, DMA_SxCR_DBM_Pos);
-	}
-
-	inline void configureDirection(TransferDirection dr) const
-	{
-		reg::setBitField<2>(stream_->CR, DMA_SxCR_DIR_Pos, dr);
-	}
-
-	inline void configureMemoryDataSize(DataSize sz) const
-	{
-		reg::setBitField<2>(stream_->CR, DMA_SxCR_MSIZE_Pos, sz);
-	}
-
-	inline void configurePeripheralDataSize(DataSize sz) const
-	{
-		reg::setBitField<2>(stream_->CR, DMA_SxCR_PSIZE_Pos, sz);
-	}
-
-	inline void configurePeripheralIncrement(bool increment) const
-	{
-		reg::setBitField<1>(stream_->CR, DMA_SxCR_PINC_Pos, increment);
-	}
-
-	inline void configureMemoryIncrement(bool increment) const
-	{
-		reg::setBitField<1>(stream_->CR, DMA_SxCR_MINC_Pos, increment);
-	}
-
-	bool getHalfTransferStatus() noexcept;
-
-	bool getTransferCompleteStatus() noexcept;
-
-	bool getTransferErrorStatus() noexcept;
-
-	bool getFifoErrorStatus() noexcept;
-
-	bool getDirectModeErrorStatus() noexcept;
-
-public:
-	void init(const StreamConfig&) const;
-
-	void setupTransaction(std::uint32_t periphAddr,
-	                       std::uint32_t mem0Addr,
-	                       std::uint16_t dataLength,
-	                       std::uint32_t mem1Addr = 0) noexcept;
-
-	inline void enableStream() const
-	{
-		reg::setBit(stream_->CR, DMA_SxCR_EN_Pos);
-	}
-
-	inline void disableStream() const
-	{
-		reg::resetBit(stream_->CR, DMA_SxCR_EN_Pos);
-
-		reg::waitUntilReset(stream_->CR, DMA_SxCR_EN_Pos);
-	}
-
-	void setCallback(Event event, callback::Callback func);
-
-	void handleISR() const;
-
-	static std::array<std::array<DmaStream*, 8>, 2> active_instances;
+    bool getHalfTransferStatus() const noexcept;
+    bool getTransferCompleteStatus() const noexcept;
+    bool getTransferErrorStatus() const noexcept;
+    bool getFifoErrorStatus() const noexcept;
+    bool getDirectModeErrorStatus() const noexcept;
 };
 
 } // namespace dma

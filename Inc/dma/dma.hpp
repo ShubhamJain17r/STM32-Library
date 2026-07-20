@@ -83,7 +83,7 @@ private:
 
 	inline void configurePeripheralDataSize(DataSize sz) const
 	{
-		reg::setBitField<2>(stream_->CR, DMA_SxCR_MSIZE_Pos, sz);
+		reg::setBitField<2>(stream_->CR, DMA_SxCR_PSIZE_Pos, sz);
 	}
 
 	inline void configurePeripheralIncrement(bool increment) const
@@ -95,6 +95,16 @@ private:
 	{
 		reg::setBitField<1>(stream_->CR, DMA_SxCR_MINC_Pos, increment);
 	}
+
+	bool getHalfTransferStatus() noexcept;
+
+	bool getTransferCompleteStatus() noexcept;
+
+	bool getTransferErrorStatus() noexcept;
+
+	bool getFifoErrorStatus() noexcept;
+
+	bool getDirectModeErrorStatus() noexcept;
 
 public:
 	void init(const StreamConfig&) const;

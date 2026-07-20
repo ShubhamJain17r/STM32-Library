@@ -15,6 +15,18 @@ std::uint32_t getStreamId(DMA_TypeDef* dmaBase, DMA_Stream_TypeDef* stream)
 	return (reinterpret_cast<std::uint32_t>(stream) - reinterpret_cast<std::uint32_t>(dmaBase) - 0x10) / 0x18;
 }
 
+std::uint8_t getFlagShift(std::uint32_t streamIdx)
+{
+	switch (streamIdx & 0x03U) {
+		case 0: return 0;   // Stream 0 or 4
+		case 1: return 6;   // Stream 1 or 5
+		case 2: return 16;  // Stream 2 or 6
+		case 3: return 22;  // Stream 3 or 7
+		default: return 0;
+	}
+	return 0;
+}
+
 IRQn_Type getIrqNumber(DMA_TypeDef* dmaBase, DMA_Stream_TypeDef* stream) {
         // 1. Calculate DMA Controller ID: DMA1 -> 0, DMA2 -> 1
         std::uint32_t dmaId = getDmaId(dmaBase);
@@ -50,25 +62,57 @@ namespace dma
 
 std::array<std::array<DmaStream*, 8>, 2> DmaStream::active_instances = {nullptr};
 
+bool DmaStream::getHalfTransferStatus() noexcept
+{
+	std::uint8_t idx = getStreamId(dmaBase_, stream_);
+	std::uint32_t reg_val = (idx < 4) ? dmaBase_->LISR : dmaBase_->HISR;
+
+	return reg::readBit(reg_val, getFlagShift(idx) + 4);
+}
+
+bool DmaStream::getTransferCompleteStatus() noexcept
+{
+	std::uint8_t idx = getStreamId(dmaBase_, stream_);
+	std::uint32_t reg_val = (idx < 4) ? dmaBase_->LISR : dmaBase_->HISR;
+
+	return reg::readBit(reg_val, getFlagShift(idx) + 5);
+}
+
+bool DmaStream::getTransferErrorStatus() noexcept
+{
+	std::uint8_t idx = getStreamId(dmaBase_, stream_);
+	std::uint32_t reg_val = (idx < 4) ? dmaBase_->LISR : dmaBase_->HISR;
+
+	return reg::readBit(reg_val, getFlagShift(idx) + 3);
+}
+
+bool DmaStream::getFifoErrorStatus() noexcept
+{
+	std::uint8_t idx = getStreamId(dmaBase_, stream_);
+	std::uint32_t reg_val = (idx < 4) ? dmaBase_->LISR : dmaBase_->HISR;
+
+	return reg::readBit(reg_val, getFlagShift(idx));
+}
+
+bool DmaStream::getDirectModeErrorStatus() noexcept
+{
+	std::uint8_t idx = getStreamId(dmaBase_, stream_);
+	std::uint32_t reg_val = (idx < 4) ? dmaBase_->LISR : dmaBase_->HISR;
+
+	return reg::readBit(reg_val, getFlagShift(idx) + 2);
+}
+
 void DmaStream::clearAllFlags() noexcept
 {
-	DMA_Stream_TypeDef* stream0_base = reinterpret_cast<DMA_Stream_TypeDef*>(reinterpret_cast<std::uintptr_t>(dmaBase_) + 0x010U);
-    std::uint8_t stream_idx = stream_ - stream0_base;
+    std::uint8_t streamIdx = getStreamId(dmaBase_, stream_);
 
     constexpr std::uint32_t ALL_FLAGS_MASK = 0x3DU;
 
-    std::uint8_t bit_shift = 0;
-    switch (stream_idx & 0x03U) {
-        case 0: bit_shift = 0;  break; // Stream 0 or 4
-        case 1: bit_shift = 6;  break; // Stream 1 or 5
-        case 2: bit_shift = 16; break; // Stream 2 or 6
-        case 3: bit_shift = 22; break; // Stream 3 or 7
-        default: return;
-    }
+    std::uint8_t bitShift = getFlagShift(streamIdx);
 
-    const std::uint32_t clear_value = ALL_FLAGS_MASK << bit_shift;
+    const std::uint32_t clear_value = ALL_FLAGS_MASK << bitShift;
 
-    if (stream_idx < 4)
+    if (streamIdx < 4)
     {
         reg::write(dmaBase_->LIFCR, clear_value);
     }
@@ -143,6 +187,38 @@ void DmaStream::registerInstance()
 
 void DmaStream::handleISR() const
 {
+	const bool isHalfTransfer = getHalfTransferStatus();
+	const bool isTransferComplete = getTransferCompleteStatus();
+	const bool isTransferError = getTransferErrorStatus();
+	const bool isFifoError = getFifoErrorStatus();
+	const bool isDirectModeError = getDirectModeErrorStatus();
+
+	clearAllFlags();
+
+	if(isHalfTransfer && callbacks_[static_cast<std::size_t>(Event::HALF_TRANSFER_COMPLETE)])
+	{
+		callbacks_[static_cast<std::size_t>(Event::HALF_TRANSFER_COMPLETE)]();
+	}
+
+	if(isTransferComplete && callbacks_[static_cast<std::size_t>(Event::TRANSFER_COMPLETE)])
+	{
+		callbacks_[static_cast<std::size_t>(Event::TRANSFER_COMPLETE)]();
+	}
+
+	if(isTransferError && callbacks_[static_cast<std::size_t>(Event::TRANSFER_ERROR)])
+	{
+		callbacks_[static_cast<std::size_t>(Event::TRANSFER_ERROR)]();
+	}
+
+	if(isFifoError && callbacks_[static_cast<std::size_t>(Event::FIFO_ERROR)])
+	{
+		callbacks_[static_cast<std::size_t>(Event::FIFO_ERROR)]();
+	}
+
+	if(isDirectModeError && callbacks_[static_cast<std::size_t>(Event::DIRECT_MODE_ERROR)])
+	{
+		callbacks_[static_cast<std::size_t>(Event::DIRECT_MODE_ERROR)]();
+	}
 
 }
 

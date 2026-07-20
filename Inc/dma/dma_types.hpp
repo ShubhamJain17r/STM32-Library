@@ -8,7 +8,8 @@ enum class Event
 	TRANSFER_COMPLETE,
 	HALF_TRANSFER_COMPLETE,
 	TRANSFER_ERROR,
-	DIRECT_MODE_ERROR
+	DIRECT_MODE_ERROR,
+	FIFO_ERROR
 };
 
 enum class Channel : std::uint8_t {

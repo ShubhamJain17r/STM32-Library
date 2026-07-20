@@ -45,7 +45,6 @@ enum class FlowController : std::uint8_t {
 struct StreamConfig {
     Channel channel;
     TransferDirection direction;
-    OperationalMode mode = OperationalMode::NORMAL;
     FlowController flowController = FlowController::DMA;
     Priority priority = Priority::LOW;
     DataSize dataSize = DataSize::BYTE;

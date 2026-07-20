@@ -12,11 +12,12 @@ class DmaStream
 private:
 	DMA_TypeDef* dmaBase_;
 	DMA_Stream_TypeDef* stream_;
+	OperationalMode activeMode_;
 
 public:
 	DmaStream() = delete;
 
-	DmaStream(DMA_TypeDef* dmaBase, DMA_Stream_TypeDef* stream) : dmaBase_(dmaBase), stream_(stream) {}
+	DmaStream(DMA_TypeDef* dmaBase, DMA_Stream_TypeDef* stream, OperationalMode activeMode = OperationalMode::NORMAL) : dmaBase_(dmaBase), stream_(stream), activeMode_(activeMode) {}
 
 	~DmaStream() = default;
 
@@ -31,23 +32,20 @@ private:
 	void disableStream();
 	void clearFlags();
 
-	void configurePeripheralAddress(const volatile std::uint32_t& periphAddr);
-	void configureMemoryAddress(const std::uint32_t& memoryAddr);
-	void configureNDTR(std::uint16_t N);
-
 	void configureChannel(Channel);
 
 	void configureFlowController(FlowController);
 
-	void setPriority(Priority);
+	void configurePriority(Priority);
 
-	void configureDirectMode();
-	void configureCircularMode();
-	void configureDoubleBufferMode();
+	void setDirectMode();
+	void setCircularMode();
+	void setDoubleBufferMode();
 
 	void configureDirection(TransferDirection);
 
-	void configureDataSize(DataSize);
+	void configureMemoryDataSize(DataSize);
+	void configurePeripheralDataSize(DataSize);
 
 	void configurePeripheralIncrement(bool);
 	void configureMemoryIncrement(bool);
@@ -56,6 +54,11 @@ private:
 
 public:
 	void init(const StreamConfig&);
+
+	void setupTransaction(std::uint32_t periphAddr,
+	                       std::uint32_t mem0Addr,
+	                       std::uint16_t dataLength,
+	                       std::uint32_t mem1Addr = 0) noexcept;
 };
 
 } // namespace dma

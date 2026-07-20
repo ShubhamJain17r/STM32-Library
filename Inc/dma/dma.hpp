@@ -5,6 +5,8 @@
 
 #include "dma/dma_types.hpp"
 
+#include "common/registers.hpp"
+
 namespace dma {
 
 class DmaStream
@@ -28,29 +30,62 @@ public:
 	DmaStream& operator=(DmaStream&&) noexcept = default;
 
 private:
+	void clearAllFlags() noexcept;
 
-	void disableStream();
-	void clearFlags();
+	inline void configureChannel(Channel ch) const
+	{
+		reg::setBitField<3>(stream_->CR, DMA_SxCR_CHSEL_Pos, ch);
+	}
 
-	void configureChannel(Channel);
+	inline void configureFlowController(FlowController fc) const
+	{
+		reg::setBitField<1>(stream_->CR, DMA_SxCR_PFCTRL_Pos, fc);
+	}
 
-	void configureFlowController(FlowController);
+	inline void configurePriority(Priority pl) const
+	{
+		reg::setBitField<2>(stream_->CR, DMA_SxCR_PL_Pos, pl);
+	}
 
-	void configurePriority(Priority);
+	inline void setDirectMode() const
+	{
+		reg::resetBit(stream_->FCR, DMA_SxFCR_DMDIS_Pos);
+	}
 
-	void setDirectMode();
-	void setCircularMode();
-	void setDoubleBufferMode();
+	inline void setCircularMode() const
+	{
+		reg::setBit(stream_->CR, DMA_SxCR_CIRC_Pos);
+	}
 
-	void configureDirection(TransferDirection);
+	inline void setDoubleBufferMode() const
+	{
+		reg::setBit(stream_->CR, DMA_SxCR_DBM_Pos);
+	}
 
-	void configureMemoryDataSize(DataSize);
-	void configurePeripheralDataSize(DataSize);
+	inline void configureDirection(TransferDirection dr) const
+	{
+		reg::setBitField<2>(stream_->CR, DMA_SxCR_DIR_Pos, dr);
+	}
 
-	void configurePeripheralIncrement(bool);
-	void configureMemoryIncrement(bool);
+	inline void configureMemoryDataSize(DataSize sz) const
+	{
+		reg::setBitField<2>(stream_->CR, DMA_SxCR_MSIZE_Pos, sz);
+	}
 
-	void enableStream();
+	inline void configurePeripheralDataSize(DataSize sz) const
+	{
+		reg::setBitField<2>(stream_->CR, DMA_SxCR_MSIZE_Pos, sz);
+	}
+
+	inline void configurePeripheralIncrement(bool increment) const
+	{
+		reg::setBitField<1>(stream_->CR, DMA_SxCR_PINC_Pos, increment);
+	}
+
+	inline void configureMemoryIncrement(bool increment) const
+	{
+		reg::setBitField<1>(stream_->CR, DMA_SxCR_MINC_Pos, increment);
+	}
 
 public:
 	void init(const StreamConfig&);
@@ -59,6 +94,18 @@ public:
 	                       std::uint32_t mem0Addr,
 	                       std::uint16_t dataLength,
 	                       std::uint32_t mem1Addr = 0) noexcept;
+
+	inline void enableStream() const
+	{
+		reg::setBit(stream_->CR, DMA_SxCR_EN_Pos);
+	}
+
+	inline void disableStream() const
+	{
+		reg::resetBit(stream_->CR, DMA_SxCR_EN_Pos);
+
+		reg::waitUntilReset(stream_->CR, DMA_SxCR_EN_Pos);
+	}
 };
 
 } // namespace dma

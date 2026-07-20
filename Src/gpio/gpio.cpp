@@ -25,13 +25,13 @@ void Pin::setAlternateFunction(AlternateFunction AFType) const {
 }
 
 void Pin::configureInput(Pull pull) const {
-    rcc::enableClock_GPIO(port_);
+    rcc::enableGpioClock(port_);
     setMode(Mode::INPUT);
     setPull(pull);
 }
 
 void Pin::configureOutput(OutputType outputType, OutputSpeed outputSpeed, Pull pull) const {
-    rcc::enableClock_GPIO(port_);
+    rcc::enableGpioClock(port_);
     setMode(Mode::OUTPUT);
     setOutputType(outputType);
     setOutputSpeed(outputSpeed);
@@ -39,7 +39,7 @@ void Pin::configureOutput(OutputType outputType, OutputSpeed outputSpeed, Pull p
 }
 
 void Pin::configureAlternate(AlternateFunction AFType, OutputType outputType, OutputSpeed outputSpeed, Pull pull) const {
-    rcc::enableClock_GPIO(port_);
+    rcc::enableGpioClock(port_);
     setMode(Mode::ALTERNATE);
     setOutputType(outputType);
     setOutputSpeed(outputSpeed);
@@ -48,7 +48,7 @@ void Pin::configureAlternate(AlternateFunction AFType, OutputType outputType, Ou
 }
 
 void Pin::configureAnalog() const {
-    rcc::enableClock_GPIO(port_);
+    rcc::enableGpioClock(port_);
     setMode(Mode::ANALOG);
 }
 

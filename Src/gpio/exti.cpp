@@ -31,7 +31,7 @@ void ExternalInterrupt::handleISR() const {
 }
 
 void ExternalInterrupt::init() {
-    rcc::enableClock_SYSCFG();
+    rcc::enableSyscfgClock();
 
     reg::setBitField<4>(SYSCFG->EXTICR[pinNumber_ / 4], (pinNumber_ % 4) * 4, gpio::mapSyscfgGpio(port_));
     reg::setBit(EXTI->IMR, pinNumber_);

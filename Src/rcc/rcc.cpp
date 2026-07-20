@@ -12,4 +12,16 @@ void enableGpioClock(const GPIO_TypeDef *port) {
     reg::setBit(RCC->AHB1ENR, port_index);
 }
 
+void enableDmaClock(const DMA_TypeDef* dmaBase)
+{
+	if(dmaBase == DMA1)
+	{
+		reg::setBit(RCC->AHB1ENR, RCC_AHB1ENR_DMA1EN_Pos);
+	}
+	else if(dmaBase == DMA2)
+	{
+		reg::setBit(RCC->AHB1ENR, RCC_AHB1ENR_DMA2EN_Pos);
+	}
+}
+
 } // namespace rcc

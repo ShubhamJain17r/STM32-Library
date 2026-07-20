@@ -2,10 +2,11 @@
 
 #include "stm32f446xx.h"
 #include <cstdint>
+#include <array>
 
 #include "dma/dma_types.hpp"
-
 #include "common/registers.hpp"
+#include "common/callback.hpp"
 
 namespace dma {
 
@@ -16,10 +17,14 @@ private:
 	DMA_Stream_TypeDef* stream_;
 	OperationalMode activeMode_;
 
+	std::array<callback::Callback, 5> callbacks_{};
+
 public:
 	DmaStream() = delete;
 
-	DmaStream(DMA_TypeDef* dmaBase, DMA_Stream_TypeDef* stream, OperationalMode activeMode = OperationalMode::NORMAL) : dmaBase_(dmaBase), stream_(stream), activeMode_(activeMode) {}
+	DmaStream(DMA_TypeDef* dmaBase, DMA_Stream_TypeDef* stream, OperationalMode activeMode = OperationalMode::NORMAL) : dmaBase_(dmaBase), stream_(stream), activeMode_(activeMode) {
+		registerInstance();
+	}
 
 	~DmaStream() = default;
 
@@ -31,6 +36,10 @@ public:
 
 private:
 	void clearAllFlags() noexcept;
+
+    void enableNVIC() const;
+
+    void registerInstance();
 
 	inline void configureChannel(Channel ch) const
 	{
@@ -88,7 +97,7 @@ private:
 	}
 
 public:
-	void init(const StreamConfig&);
+	void init(const StreamConfig&) const;
 
 	void setupTransaction(std::uint32_t periphAddr,
 	                       std::uint32_t mem0Addr,
@@ -106,6 +115,12 @@ public:
 
 		reg::waitUntilReset(stream_->CR, DMA_SxCR_EN_Pos);
 	}
+
+	void setCallback(Event event, callback::Callback func);
+
+	void handleISR() const;
+
+	static std::array<std::array<DmaStream*, 8>, 2> active_instances;
 };
 
 } // namespace dma

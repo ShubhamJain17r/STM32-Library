@@ -59,6 +59,9 @@ void I2cHandler::configureI2c(std::uint16_t speedKHz)
     reg::write(i2cBase_->CCR, ccrReg);
     reg::write(i2cBase_->TRISE, trise);
 
+    reg::setBit(i2cBase_->CR2, I2C_CR2_ITEVTEN_Pos);
+    reg::setBit(i2cBase_->CR2, I2C_CR2_ITERREN_Pos);
+
     enablePeripheral();
 }
 
@@ -165,6 +168,21 @@ void I2cHandler::init(std::uint16_t speedKHz)
 	configureGpio();
 	configureI2c(speedKHz);
 	configureDMA();
+}
+
+void I2cHandler::transmit(const std::uint8_t* stream, std::uint16_t len)
+{
+	txDma_.setupTransaction(
+			reinterpret_cast<std::uint32_t>(&i2cBase_->DR),
+			stream,
+			len
+	);
+
+	txDma_.enableStream();
+
+	enableDmaStream();
+
+	generateStart();
 }
 
 } // namespace i2c

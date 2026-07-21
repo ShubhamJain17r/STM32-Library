@@ -80,10 +80,6 @@ private:
 		(void)reg::read(i2cBase_->SR1);
 	}
 
-	void transmit(const std::uint8_t* stream, std::uint16_t len);
-
-	void receive(std::uint8_t* stream, std::uint16_t len);
-
 	void generateStop()
 	{
 		reg::setBit(i2cBase_->CR1, I2C_CR1_STOP_Pos);
@@ -100,6 +96,20 @@ private:
 
 public:
 	void init(std::uint16_t speedKHz = 100);
+
+	void transmit(const std::uint8_t* stream, std::uint16_t len);
+
+	void receive(std::uint8_t* stream, std::uint16_t len);
+
+	void enableDmaStream()
+	{
+		reg::setBit(i2cBase_->CR2, I2C_CR2_DMAEN_Pos);
+	}
+
+	void disableDmaStream()
+	{
+		reg::resetBit(i2cBase_->CR2, I2C_CR2_DMAEN_Pos);
+	}
 
 };
 

@@ -24,4 +24,20 @@ void enableDmaClock(const DMA_TypeDef* dmaBase)
 	}
 }
 
+void enableI2cClock(const I2C_TypeDef* i2cBase)
+{
+	if(i2cBase == I2C1)
+	{
+		reg::setBit(RCC->APB1ENR, RCC_APB1ENR_I2C1EN_Pos);
+	}
+	else if(i2cBase == I2C2)
+	{
+		reg::setBit(RCC->APB1ENR, RCC_APB2ENR_I2C1EN_Pos);
+	}
+	else if(i2cBase == I2C3)
+	{
+		reg::setBit(RCC->APB1ENR, RCC_APB3ENR_I2C1EN_Pos);
+	}
+}
+
 } // namespace rcc

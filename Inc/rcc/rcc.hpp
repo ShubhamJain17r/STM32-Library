@@ -11,9 +11,10 @@ constexpr std::uint8_t SYSCLK_MHz = 16;
 
 void enableGpioClock(const GPIO_TypeDef* port);
 void enableDmaClock(const DMA_TypeDef* dmaBase);
+void enableI2cClock(const I2C_TypeDef* i2cBase);
 
 inline void enableSyscfgClock() {
-    reg::setBit(RCC->APB2ENR, 14);
+    reg::setBit(RCC->APB2ENR, RCC_APB2ENR_SYSCFGEN_Pos);
 }
 
 } // namespace rcc

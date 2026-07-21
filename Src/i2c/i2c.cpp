@@ -64,12 +64,35 @@ void I2cHandler::configureI2c(std::uint16_t speedKHz)
 
 void I2cHandler::configureDMA()
 {
+	txDma_.init(
+		{
+			dmaChannel_,
+			dma::TransferDirection::MEMORY_TO_PERIPHERAL,
+			dma::FlowController::DMA,
+			dma::Priority::MEDIUM,
+			dma::DataSize::BYTE,
+			false,
+			true
+		}
+	);
 
+	rxDma_.init(
+		{
+			dmaChannel_,
+			dma::TransferDirection::PERIPHERAL_TO_MEMORY,
+			dma::FlowController::DMA,
+			dma::Priority::MEDIUM,
+			dma::DataSize::BYTE,
+			false,
+			true
+		}
+	);
 }
 
 void I2cHandler::configureGpio()
 {
-
+	sdaPin_.configureAlternate(gpio::AlternateFunction::AF4, gpio::OutputType::OPEN_DRAIN, gpio::OutputSpeed::LOW, gpio::Pull::UP);
+	sclPin_.configureAlternate(gpio::AlternateFunction::AF4, gpio::OutputType::OPEN_DRAIN, gpio::OutputSpeed::LOW, gpio::Pull::UP);
 }
 
 DmaMapping I2cHandler::getHardwareMapping(I2C_TypeDef* i2cBase) {
@@ -137,5 +160,11 @@ GpioMapping I2cHandler::getPinMapping(I2C_TypeDef* i2cBase)
 	return {};
 }
 
+void I2cHandler::init(std::uint16_t speedKHz)
+{
+	configureGpio();
+	configureI2c(speedKHz);
+	configureDMA();
+}
 
 } // namespace i2c

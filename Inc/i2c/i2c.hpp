@@ -99,7 +99,7 @@ private:
 	static GpioMapping getPinMapping(I2C_TypeDef* i2cBase);
 
 public:
-	void init(const I2cConfig&);
+	void init(std::uint16_t speedKHz = 100);
 
 };
 

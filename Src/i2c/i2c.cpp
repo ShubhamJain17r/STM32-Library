@@ -2,8 +2,21 @@
 
 #include "rcc/rcc.hpp"
 
+namespace
+{
+	std::uint8_t getI2cId(I2C_TypeDef* i2cBase)
+	{
+		if(i2cBase == I2C1) return 0;
+		if(i2cBase == I2C2) return 1;
+		if(i2cBase == I2C3) return 2;
+		return -1;
+	}
+}
+
 namespace i2c
 {
+
+std::array<I2cHandler*, 3> I2cHandler::active_instances = {nullptr};
 
 I2cHandler::I2cHandler(I2C_TypeDef* i2cBase)
 	:	i2cBase_(i2cBase),
@@ -183,6 +196,49 @@ void I2cHandler::transmit(const std::uint8_t* stream, std::uint16_t len)
 	enableDmaStream();
 
 	generateStart();
+}
+
+void I2cHandler::receive(std::uint8_t* stream, std::uint16_t len)
+{
+	rxDma_.setupTransaction(
+			reinterpret_cast<std::uint32_t>(&i2cBase_->DR),
+			stream,
+			len
+	);
+
+	rxDma_.enableStream();
+
+	enableDmaStream();
+
+	generateStart();
+}
+
+void I2cHandler::setCallback(Event event, callback::Callback func) {
+    eventCallbacks_[static_cast<std::size_t>(event)] = func;
+}
+
+void I2cHandler::setCallback(Error error, callback::Callback func) {
+    errorCallbacks_[static_cast<std::size_t>(error)] = func;
+}
+
+void I2cHandler::registerInstance()
+{
+	active_instances[getI2cId(i2cBase_)] = this;
+}
+
+void enableNVIC()
+{
+	NVIC_EnableIRQ(I2C1_EV_IRQn);
+	NVIC_EnableIRQ(I2C1_ER_IRQn);
+	NVIC_EnableIRQ(I2C2_EV_IRQn);
+	NVIC_EnableIRQ(I2C2_ER_IRQn);
+	NVIC_EnableIRQ(I2C3_EV_IRQn);
+	NVIC_EnableIRQ(I2C3_ER_IRQn);
+}
+
+void handleEventISR()
+{
+
 }
 
 } // namespace i2c

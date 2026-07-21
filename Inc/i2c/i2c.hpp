@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <array>
 #include "stm32f446xx.h"
 
 #include "i2c/i2c_types.hpp"
@@ -28,6 +29,9 @@ private:
 
 	gpio::Pin sdaPin_;
 	gpio::Pin sclPin_;
+
+	std::array<callback::Callback, 3> eventCallbacks_{};
+	std::array<callback::Callback, 4> errorCallbacks_{};
 
 public:
 	I2cHandler() = delete;
@@ -94,6 +98,10 @@ private:
 	static DmaMapping getHardwareMapping(I2C_TypeDef* i2cBase);
 	static GpioMapping getPinMapping(I2C_TypeDef* i2cBase);
 
+	void enableNVIC();
+
+	void registerInstance();
+
 public:
 	void init(std::uint16_t speedKHz = 100);
 
@@ -111,6 +119,13 @@ public:
 		reg::resetBit(i2cBase_->CR2, I2C_CR2_DMAEN_Pos);
 	}
 
+	void setCallback(Event event, callback::Callback func);
+	void setCallback(Error error, callback::Callback func);
+
+	void handleEventISR();
+	void handleErrorISR();
+
+	static std::array<I2cHandler*, 3> active_instances;
 };
 
 } // namespace i2c

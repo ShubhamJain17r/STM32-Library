@@ -9,6 +9,8 @@ void I2cHandler::configureI2c(CommunicationSpeed spd)
 {
 	rcc::enableI2cClock(i2cBase_);
 
+	disablePeripheral();
+
 	reg::write(i2cBase_->CR2, rcc::SYSCLK_MHz);
 
 	reg::setBitField<1>(i2cBase_->CCR, I2C_CCR_FS_Pos, spd);
@@ -41,6 +43,8 @@ void I2cHandler::configureI2c(CommunicationSpeed spd)
 
 		reg::write(i2cBase_->TRISE, ((rcc::SYSCLK_MHz * 3) / 10) + 1);
 	}
+
+	enablePeripheral();
 }
 
 } // namespace i2c

@@ -8,10 +8,14 @@
 namespace i2c
 {
 
-enum class CommunicationSpeed : std::uint8_t
+enum class Event
 {
-	STANDARD_MODE = 0,
-	FAST_MODE
+	START_GENERATED, ADDRESS_SENT, BYTE_TRANSFER_FINISHED
+};
+
+enum class Error
+{
+	BUS_ERROR, ARBITRATION_LOST, ACKNOWLEDGE_FAILURE, DATA_ERROR
 };
 
 enum class OperatingMode
@@ -24,11 +28,6 @@ enum class Operation : std::uint8_t
 	WRITE = 0,
 	READ
 };
-
-typedef struct
-{
-
-}I2cConfig;
 
 struct DmaMapping {
         DMA_TypeDef* txDmaBase;

@@ -4,7 +4,7 @@
 
 namespace
 {
-	std::uint8_t getI2cId(I2C_TypeDef* i2cBase)
+	std::uint8_t getI2cIndex(I2C_TypeDef* i2cBase)
 	{
 		if(i2cBase == I2C1) return 0;
 		if(i2cBase == I2C2) return 1;
@@ -223,7 +223,7 @@ void I2cHandler::setCallback(Error error, callback::Callback func) {
 
 void I2cHandler::registerInstance()
 {
-	active_instances[getI2cId(i2cBase_)] = this;
+	active_instances[getI2cIndex(i2cBase_)] = this;
 }
 
 void enableNVIC()
@@ -241,4 +241,61 @@ void handleEventISR()
 
 }
 
+void handleErrorISR()
+{
+
+}
+
 } // namespace i2c
+
+extern "C"
+{
+
+void I2C1_EV_IRQHandler(void)
+{
+	if(i2c::I2cHandler::active_instances[getI2cIndex(I2C1)])
+	{
+		i2c::I2cHandler::active_instances[getI2cIndex(I2C1)]->handleEventISR();
+	}
+}
+
+void I2C2_EV_IRQHandler(void)
+{
+	if(i2c::I2cHandler::active_instances[getI2cIndex(I2C2)])
+	{
+		i2c::I2cHandler::active_instances[getI2cIndex(I2C2)]->handleEventISR();
+	}
+}
+
+void I2C3_EV_IRQHandler(void)
+{
+	if(i2c::I2cHandler::active_instances[getI2cIndex(I2C3)])
+	{
+		i2c::I2cHandler::active_instances[getI2cIndex(I2C3)]->handleEventISR();
+	}
+}
+
+void I2C1_ER_IRQHandler(void)
+{
+	if(i2c::I2cHandler::active_instances[getI2cIndex(I2C1)])
+	{
+		i2c::I2cHandler::active_instances[getI2cIndex(I2C1)]->handleErrorISR();
+	}
+}
+
+void I2C2_ER_IRQHandler(void)
+{
+	if(i2c::I2cHandler::active_instances[getI2cIndex(I2C2)])
+	{
+		i2c::I2cHandler::active_instances[getI2cIndex(I2C2)]->handleErrorISR();
+	}
+}
+
+void I2C3_ER_IRQHandler(void)
+{
+	if(i2c::I2cHandler::active_instances[getI2cIndex(I2C3)])
+	{
+		i2c::I2cHandler::active_instances[getI2cIndex(I2C3)]->handleErrorISR();
+	}
+}
+} // extern "C"

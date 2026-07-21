@@ -68,11 +68,6 @@ private:
 		reg::setBit(i2cBase_->CR1, I2C_CR1_START_Pos);
 	}
 
-	void sendTargetAddress(std::uint8_t address, Operation op)
-	{
-		reg::write(i2cBase_->DR, ((address << 1) | static_cast<std::uint32_t>(op)));
-	}
-
 	void clearAddrFlag()
 	{
 		(void)reg::read(i2cBase_->SR1);
@@ -105,6 +100,11 @@ private:
 public:
 	void init(std::uint16_t speedKHz = 100);
 
+	void sendTargetAddress(std::uint8_t address, Operation op)
+	{
+		reg::write(i2cBase_->DR, ((address << 1) | static_cast<std::uint32_t>(op)));
+	}
+
 	void transmit(const std::uint8_t* stream, std::uint16_t len);
 
 	void receive(std::uint8_t* stream, std::uint16_t len);
@@ -123,6 +123,7 @@ public:
 	void setCallback(Error error, callback::Callback func);
 
 	void handleEventISR();
+
 	void handleErrorISR();
 
 	static std::array<I2cHandler*, 3> active_instances;

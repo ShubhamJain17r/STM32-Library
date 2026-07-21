@@ -10,14 +10,14 @@ namespace gpio {
 
 class Pin {
 private:
-    std::uint8_t pinNumber_;
     GPIO_TypeDef *const port_;
+    std::uint8_t pinNumber_;
 
 public:
 	Pin() = delete;
 
-    constexpr Pin(std::uint8_t pinNumber, GPIO_TypeDef *port) :
-        pinNumber_(pinNumber), port_(port) {}
+    constexpr Pin(GPIO_TypeDef *port, std::uint8_t pinNumber) :
+		port_(port), pinNumber_(pinNumber) {}
 
     Pin(const Pin&) = delete;
     Pin& operator=(const Pin&) = delete;

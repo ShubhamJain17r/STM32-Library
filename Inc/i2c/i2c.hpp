@@ -7,6 +7,12 @@
 
 #include "common/registers.hpp"
 
+#include "dma/dma.hpp"
+#include "dma/dma_types.hpp"
+
+#include "gpio/gpio.hpp"
+#include "gpio/gpio_types.hpp"
+
 namespace i2c
 {
 
@@ -15,17 +21,25 @@ class I2cHandler
 private:
 	I2C_TypeDef* i2cBase_;
 
+	dma::DmaStream txDma_;
+	dma::DmaStream rxDma_;
+
+	dma::Channel dmaChannel_;
+
+	gpio::Pin sdaPin_;
+	gpio::Pin sclPin_;
+
 public:
 	I2cHandler() = delete;
 	~I2cHandler() = default;
 
-	I2cHandler(I2C_TypeDef* i2cBase) : i2cBase_(i2cBase) {}
+	explicit I2cHandler(I2C_TypeDef*);
 
 	I2cHandler(const I2cHandler&) = delete;
-	I2cHandler operator=(const I2cHandler&) = delete;
+	I2cHandler& operator=(const I2cHandler&) = delete;
 
-	I2cHandler(const I2cHandler&&) = default;
-	I2cHandler operator=(const I2cHandler&&) = default;
+	I2cHandler(I2cHandler&&) noexcept = default;
+	I2cHandler& operator=(I2cHandler&&) noexcept = default;
 
 private:
 	void enablePeripheral()
@@ -52,7 +66,7 @@ private:
 
 	void sendTargetAddress(std::uint8_t address, Operation op)
 	{
-		reg::write(i2cBase_->DR, ((address << 1) | op));
+		reg::write(i2cBase_->DR, ((address << 1) | static_cast<std::uint32_t>(op)));
 	}
 
 	void clearAddrFlag()
@@ -66,7 +80,9 @@ private:
 		(void)reg::read(i2cBase_->SR1);
 	}
 
-	void sendData(const std::uint8_t* stream, std::uint16_t len);
+	void transmit(const std::uint8_t* stream, std::uint16_t len);
+
+	void receive(std::uint8_t* stream, std::uint16_t len);
 
 	void generateStop()
 	{
@@ -75,7 +91,12 @@ private:
 
 	void configureDMA();
 
-	void configureI2c();
+	void configureGpio();
+
+	void configureI2c(std::uint16_t);
+
+	static DmaMapping getHardwareMapping(I2C_TypeDef* i2cBase);
+	static GpioMapping getPinMapping(I2C_TypeDef* i2cBase);
 
 public:
 	void init(const I2cConfig&);

@@ -28,6 +28,16 @@ public:
 	I2cHandler operator=(const I2cHandler&&) = default;
 
 private:
+	void enablePeripheral()
+	{
+		reg::setBit(i2cBase_->CR1, I2C_CR1_PE_Pos);
+	}
+
+	void disablePeripheral()
+	{
+		reg::resetBit(i2cBase_->CR1, I2C_CR1_PE_Pos);
+	}
+
 	void generateStart()
 	{
 		reg::waitUntilSet(i2cBase_->SR2, I2C_SR2_BUSY_Pos);

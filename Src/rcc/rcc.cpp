@@ -32,11 +32,11 @@ void enableI2cClock(const I2C_TypeDef* i2cBase)
 	}
 	else if(i2cBase == I2C2)
 	{
-		reg::setBit(RCC->APB1ENR, RCC_APB2ENR_I2C1EN_Pos);
+		reg::setBit(RCC->APB1ENR, RCC_APB1ENR_I2C2EN_Pos);
 	}
 	else if(i2cBase == I2C3)
 	{
-		reg::setBit(RCC->APB1ENR, RCC_APB3ENR_I2C1EN_Pos);
+		reg::setBit(RCC->APB1ENR, RCC_APB1ENR_I2C2EN_Pos);
 	}
 }
 

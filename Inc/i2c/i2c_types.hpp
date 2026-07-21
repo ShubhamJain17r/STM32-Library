@@ -1,15 +1,20 @@
-/*
- * i2c_types.hpp
- *
- *  Created on: 21-Jul-2026
- *      Author: shubh
- */
+#pragma once
 
-#ifndef I2C_I2C_TYPES_HPP_
-#define I2C_I2C_TYPES_HPP_
+#include <cstdint>
+#include "stm32f446xx.h"
 
+namespace i2c
+{
 
+enum class Operation : std::uint8_t
+{
+	WRITE = 0,
+	READ
+};
 
+typedef struct
+{
 
+}I2cConfig;
 
-#endif /* I2C_I2C_TYPES_HPP_ */
+} // namespace i2c

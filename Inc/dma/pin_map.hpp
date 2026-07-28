@@ -1,15 +1,26 @@
-/*
- * pin_map.hpp
- *
- *  Created on: 28-Jul-2026
- *      Author: shubh
- */
+#pragma once
 
-#ifndef DMA_PIN_MAP_HPP_
-#define DMA_PIN_MAP_HPP_
+#include "stm32f446xx.h"
+#include <cstdint>
 
+struct Pin
+{
+    GPIO_TypeDef *port;
+    std::uint8_t pinNumber;
+    IRQn_Type irqn;
 
+    void (*enableClock)();
+};
 
+void enableGPIOA()
+{
+    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;
+}
 
-
-#endif /* DMA_PIN_MAP_HPP_ */
+constexpr Pin PA0
+{
+    GPIOA,
+    0,
+    EXTI0_IRQn,
+    enableGPIOA
+};

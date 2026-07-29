@@ -6,12 +6,22 @@
 namespace gpio
 {
 
-struct Pin
+enum class Port : uint8_t
 {
-	GPIO_TypeDef* port;
-	std::uint8_t pin;
+    A,
+    B,
+    C,
+    D,
+    E,
+    H
 };
 
-constexpr Pin PA0{GPIOA, 0};
+struct Pin
+{
+    Port port;
+    uint8_t number;
+};
+
+constexpr Pin PA0{Port::A, 0};
 
 } // namespace gpio

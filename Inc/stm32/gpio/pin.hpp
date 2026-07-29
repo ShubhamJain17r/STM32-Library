@@ -1,15 +1,17 @@
-/*
- * pin.hpp
- *
- *  Created on: 29-Jul-2026
- *      Author: shubh
- */
+#pragma once
 
-#ifndef STM32_GPIO_PIN_HPP_
-#define STM32_GPIO_PIN_HPP_
+#include "stm32f446xx.h"
+#include <cstdint>
 
+namespace gpio
+{
 
+struct Pin
+{
+	GPIO_TypeDef* port;
+	std::uint8_t pin;
+};
 
+constexpr Pin PA0{GPIOA, 0};
 
-
-#endif /* STM32_GPIO_PIN_HPP_ */
+} // namespace gpio

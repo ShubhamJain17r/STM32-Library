@@ -1,15 +1,20 @@
-/*
- * exti_map.hpp
- *
- *  Created on: 29-Jul-2026
- *      Author: shubh
- */
+#pragma once
 
-#ifndef STM32_GPIO_EXTI_MAP_HPP_
-#define STM32_GPIO_EXTI_MAP_HPP_
+#include "stm32f446xx.h"
+#include <cstdint>
 
+namespace exti
+{
 
+constexpr IRQn_Type extiIRQ(std::uint8_t line)
+{
+    if(line <= 4)
+        return static_cast<IRQn_Type>(EXTI0_IRQn + line);
 
+    if(line <= 9)
+        return EXTI9_5_IRQn;
 
+    return EXTI15_10_IRQn;
+}
 
-#endif /* STM32_GPIO_EXTI_MAP_HPP_ */
+} // namespace exti

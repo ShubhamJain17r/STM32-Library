@@ -6,10 +6,29 @@
 namespace gpio
 {
 
+constexpr uint8_t portIndex(GPIO_TypeDef* port)
+{
+    if(port == GPIOA) return 0;
+    if(port == GPIOB) return 1;
+    if(port == GPIOC) return 2;
+    if(port == GPIOD) return 3;
+    if(port == GPIOE) return 4;
+    if(port == GPIOF) return 5;
+    if(port == GPIOG) return 6;
+    if(port == GPIOH) return 7;
+
+    return 0xFF;
+}
+
 struct Pin
 {
 	GPIO_TypeDef* port;
 	std::uint8_t number;
+
+	constexpr std::uint8_t index() const
+	{
+		return (portIndex(port) << 4) | number;
+	}
 };
 
 constexpr Pin PA0{GPIOA, 0};
@@ -62,19 +81,5 @@ constexpr Pin PC12{GPIOC, 12};
 constexpr Pin PC13{GPIOC, 13};
 constexpr Pin PC14{GPIOC, 14};
 constexpr Pin PC15{GPIOC, 15};
-
-constexpr uint8_t portIndex(GPIO_TypeDef* port)
-{
-    if(port == GPIOA) return 0;
-    if(port == GPIOB) return 1;
-    if(port == GPIOC) return 2;
-    if(port == GPIOD) return 3;
-    if(port == GPIOE) return 4;
-    if(port == GPIOF) return 5;
-    if(port == GPIOG) return 6;
-    if(port == GPIOH) return 7;
-
-    return 0xFF;
-}
 
 } // namespace gpio

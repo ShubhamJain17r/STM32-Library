@@ -41,12 +41,6 @@ enum class PinState : std::uint8_t
 	HIGH
 };
 
-struct DigitalInputConfig
-{
-	Pull pull = Pull::NONE;
-	bool enableInterrupt = false;
-};
-
 struct DigitalOutputConfig
 {
 	OutputType outputType = OutputType::PUSH_PULL;

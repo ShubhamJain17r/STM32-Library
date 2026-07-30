@@ -20,7 +20,7 @@ constexpr uint8_t portIndex(GPIO_TypeDef* port)
     return 0xFF;
 }
 
-struct Pin
+typedef struct
 {
 	GPIO_TypeDef* port;
 	std::uint8_t number;
@@ -29,7 +29,7 @@ struct Pin
 	{
 		return (portIndex(port) << 4) | number;
 	}
-};
+}Pin;
 
 constexpr Pin PA0{GPIOA, 0};
 constexpr Pin PA1{GPIOA, 1};

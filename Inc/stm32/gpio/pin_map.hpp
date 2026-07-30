@@ -3,6 +3,8 @@
 #include "stm32f446xx.h"
 #include <cstdint>
 
+#include "stm32/rcc/rcc.hpp"
+
 namespace gpio
 {
 
@@ -33,6 +35,11 @@ struct Pin
 	constexpr std::uint8_t index() const
 	{
 		return ((portIndex(port) << 4) | number);
+	}
+
+	inline void enableClock() const noexcept
+	{
+		rcc::enableGpioClock(port);
 	}
 };
 

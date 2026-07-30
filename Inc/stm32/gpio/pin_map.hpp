@@ -24,23 +24,33 @@ constexpr uint8_t portIndex(GPIO_TypeDef* port)
 
 struct Pin
 {
-	GPIO_TypeDef* port;
-	std::uint8_t number;
+    GPIO_TypeDef* port;
+    std::uint8_t number;
 
-	constexpr std::uint32_t mask() const
-	{
-		return (1U << number);
-	}
+    constexpr std::uint16_t mask() const noexcept
+    {
+        return static_cast<std::uint16_t>(1u << number);
+    }
 
-	constexpr std::uint8_t index() const
-	{
-		return ((portIndex(port) << 4) | number);
-	}
+    constexpr std::uint8_t portIndex() const noexcept
+    {
+        return gpio::portIndex(port);
+    }
 
-	inline void enableClock() const noexcept
-	{
-		rcc::enableGpioClock(port);
-	}
+    constexpr std::uint8_t index() const noexcept
+    {
+        return (portIndex() << 4) | number;
+    }
+
+    void enableClock() const noexcept
+    {
+        rcc::enableGpioClock(port);
+    }
+
+    constexpr bool operator==(const Pin& rhs) const noexcept
+    {
+        return port == rhs.port && number == rhs.number;
+    }
 };
 
 constexpr Pin PA0{GPIOA, 0};

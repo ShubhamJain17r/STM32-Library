@@ -1,15 +1,21 @@
-/*
- * rcc.hpp
- *
- *  Created on: 30-Jul-2026
- *      Author: shubh
- */
+#pragma once
 
-#ifndef STM32_RCC_RCC_HPP_
-#define STM32_RCC_RCC_HPP_
+#include "stm32f446xx.h"
+#include <cstdint>
 
+namespace rcc
+{
 
+void enableGpioClock(GPIO_TypeDef* port)
+{
+	if(port == GPIOA) RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;
+	if(port == GPIOB) RCC->AHB1ENR |= RCC_AHB1ENR_GPIOBEN;
+	if(port == GPIOC) RCC->AHB1ENR |= RCC_AHB1ENR_GPIOCEN;
+	if(port == GPIOD) RCC->AHB1ENR |= RCC_AHB1ENR_GPIODEN;
+	if(port == GPIOE) RCC->AHB1ENR |= RCC_AHB1ENR_GPIOEEN;
+	if(port == GPIOF) RCC->AHB1ENR |= RCC_AHB1ENR_GPIOFEN;
+	if(port == GPIOG) RCC->AHB1ENR |= RCC_AHB1ENR_GPIOGEN;
+	if(port == GPIOH) RCC->AHB1ENR |= RCC_AHB1ENR_GPIOHEN;
+}
 
-
-
-#endif /* STM32_RCC_RCC_HPP_ */
+} // namespace rcc

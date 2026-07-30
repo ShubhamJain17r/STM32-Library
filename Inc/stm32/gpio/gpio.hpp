@@ -3,7 +3,8 @@
 #include "stm32f446xx.h"
 #include <cstdint>
 
-#include "gpio/pin_map.hpp"
+#include "stm32/gpio/pin_map.hpp"
+#include "stm32/gpio/gpio_types.hpp"
 
 namespace gpio
 {
@@ -11,7 +12,7 @@ namespace gpio
 class DigitalOutput
 {
 private:
-	struct Pin pin_;
+	Pin pin_;
 
 public:
 	DigitalOutput() = delete;
@@ -20,8 +21,8 @@ public:
 	DigitalOutput(const DigitalOutput&) = delete;
 	DigitalOutput& operator=(const DigitalOutput&) = delete;
 
-	DigitalOutput(DigitalOutput&&) = default;
-	DigitalOutput& operator=(DigitalOutput&&) = default;
+	DigitalOutput(DigitalOutput&&) = delete;
+	DigitalOutput& operator=(DigitalOutput&&) = delete;
 
 	explicit DigitalOutput(Pin pin, DigitalOutputConfig config = {});
 
@@ -34,7 +35,7 @@ public:
 class DigitalInput
 {
 private:
-	struct Pin pin_;
+	Pin pin_;
 
 public:
 	DigitalInput() = delete;
@@ -43,8 +44,8 @@ public:
 	DigitalInput(const DigitalInput&) = delete;
 	DigitalInput& operator=(const DigitalInput&) = delete;
 
-	DigitalInput(DigitalInput&&) = default;
-	DigitalInput& operator=(DigitalInput&&) = default;
+	DigitalInput(DigitalInput&&) = delete;
+	DigitalInput& operator=(DigitalInput&&) = delete;
 
 	explicit DigitalInput(Pin pin, DigitalInputConfig config = {});
 private:

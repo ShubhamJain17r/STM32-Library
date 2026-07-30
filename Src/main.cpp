@@ -12,7 +12,13 @@ inline void delay(std::uint32_t t)
 
 int main()
 {
-	DigitalOutput led(PA5);
+	DigitalOutput led(PA5,
+	{
+			.outputType = OutputType::PUSH_PULL,
+//			.outputSpeed = OutputSpeed::LOW,
+			.pull = Pull::DOWN,
+//			.initialState = PinState::HIGH
+	});
 
 	while(1)
 	{

@@ -20,16 +20,21 @@ constexpr uint8_t portIndex(GPIO_TypeDef* port)
     return 0xFF;
 }
 
-typedef struct
+struct Pin
 {
 	GPIO_TypeDef* port;
 	std::uint8_t number;
 
+	constexpr std::uint32_t mask() const
+	{
+		return (1U << number);
+	}
+
 	constexpr std::uint8_t index() const
 	{
-		return (portIndex(port) << 4) | number;
+		return ((portIndex(port) << 4) | number);
 	}
-}Pin;
+};
 
 constexpr Pin PA0{GPIOA, 0};
 constexpr Pin PA1{GPIOA, 1};

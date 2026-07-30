@@ -29,7 +29,41 @@ public:
 private:
 
 public:
+	inline void write(PinState state) const noexcept
+	{
+		if(state == PinState::HIGH)
+		{
+			high();
+		}
+		else
+		{
+			low();
+		}
+	}
 
+	inline void high() const noexcept
+	{
+		pin_.port->BSRR = pin_.mask();
+	}
+
+	inline void low() const noexcept
+	{
+		pin_.port->BSRR = pin_.mask();
+	}
+
+	inline void toggle() const noexcept
+	{
+		pin_.port->ODR ^= pin_.mask();
+	}
+
+	inline PinState read() const noexcept
+	{
+		if(pin_.port->ODR & pin_.mask())
+		{
+			return PinState::HIGH;
+		}
+		return PinState::LOW;
+	}
 };
 
 class DigitalInput
@@ -51,6 +85,14 @@ public:
 private:
 
 public:
+	inline PinState read() const noexcept
+	{
+		if(pin_.port->IDR & pin_.mask())
+		{
+			return PinState::HIGH;
+		}
+		return PinState::LOW;
+	}
 
 };
 

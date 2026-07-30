@@ -19,9 +19,12 @@ DigitalOutput::DigitalOutput(Pin pin, DigitalOutputConfig config) : pin_(pin)
 
 }
 
-DigitalInput::DigitalInput(Pin pin, DigitalInputConfig config) : pin_(pin)
+DigitalInput::DigitalInput(Pin pin, Pull pull) : pin_(pin)
 {
 	pin_.enableClock();
+
+	setModeInput();
+	configurePull(pull);
 }
 
 } // namespace gpio

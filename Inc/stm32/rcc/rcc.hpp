@@ -6,7 +6,7 @@
 namespace rcc
 {
 
-void enableGpioClock(GPIO_TypeDef* port)
+inline void enableGpioClock(GPIO_TypeDef* port) noexcept
 {
 	if(port == GPIOA) RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;
 	if(port == GPIOB) RCC->AHB1ENR |= RCC_AHB1ENR_GPIOBEN;

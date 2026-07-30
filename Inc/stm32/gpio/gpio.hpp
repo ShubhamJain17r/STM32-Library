@@ -35,8 +35,8 @@ private:
 
 	inline void configureOutputType(OutputType outputType) const noexcept
 	{
-		pin_.port->OTYPER &= ~(3U << (pin_.number * 2));
-		pin_.port->OTYPER |=  (static_cast<std::uint8_t>(outputType) << (pin_.number * 2));
+		pin_.port->OTYPER &= pin_.mask();
+		pin_.port->OTYPER |=  (static_cast<std::uint8_t>(outputType) << pin_.number);
 	}
 
 	inline void configureOutputSpeed(OutputSpeed outputSpeed) const noexcept
@@ -97,8 +97,19 @@ public:
 	DigitalInput(DigitalInput&&) = delete;
 	DigitalInput& operator=(DigitalInput&&) = delete;
 
-	explicit DigitalInput(Pin pin, DigitalInputConfig config = {});
+	explicit DigitalInput(Pin pin, Pull pull = Pull::NONE);
 private:
+	inline void setModeInput() const noexcept
+	{
+		pin_.port->MODER &= ~(3U << (pin_.number * 2));
+		pin_.port->MODER |=  (static_cast<std::uint8_t>(Mode::INPUT) << (pin_.number * 2));
+	}
+
+	inline void configurePull(Pull pull) const noexcept
+	{
+		pin_.port->PUPDR &= ~(3U << (pin_.number * 2));
+		pin_.port->PUPDR |=  (static_cast<std::uint8_t>(pull) << (pin_.number * 2));
+	}
 
 public:
 	inline PinState read() const noexcept

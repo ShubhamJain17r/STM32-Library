@@ -3,8 +3,11 @@
 #include "stm32f446xx.h"
 #include <cstdint>
 
+#include "stm32/common/callback.hpp"
+
 #include "stm32/gpio/pin_map.hpp"
 #include "stm32/gpio/gpio_types.hpp"
+#include "stm32/gpio/exti_map.hpp"
 
 namespace gpio
 {
@@ -162,6 +165,26 @@ public:
 		}
 		return PinState::LOW;
 	}
+};
+
+struct ExtiEntry
+{
+    GPIO_TypeDef* port;
+
+    Callback rising = nullptr;
+    Callback falling = nullptr;
+};
+
+class ExtiManager
+{
+public:
+    static void setRisingCallback(const Pin&, Callback);
+    static void setFallingCallback(const Pin&, Callback);
+
+    static void handleInterrupt(std::uint8_t line);
+
+private:
+    inline static ExtiEntry table[16];
 };
 
 } // namespace gpio

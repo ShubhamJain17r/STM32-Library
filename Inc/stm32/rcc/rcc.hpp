@@ -18,4 +18,9 @@ inline void enableGpioClock(GPIO_TypeDef* port) noexcept
 	if(port == GPIOH) RCC->AHB1ENR |= RCC_AHB1ENR_GPIOHEN;
 }
 
+inline void enableSyscfgClock() noexcept
+{
+	RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
+}
+
 } // namespace rcc

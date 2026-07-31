@@ -27,4 +27,16 @@ DigitalInput::DigitalInput(Pin pin, Pull pull) : pin_(pin)
 	configurePull(pull);
 }
 
+InterruptInput::InterruptInput(Pin pin, Pull pull) : pin_(pin)
+{
+	pin_.enableClock();
+
+	setModeInput();
+	configurePull(pull);
+
+	rcc::enableSyscfgClock();
+
+//	SYSCFG->EXTICR[(pin_.number / 4)]
+}
+
 } // namespace gpio

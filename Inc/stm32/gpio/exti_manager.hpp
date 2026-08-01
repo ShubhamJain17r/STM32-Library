@@ -21,6 +21,45 @@ constexpr IRQn_Type extiIRQ(std::uint8_t line)
     return EXTI15_10_IRQn;
 }
 
+inline void configureExticr(const gpio::Pin& pin) noexcept
+{
+	std::uint8_t index = pin.number / 4;
+	std::uint16_t pos = (index % 4) * 4;
+
+	SYSCFG->EXTICR[index] &= ~(0xF << pos);
+	SYSCFG->EXTICR[index] |=  (pin.portIndex() << pos);
+}
+
+inline void enableInterrupt(const gpio::Pin& pin) noexcept
+{
+	EXTI->IMR |= pin.mask();
+}
+
+inline void disableInterrupt(const gpio::Pin& pin) noexcept
+{
+	EXTI->IMR &= ~pin.mask();
+}
+
+inline void enableRisingTrigger(const gpio::Pin& pin) noexcept
+{
+	EXTI->RTSR |= pin.mask();
+}
+
+inline void enableFallingTrigger(const gpio::Pin& pin) noexcept
+{
+	EXTI->FTSR |= pin.mask();
+}
+
+inline void clearPending(std::uint8_t line) noexcept
+{
+	EXTI->PR = (1u << line);
+}
+
+inline void enableIRQ(const gpio::Pin& pin) noexcept
+{
+	NVIC_EnableIRQ(extiIRQ(pin.number));
+}
+
 struct ExtiEntry
 {
     GPIO_TypeDef* port;

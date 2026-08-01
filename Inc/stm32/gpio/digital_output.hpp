@@ -5,6 +5,7 @@
 
 #include "stm32/gpio/pin_map.hpp"
 #include "stm32/gpio/gpio_types.hpp"
+#include "stm32/gpio/gpio_helper.hpp"
 
 namespace gpio
 {
@@ -35,29 +36,6 @@ public:
 	explicit DigitalOutput(Pin pin, DigitalOutputConfig config = {});
 
 private:
-	inline void setModeOutput() const noexcept
-	{
-		pin_.port->MODER &= ~(3U << (pin_.number * 2));
-		pin_.port->MODER |=  (static_cast<std::uint8_t>(Mode::OUTPUT) << (pin_.number * 2));
-	}
-
-	inline void configureOutputType(OutputType outputType) const noexcept
-	{
-		pin_.port->OTYPER &= pin_.mask();
-		pin_.port->OTYPER |=  (static_cast<std::uint8_t>(outputType) << pin_.number);
-	}
-
-	inline void configureOutputSpeed(OutputSpeed outputSpeed) const noexcept
-	{
-		pin_.port->OSPEEDR &= ~(3U << (pin_.number * 2));
-		pin_.port->OSPEEDR |=  (static_cast<std::uint8_t>(outputSpeed) << (pin_.number * 2));
-	}
-
-	inline void configurePull(Pull pull) const noexcept
-	{
-		pin_.port->PUPDR &= ~(3U << (pin_.number * 2));
-		pin_.port->PUPDR |=  (static_cast<std::uint8_t>(pull) << (pin_.number * 2));
-	}
 
 public:
 	inline void write(PinState state) const noexcept

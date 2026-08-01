@@ -43,46 +43,4 @@ inline void setPull(const Pin& pin,
 		(static_cast<std::uint32_t>(pull) << (pin.number * 2));
 }
 
-inline void write(const Pin& pin,
-				  PinState state) noexcept
-{
-	if(state == PinState::HIGH)
-	{
-		pin.port->BSRR = pin.mask();
-	}
-	else
-	{
-		pin.port->BSRR = pin.mask() << 16;
-	}
-}
-
-inline void high(const Pin& pin) noexcept
-{
-	pin.port->BSRR = pin.mask();
-}
-
-inline void low(const Pin& pin) noexcept
-{
-	pin.port->BSRR = pin.mask() << 16;
-}
-
-inline void toggle(const Pin& pin) noexcept
-{
-	pin.port->ODR ^= pin.mask();
-}
-
-inline PinState readInput(const Pin& pin) noexcept
-{
-	return (pin.port->IDR & pin.mask())
-		? PinState::HIGH
-		: PinState::LOW;
-}
-
-inline PinState readOutput(const Pin& pin) noexcept
-{
-	return (pin.port->ODR & pin.mask())
-		? PinState::HIGH
-		: PinState::LOW;
-}
-
 } // namespace gpio::detail

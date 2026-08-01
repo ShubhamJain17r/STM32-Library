@@ -7,6 +7,7 @@
 
 #include "stm32/gpio/pin_map.hpp"
 #include "stm32/gpio/gpio_types.hpp"
+#include "stm32/gpio/gpio_helper.hpp"
 
 namespace gpio
 {

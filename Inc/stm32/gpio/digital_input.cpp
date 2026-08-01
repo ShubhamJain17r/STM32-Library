@@ -7,8 +7,8 @@ DigitalInput::DigitalInput(Pin pin, Pull pull) : pin_(pin)
 {
 	pin_.enableClock();
 
-	setModeInput();
-	configurePull(pull);
+	detail::setMode(pin_, Mode::INPUT);
+	detail::setPull(pin_, pull);
 }
 
 } // namespace gpio

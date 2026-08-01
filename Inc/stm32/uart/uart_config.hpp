@@ -1,15 +1,34 @@
-/*
- * uart_config.hpp
- *
- *  Created on: 01-Aug-2026
- *      Author: shubh
- */
+#pragma once
 
-#ifndef STM32_UART_UART_CONFIG_HPP_
-#define STM32_UART_UART_CONFIG_HPP_
+#include "stm32f446xx.h"
+#include <cstdint>
 
+#include "stm32/uart/uart_traits.hpp"
+#include "stm32/uart/uart_types.hpp"
 
+#include "stm32/gpio/pin.hpp"
 
+namespace uart
+{
 
+template<USART_TypeDef* Instance>
+struct Config
+{
+    gpio::Pin tx = Traits<Instance>::defaultTx;
 
-#endif /* STM32_UART_UART_CONFIG_HPP_ */
+    gpio::Pin rx = Traits<Instance>::defaultRx;
+
+    std::uint32_t baud = 115200;
+
+    Mode mode = Mode::TX_RX;
+
+    WordLength wordLength = WordLength::BITS_8;
+
+    StopBits stopBits = StopBits::ONE;
+
+    Parity parity = Parity::NONE;
+
+    Oversampling oversampling = Oversampling::BY16;
+};
+
+} // namespace uart

@@ -109,6 +109,4 @@ struct Traits<USART6>
 	static constexpr std::uint32_t busClock = rcc::apb2Clock;
 };
 
-
-
 } // namespace uart

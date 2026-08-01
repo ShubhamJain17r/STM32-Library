@@ -12,7 +12,7 @@ namespace uart
 {
 
 template<USART_TypeDef* Instance>
-struct Config
+struct uartConfig
 {
     gpio::Pin tx = Traits<Instance>::defaultTx;
 

@@ -1,15 +1,42 @@
-/*
- * uart_types.hpp
- *
- *  Created on: 01-Aug-2026
- *      Author: shubh
- */
+#pragma once
 
-#ifndef STM32_UART_UART_TYPES_HPP_
-#define STM32_UART_UART_TYPES_HPP_
+#include <cstdint>
 
+namespace uart
+{
 
+enum class Mode : std::uint8_t
+{
+    RX,
+    TX,
+    TX_RX
+};
 
+enum class Parity : std::uint8_t
+{
+    NONE,
+    EVEN,
+    ODD
+};
 
+enum class StopBits : std::uint8_t
+{
+    ONE,
+    HALF,
+    TWO,
+    ONE_AND_HALF
+};
 
-#endif /* STM32_UART_UART_TYPES_HPP_ */
+enum class WordLength : std::uint8_t
+{
+    BITS_8,
+    BITS_9
+};
+
+enum class Oversampling : std::uint8_t
+{
+    BY16,
+    BY8
+};
+
+} // namespace uart

@@ -2,8 +2,6 @@
 
 #include <cstdint>
 
-#include "stm32/common/callback.hpp"
-
 namespace gpio
 {
 
@@ -48,22 +46,7 @@ enum class Edge
 	FALLING
 };
 
-struct DigitalOutputConfig
-{
-	OutputType outputType = OutputType::PUSH_PULL;
-	OutputSpeed outputSpeed = OutputSpeed::LOW;
-	Pull pull = Pull::NONE;
-	PinState initialState = PinState::LOW;
-};
-
-struct InterruptInputConfig
-{
-	Pull pull = Pull::NONE;
-	Callback risingEdgeCallback = nullptr;
-	Callback fallingEdgeCallback = nullptr;
-};
-
-struct AlternateConfig
+struct AlternateFunctionConfig
 {
 	OutputType outputType = OutputType::PUSH_PULL;
 	OutputSpeed outputSpeed = OutputSpeed::LOW;

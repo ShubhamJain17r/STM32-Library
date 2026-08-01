@@ -1,15 +1,19 @@
-/*
- * i2c_traits.hpp
- *
- *  Created on: 29-Jul-2026
- *      Author: shubh
- */
+#pragma once
 
-#ifndef STM32_I2C_I2C_TRAITS_HPP_
-#define STM32_I2C_I2C_TRAITS_HPP_
+#include "stm32f446xx.h"
+#include <cstdint>
 
+namespace i2c
+{
 
+template<I2C_TypeDef*>
+struct I2cTraits;
 
+template<>
+struct I2cTraits<I2C1>
+{
+	static constexpr IRQn_Type eventIrq = I2C1_EV_IRQn;
+	static constexpr IRQn_Type errorIrq = I2C1_ER_IRQn;
+};
 
-
-#endif /* STM32_I2C_I2C_TRAITS_HPP_ */
+} // namespace i2c

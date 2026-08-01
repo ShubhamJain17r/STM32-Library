@@ -5,6 +5,8 @@
 
 #include "stm32/common/rcc.hpp"
 
+#include "stm32/gpio/pin_map.hpp"
+
 namespace uart
 {
 
@@ -14,6 +16,9 @@ struct Traits;
 template<>
 struct Traits<USART1>
 {
+	static constexpr gpio::Pin defaultTx = gpio::PA9;
+	static constexpr gpio::Pin defaultRx = gpio::PA10;
+
 	static constexpr IRQn_Type irq = USART1_IRQn;
 
 	void enableClock() noexcept
@@ -27,6 +32,9 @@ struct Traits<USART1>
 template<>
 struct Traits<USART2>
 {
+	static constexpr gpio::Pin defaultTx = gpio::PA2;
+	static constexpr gpio::Pin defaultRx = gpio::PA3;
+
 	static constexpr IRQn_Type irq = USART2_IRQn;
 
 	void enableClock() noexcept
@@ -40,6 +48,9 @@ struct Traits<USART2>
 template<>
 struct Traits<USART3>
 {
+	static constexpr gpio::Pin defaultTx = gpio::PB10;
+	static constexpr gpio::Pin defaultRx = gpio::PB11;
+
 	static constexpr IRQn_Type irq = USART3_IRQn;
 
 	void enableClock() noexcept
@@ -53,6 +64,9 @@ struct Traits<USART3>
 template<>
 struct Traits<UART4>
 {
+	static constexpr gpio::Pin defaultTx = gpio::PA0;
+	static constexpr gpio::Pin defaultRx = gpio::PA1;
+
 	static constexpr IRQn_Type irq = UART4_IRQn;
 
 	void enableClock() noexcept
@@ -66,6 +80,9 @@ struct Traits<UART4>
 template<>
 struct Traits<UART5>
 {
+	static constexpr gpio::Pin defaultTx = gpio::PC12;
+	static constexpr gpio::Pin defaultRx = gpio::PD2;
+
 	static constexpr IRQn_Type irq = UART5_IRQn;
 
 	void enableClock() noexcept
@@ -79,6 +96,9 @@ struct Traits<UART5>
 template<>
 struct Traits<USART6>
 {
+	static constexpr gpio::Pin defaultTx = gpio::PC6;
+	static constexpr gpio::Pin defaultRx = gpio::PC7;
+
 	static constexpr IRQn_Type irq = USART6_IRQn;
 
 	void enableClock() noexcept

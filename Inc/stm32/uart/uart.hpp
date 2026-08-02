@@ -27,19 +27,26 @@ public:
 private:
 
 public:
-    void write(char);
-    void write(std::uint8_t);
-    void write(const char*);
-    void write(const std::uint8_t*, std::size_t);
+    void write(char) noexcept;
+    void write(std::uint8_t) noexcept;
+    void write(const char*) noexcept;
+    void write(const std::uint8_t*, std::size_t) noexcept;
 
-    char read();
-    std::uint8_t readByte();
-    void read(std::uint8_t*, std::size_t);
+    char read() noexcept;
+    std::uint8_t readByte() noexcept;
+    void read(std::uint8_t*, std::size_t) noexcept;
 
-    bool available() const;
+    bool available() const noexcept;
 
-    void enable();
-    void disable();
+    void enable() noexcept;
+    void disable() noexcept;
 };
+
+using Uart1 = UartHandler<Instance::usart1>;
+using Uart2 = UartHandler<Instance::usart2>;
+using Uart3 = UartHandler<Instance::usart3>;
+using Uart4 = UartHandler<Instance::uart4>;
+using Uart5 = UartHandler<Instance::uart5>;
+using Uart6 = UartHandler<Instance::usart6>;
 
 } // namespace uart

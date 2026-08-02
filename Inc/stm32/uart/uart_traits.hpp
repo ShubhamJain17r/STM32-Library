@@ -13,19 +13,19 @@ namespace uart
 
 enum class Instance
 {
-    Usart1,
-    Usart2,
-    Usart3,
-    Uart4,
-    Uart5,
-    Usart6
+    usart1,
+    usart2,
+    usart3,
+    uart4,
+    uart5,
+    usart6
 };
 
 template<Instance I>
 struct Traits;
 
 template<>
-struct Traits<Instance::Usart1>
+struct Traits<Instance::usart1>
 {
     static USART_TypeDef* peripheral() noexcept
     {
@@ -49,7 +49,7 @@ struct Traits<Instance::Usart1>
 };
 
 template<>
-struct Traits<Instance::Usart2>
+struct Traits<Instance::usart2>
 {
     static USART_TypeDef* peripheral() noexcept
     {
@@ -73,7 +73,7 @@ struct Traits<Instance::Usart2>
 };
 
 template<>
-struct Traits<Instance::Usart3>
+struct Traits<Instance::usart3>
 {
     static USART_TypeDef* peripheral() noexcept
     {
@@ -97,7 +97,7 @@ struct Traits<Instance::Usart3>
 };
 
 template<>
-struct Traits<Instance::Uart4>
+struct Traits<Instance::uart4>
 {
     static USART_TypeDef* peripheral() noexcept
     {
@@ -121,7 +121,7 @@ struct Traits<Instance::Uart4>
 };
 
 template<>
-struct Traits<Instance::Uart5>
+struct Traits<Instance::uart5>
 {
     static USART_TypeDef* peripheral() noexcept
     {
@@ -145,7 +145,7 @@ struct Traits<Instance::Uart5>
 };
 
 template<>
-struct Traits<Instance::Usart6>
+struct Traits<Instance::usart6>
 {
     static USART_TypeDef* peripheral() noexcept
     {

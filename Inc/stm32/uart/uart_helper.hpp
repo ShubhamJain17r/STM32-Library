@@ -10,12 +10,12 @@
 namespace uart::helper
 {
 
-inline bool txReady(USART_TypeDef* uart)
+inline bool txReady(USART_TypeDef* uart) noexcept
 {
 	return uart->SR & USART_SR_TXE;
 }
 
-inline bool transmissionComplete(USART_TypeDef* uart)
+inline bool transmissionComplete(USART_TypeDef* uart) noexcept
 {
 	return uart->SR & USART_SR_TC;
 }
@@ -25,14 +25,14 @@ inline bool rxReady(USART_TypeDef* uart)
 	return uart->SR & USART_SR_RXNE;
 }
 
-inline void configureBaudRate(USART_TypeDef* uart, std::uint32_t baud, rcc::Bus bus)
+inline void configureBaudRate(USART_TypeDef* uart, std::uint32_t baud, rcc::Bus bus) noexcept
 {
 	const std::uint32_t freq = frequency(bus);
 
 	uart->BRR = (freq / baud);
 }
 
-inline void setOversampling(USART_TypeDef* uart, Oversampling over)
+inline void setOversampling(USART_TypeDef* uart, Oversampling over) noexcept
 {
 	uart->CR1 &= ~USART_CR1_OVER8;
 
@@ -52,7 +52,7 @@ inline void disable(USART_TypeDef* uart)
 	uart->CR1 &= ~USART_CR1_UE;
 }
 
-inline void setWordLength(USART_TypeDef* uart, WordLength len)
+inline void setWordLength(USART_TypeDef* uart, WordLength len) noexcept
 {
 	uart->CR1 &= ~USART_CR1_M;
 
@@ -62,7 +62,7 @@ inline void setWordLength(USART_TypeDef* uart, WordLength len)
 	}
 }
 
-inline void setParity(USART_TypeDef* uart, Parity parity)
+inline void setParity(USART_TypeDef* uart, Parity parity) noexcept
 {
     uart->CR1 &= ~(USART_CR1_PCE | USART_CR1_PS);
 
@@ -82,7 +82,7 @@ inline void setParity(USART_TypeDef* uart, Parity parity)
     }
 }
 
-inline void setMode(USART_TypeDef* uart, Mode mode)
+inline void setMode(USART_TypeDef* uart, Mode mode) noexcept
 {
     uart->CR1 &= ~(USART_CR1_TE | USART_CR1_RE);
 
@@ -102,21 +102,21 @@ inline void setMode(USART_TypeDef* uart, Mode mode)
     }
 }
 
-inline void setStopBits(USART_TypeDef* uart, StopBits stop)
+inline void setStopBits(USART_TypeDef* uart, StopBits stop) noexcept
 {
 	uart->CR2 &= ~USART_CR2_STOP;
 
     uart->CR2 |= (static_cast<uint32_t>(stop) << USART_CR2_STOP_Pos);
 }
 
-inline std::uint16_t read(USART_TypeDef* uart)
+inline std::uint16_t read(USART_TypeDef* uart) noexcept
 {
 	while(!rxReady(uart));
 
     return uart->DR;
 }
 
-inline void write(USART_TypeDef* uart, std::uint16_t data)
+inline void write(USART_TypeDef* uart, std::uint16_t data) noexcept
 {
 	while(!txReady(uart));
 

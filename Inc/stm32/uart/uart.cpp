@@ -58,19 +58,19 @@ UartHandler<I>::UartHandler(const uartConfig<I>& config)
 }
 
 template<Instance I>
-inline void UartHandler<I>::write(char c)
+inline void UartHandler<I>::write(char c) noexcept
 {
     helper::write(Traits<I>::peripheral(), static_cast<std::uint8_t>(c));
 }
 
 template<Instance I>
-inline void UartHandler<I>::write(std::uint8_t data)
+inline void UartHandler<I>::write(std::uint8_t data) noexcept
 {
     helper::write(Traits<I>::peripheral(), data);
 }
 
 template<Instance I>
-inline void UartHandler<I>::write(const char* str)
+inline void UartHandler<I>::write(const char* str) noexcept
 {
     while(*str)
     {
@@ -79,7 +79,7 @@ inline void UartHandler<I>::write(const char* str)
 }
 
 template<Instance I>
-inline void UartHandler<I>::write(const std::uint8_t* data, std::size_t length)
+inline void UartHandler<I>::write(const std::uint8_t* data, std::size_t length) noexcept
 {
     while(length--)
     {
@@ -88,19 +88,19 @@ inline void UartHandler<I>::write(const std::uint8_t* data, std::size_t length)
 }
 
 template<Instance I>
-inline char UartHandler<I>::read()
+inline char UartHandler<I>::read() noexcept
 {
     return static_cast<char>(helper::read(Traits<I>::peripheral()));
 }
 
 template<Instance I>
-inline std::uint8_t UartHandler<I>::readByte()
+inline std::uint8_t UartHandler<I>::readByte() noexcept
 {
     return static_cast<std::uint8_t>(helper::read(Traits<I>::peripheral()));
 }
 
 template<Instance I>
-inline void UartHandler<I>::read(std::uint8_t* buffer, std::size_t length)
+inline void UartHandler<I>::read(std::uint8_t* buffer, std::size_t length) noexcept
 {
     while(length--)
     {
@@ -115,13 +115,13 @@ inline bool UartHandler<I>::available() const noexcept
 }
 
 template<Instance I>
-inline void UartHandler<I>::enable()
+inline void UartHandler<I>::enable() noexcept
 {
     helper::enable(Traits<I>::peripheral());
 }
 
 template<Instance I>
-inline void UartHandler<I>::disable()
+inline void UartHandler<I>::disable() noexcept
 {
     helper::disable(Traits<I>::peripheral());
 }

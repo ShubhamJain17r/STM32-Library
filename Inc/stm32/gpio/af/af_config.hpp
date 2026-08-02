@@ -3,11 +3,8 @@
 #include "stm32f446xx.h"
 #include <cstdint>
 
-#include "stm32/gpio/pin.hpp"
-#include "stm32/gpio/gpio_types.hpp"
 #include "stm32/gpio/gpio_helper.hpp"
 
-#include "stm32/gpio/af/af_types.hpp"
 #include "stm32/gpio/af/af_helper.hpp"
 
 namespace gpio::af

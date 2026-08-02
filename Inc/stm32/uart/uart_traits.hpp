@@ -6,7 +6,6 @@
 #include "stm32/common/rcc.hpp"
 #include "stm32/common/rcc_enable.hpp"
 
-#include "stm32/gpio/pin_map.hpp"
 #include "stm32/gpio/af/af_traits.hpp"
 
 namespace uart

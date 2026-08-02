@@ -6,8 +6,6 @@
 #include "stm32/uart/uart_traits.hpp"
 #include "stm32/uart/uart_types.hpp"
 
-#include "stm32/gpio/pin.hpp"
-
 #include "stm32/gpio/af/af_config.hpp"
 
 namespace uart

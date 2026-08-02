@@ -56,7 +56,6 @@ public:
 	{
 		return !isHigh();
 	}
-
 };
 
 } // namespace gpio

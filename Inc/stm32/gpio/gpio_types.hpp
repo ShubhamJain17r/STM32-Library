@@ -46,7 +46,4 @@ enum class Edge
 	FALLING
 };
 
-// TODO
-
-
 } // namespace gpio

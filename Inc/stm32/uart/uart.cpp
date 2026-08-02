@@ -3,6 +3,7 @@
 #include "stm32/gpio/gpio_helper.hpp"
 
 #include "stm32/gpio/af/af_helper.hpp"
+
 #include "stm32/uart/uart_helper.hpp"
 
 namespace uart
@@ -38,7 +39,6 @@ UartHandler<I>::UartHandler(gpio::Pin tx,
 template<Instance I>
 UartHandler<I>::UartHandler(const uartConfig<I>& config)
 {
-	// TODO : gpio configuration
 	gpio::af::configure<Traits<I>::txSignal>(config.tx, config.txPinConfig);
 	gpio::af::configure<Traits<I>::rxSignal>(config.tx, config.txPinConfig);
 

@@ -5,7 +5,7 @@
 
 #include "stm32/uart/uart_types.hpp"
 
-namespace uart
+namespace uart::helper
 {
 
 inline bool txReady(USART_TypeDef* uart)
@@ -112,4 +112,4 @@ inline void write(USART_TypeDef* uart, std::uint16_t data)
     uart->DR = data;
 }
 
-} // namespace uart
+} // namespace uart::helper

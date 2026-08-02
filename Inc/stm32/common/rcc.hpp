@@ -1,46 +1,43 @@
 #pragma once
 
-#include "stm32f446xx.h"
 #include <cstdint>
 
 namespace rcc
 {
 
 inline constexpr std::uint32_t HSI_FREQUENCY = 16'000'000U;
+inline constexpr std::uint32_t LSI_FREQUENCY =     32'000U;
 
-inline constexpr std::uint32_t LSI_FREQUENCY = 32'000U;
+inline constexpr std::uint32_t SYSTEM_CLOCK = HSI_FREQUENCY;
+inline constexpr std::uint32_t AHB_CLOCK    = SYSTEM_CLOCK;
+inline constexpr std::uint32_t APB1_CLOCK   = SYSTEM_CLOCK;
+inline constexpr std::uint32_t APB2_CLOCK   = SYSTEM_CLOCK;
 
-inline std::uint32_t systemClock = HSI_FREQUENCY;
-inline std::uint32_t ahbClock    = HSI_FREQUENCY;
-inline std::uint32_t apb1Clock   = HSI_FREQUENCY;
-inline std::uint32_t apb2Clock   = HSI_FREQUENCY;
-
-
-inline void enableGpioClock(GPIO_TypeDef* port) noexcept
+enum class Bus : std::uint8_t
 {
-	if(port == GPIOA) RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;
-	if(port == GPIOB) RCC->AHB1ENR |= RCC_AHB1ENR_GPIOBEN;
-	if(port == GPIOC) RCC->AHB1ENR |= RCC_AHB1ENR_GPIOCEN;
-	if(port == GPIOD) RCC->AHB1ENR |= RCC_AHB1ENR_GPIODEN;
-	if(port == GPIOE) RCC->AHB1ENR |= RCC_AHB1ENR_GPIOEEN;
-	if(port == GPIOF) RCC->AHB1ENR |= RCC_AHB1ENR_GPIOFEN;
-	if(port == GPIOG) RCC->AHB1ENR |= RCC_AHB1ENR_GPIOGEN;
-	if(port == GPIOH) RCC->AHB1ENR |= RCC_AHB1ENR_GPIOHEN;
-}
+    AHB1,
+    AHB2,
 
-inline void enableSyscfgClock() noexcept
-{
-	RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
-}
+    APB1,
+    APB2
+};
 
-inline void enableUartClock(USART_TypeDef* uart)
+constexpr std::uint32_t frequency(Bus bus) noexcept
 {
-	if(uart == USART1) RCC->APB2ENR |= RCC_APB2ENR_USART1EN;
-	if(uart == USART2) RCC->APB1ENR |= RCC_APB1ENR_USART2EN;
-	if(uart == USART3) RCC->APB1ENR |= RCC_APB1ENR_USART3EN;
-	if(uart == UART4) RCC->APB1ENR |= RCC_APB1ENR_UART4EN;
-	if(uart == UART5) RCC->APB1ENR |= RCC_APB1ENR_UART5EN;
-	if(uart == USART6) RCC->APB2ENR |= RCC_APB2ENR_USART6EN;
+    switch(bus)
+    {
+        case Bus::AHB1:
+        case Bus::AHB2:
+            return AHB_CLOCK;
+
+        case Bus::APB1:
+            return APB1_CLOCK;
+
+        case Bus::APB2:
+            return APB2_CLOCK;
+    }
+
+    return 0;
 }
 
 } // namespace rcc

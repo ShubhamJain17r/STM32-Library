@@ -11,12 +11,12 @@
 namespace uart
 {
 
-template<USART_TypeDef* Instance>
+template<Instance I>
 struct uartConfig
 {
-    gpio::Pin tx = Traits<Instance>::defaultTx;
+    gpio::Pin tx = Traits<I>::defaultTx;
 
-    gpio::Pin rx = Traits<Instance>::defaultRx;
+    gpio::Pin rx = Traits<I>::defaultRx;
 
     std::uint32_t baud = 115200;
 

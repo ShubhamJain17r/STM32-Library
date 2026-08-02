@@ -6,16 +6,29 @@
 #include "stm32/common/rcc.hpp"
 
 #include "stm32/gpio/pin_map.hpp"
+#include "stm32/gpio/af_traits.hpp"
 
 namespace uart
 {
 
-template<USART_TypeDef* Instance>
+enum class Instance
+{
+    Usart1,
+    Usart2,
+    Usart3,
+    Uart4,
+    Uart5,
+    Usart6
+};
+
+template<Instance I>
 struct Traits;
 
 template<>
-struct Traits<USART1>
+struct Traits<Instance::Usart1>
 {
+	static constexpr USART_TypeDef* instance = USART1;
+
 	static constexpr gpio::Pin defaultTx = gpio::PA9;
 	static constexpr gpio::Pin defaultRx = gpio::PA10;
 
@@ -30,8 +43,9 @@ struct Traits<USART1>
 };
 
 template<>
-struct Traits<USART2>
+struct Traits<Instance::Usart2>
 {
+	static constexpr USART_TypeDef* instance = USART2;
 	static constexpr gpio::Pin defaultTx = gpio::PA2;
 	static constexpr gpio::Pin defaultRx = gpio::PA3;
 
@@ -46,8 +60,9 @@ struct Traits<USART2>
 };
 
 template<>
-struct Traits<USART3>
+struct Traits<Instance::Usart3>
 {
+	static constexpr USART_TypeDef* instance = USART3;
 	static constexpr gpio::Pin defaultTx = gpio::PB10;
 	static constexpr gpio::Pin defaultRx = gpio::PB11;
 
@@ -62,8 +77,9 @@ struct Traits<USART3>
 };
 
 template<>
-struct Traits<UART4>
+struct Traits<Instance::Uart4>
 {
+	static constexpr USART_TypeDef* instance = UART4;
 	static constexpr gpio::Pin defaultTx = gpio::PA0;
 	static constexpr gpio::Pin defaultRx = gpio::PA1;
 
@@ -78,8 +94,9 @@ struct Traits<UART4>
 };
 
 template<>
-struct Traits<UART5>
+struct Traits<Instance::Uart5>
 {
+	static constexpr USART_TypeDef* instance = UART5;
 	static constexpr gpio::Pin defaultTx = gpio::PC12;
 	static constexpr gpio::Pin defaultRx = gpio::PD2;
 
@@ -94,8 +111,9 @@ struct Traits<UART5>
 };
 
 template<>
-struct Traits<USART6>
+struct Traits<Instance::Usart6>
 {
+	static constexpr USART_TypeDef* instance = USART6;
 	static constexpr gpio::Pin defaultTx = gpio::PC6;
 	static constexpr gpio::Pin defaultRx = gpio::PC7;
 

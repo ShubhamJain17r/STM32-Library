@@ -46,11 +46,4 @@ enum class Edge
 	FALLING
 };
 
-struct AlternateFunctionConfig
-{
-	OutputType outputType = OutputType::PUSH_PULL;
-	OutputSpeed outputSpeed = OutputSpeed::LOW;
-	Pull pull = Pull::NONE;
-};
-
 } // namespace gpio

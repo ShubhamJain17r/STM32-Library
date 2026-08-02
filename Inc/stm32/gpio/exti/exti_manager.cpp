@@ -1,4 +1,4 @@
-#include "stm32/gpio/exti_manager.hpp"
+#include "stm32/gpio/exti/exti_manager.hpp"
 
 namespace exti
 {
@@ -21,7 +21,7 @@ void ExtiManager::setFallingCallback(const gpio::Pin& pin, Callback cb)
 
 void ExtiManager::handleInterrupt(std::uint8_t line)
 {
-    EXTI->PR = (1u << line);
+	clearPending(line);
 
     auto& entry = table[line];
 

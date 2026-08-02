@@ -5,12 +5,9 @@
 
 #include "stm32/gpio/pin.hpp"
 #include "stm32/gpio/gpio_types.hpp"
-#include "stm32/gpio/af_types.hpp"
+#include "stm32/gpio/af/af_types.hpp"
 
-namespace gpio
-{
-
-namespace af
+namespace gpio::af
 {
 
 inline void setAlternateFunction(const Pin& pin, AlternateFunction af)
@@ -25,7 +22,7 @@ inline void setAlternateFunction(const Pin& pin, AlternateFunction af)
 template<Signal signal>
 constexpr bool supports(Pin pin)
 {
-    for(auto p : Traits<signal>::pins)
+    for(const auto& p : Traits<signal>::pins)
     {
         if(p == pin)
             return true;
@@ -37,11 +34,7 @@ constexpr bool supports(Pin pin)
 template<Signal signal>
 constexpr AlternateFunction alternateFunction(Pin pin)
 {
-    return supports<signal>(pin)
-            ? Traits<signal>::af
-            : AlternateFunction::INVALID;
+    return supports<signal>(pin) ? Traits<signal>::af : AlternateFunction::INVALID;
 }
 
-} // namespace af
-
-} // namespace gpio
+} // namespace gpio::af

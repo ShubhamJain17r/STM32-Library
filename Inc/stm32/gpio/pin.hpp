@@ -3,7 +3,7 @@
 #include "stm32f446xx.h"
 #include <cstdint>
 
-#include "stm32/common/rcc.hpp"
+#include "stm32/common/rcc_enable.hpp"
 
 namespace
 {
@@ -47,9 +47,9 @@ struct Pin
         return (portIndex() << 4) | number;
     }
 
-    void enableClock() const noexcept
+    inline void enableClock() const noexcept
     {
-        rcc::enableGpioClock(port);
+        rcc::enablePeripheralClock(port);
     }
 
     constexpr bool operator==(const Pin& rhs) const noexcept

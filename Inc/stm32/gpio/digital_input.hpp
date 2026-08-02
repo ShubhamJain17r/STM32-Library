@@ -3,9 +3,8 @@
 #include "stm32f446xx.h"
 #include <cstdint>
 
-#include "stm32/gpio/pin_map.hpp"
+#include "stm32/gpio/pin.hpp"
 #include "stm32/gpio/gpio_types.hpp"
-#include "stm32/gpio/gpio_helper.hpp"
 
 namespace gpio
 {
@@ -37,6 +36,16 @@ public:
 			return PinState::HIGH;
 		}
 		return PinState::LOW;
+	}
+
+	inline bool isHigh() const noexcept
+	{
+		return (read() == PinState::HIGH);
+	}
+
+	inline bool isLow() const noexcept
+	{
+		return !isHigh();
 	}
 };
 

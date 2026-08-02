@@ -46,6 +46,7 @@ enum class Edge
 	FALLING
 };
 
+// TODO
 struct AlternatePinConfig
 {
 	OutputType outputType = OutputType::PUSH_PULL;

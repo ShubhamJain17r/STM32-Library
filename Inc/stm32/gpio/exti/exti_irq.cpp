@@ -1,4 +1,4 @@
-#include "stm32/gpio/exti_manager.hpp"
+#include "stm32/gpio/exti/exti_manager.hpp"
 
 extern "C"
 {

@@ -5,9 +5,8 @@
 
 #include"stm32/common/callback.hpp"
 
-#include "stm32/gpio/pin_map.hpp"
+#include "stm32/gpio/pin.hpp"
 #include "stm32/gpio/gpio_types.hpp"
-#include "stm32/gpio/gpio_helper.hpp"
 
 namespace gpio
 {
@@ -37,17 +36,6 @@ public:
 	explicit InterruptInput(Pin pin, InterruptInputConfig config = {});
 
 private:
-	inline void setModeInput() const noexcept
-	{
-		pin_.port->MODER &= ~(3U << (pin_.number * 2));
-		pin_.port->MODER |=  (static_cast<std::uint8_t>(Mode::INPUT) << (pin_.number * 2));
-	}
-
-	inline void configurePull(Pull pull) const noexcept
-	{
-		pin_.port->PUPDR &= ~(3U << (pin_.number * 2));
-		pin_.port->PUPDR |=  (static_cast<std::uint8_t>(pull) << (pin_.number * 2));
-	}
 
 public:
 	inline PinState read() const noexcept
@@ -58,6 +46,17 @@ public:
 		}
 		return PinState::LOW;
 	}
+
+	inline bool isHigh() const noexcept
+	{
+		return (read() == PinState::HIGH);
+	}
+
+	inline bool isLow() const noexcept
+	{
+		return !isHigh();
+	}
+
 };
 
 } // namespace gpio

@@ -3,13 +3,10 @@
 #include <cstdint>
 #include <array>
 
-#include "stm32/gpio/af_types.hpp"
+#include "stm32/gpio/af/af_types.hpp"
 #include "Stm32/gpio/pin_map.hpp"
 
-namespace gpio
-{
-
-namespace af
+namespace gpio::af
 {
 
 template<Signal>
@@ -111,7 +108,4 @@ struct Traits<Signal::USART6_RX>
 	static constexpr std::array<Pin, 2> pins = {PC7, PG9};
 };
 
-
-} // namespace af
-
-} // namespace gpio
+} // namespace gpio::af

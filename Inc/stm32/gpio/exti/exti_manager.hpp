@@ -7,7 +7,7 @@
 
 #include "stm32/common/callback.hpp"
 
-namespace exti
+namespace
 {
 
 constexpr IRQn_Type extiIRQ(std::uint8_t line)
@@ -21,10 +21,15 @@ constexpr IRQn_Type extiIRQ(std::uint8_t line)
     return EXTI15_10_IRQn;
 }
 
+} // namespace
+
+namespace exti
+{
+
 inline void configureExticr(const gpio::Pin& pin) noexcept
 {
 	std::uint8_t index = pin.number / 4;
-	std::uint16_t pos = (index % 4) * 4;
+	std::uint16_t pos = (pin.number % 4) * 4;
 
 	SYSCFG->EXTICR[index] &= ~(0xF << pos);
 	SYSCFG->EXTICR[index] |=  (pin.portIndex() << pos);

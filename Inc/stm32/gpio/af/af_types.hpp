@@ -2,10 +2,7 @@
 
 #include <cstdint>
 
-namespace gpio
-{
-
-namespace af
+namespace gpio::af
 {
 
 enum class AlternateFunction : std::uint8_t
@@ -33,6 +30,4 @@ enum class Signal
 	USART6_TX, USART6_RX
 };
 
-} // namespace af
-
-} // namespace gpio
+} // namespace gpio::af

@@ -13,10 +13,10 @@ namespace gpio::af
 inline void setAlternateFunction(const Pin& pin, AlternateFunction af)
 {
 	std::uint8_t index = pin.number / 8;
-	std::uint32_t pos = (pin.number % 8) * 4;
+	std::uint8_t pos = (pin.number % 8) * 4;
 
 	pin.port->AFR[index] &= ~(0xF << pos);
-	pin.port->AFR[index] |=  (af << pos);
+	pin.port->AFR[index] |=  (static_cast<std::uint8_t>(af) << pos);
 }
 
 template<Signal signal>

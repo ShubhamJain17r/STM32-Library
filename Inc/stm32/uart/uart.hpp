@@ -11,34 +11,32 @@
 namespace uart
 {
 
-template<USART_TypeDef* Instance>
+template<Instance I>
 class UartHandler
 {
 private:
 
 public:
-//	using Traits_ = Traits<Instance>;
-//
-//	explicit UartHandler();
-//
-//    explicit UartHandler(uint32_t baud);
-//
-//    explicit UartHandler(gpio::Pin tx, gpio::Pin rx);
-//
-//    explicit UartHandler(gpio::Pin tx, gpio::Pin rx, uint32_t baud);
-//
-//    explicit UartHandler(const uartConfig<Instance>& config);
+	explicit UartHandler();
+
+    explicit UartHandler(std::uint32_t baud);
+
+    explicit UartHandler(gpio::Pin tx, gpio::Pin rx);
+
+    explicit UartHandler(gpio::Pin tx, gpio::Pin rx, std::uint32_t baud);
+
+    explicit UartHandler(const uartConfig<I>& config);
 
 private:
 
 public:
-//    void write(char);
+//    inline void write(char);
 //
-//    char read();
+//    inline char read();
 //
-//    void enable();
+//    inline void enable();
 //
-//    void disable();
+//    inline void disable();
 };
 
 } // namespace uart

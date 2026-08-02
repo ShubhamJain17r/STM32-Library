@@ -57,4 +57,73 @@ UartHandler<I>::UartHandler(const uartConfig<I>& config)
     helper::enable(uart);
 }
 
+template<Instance I>
+inline void UartHandler<I>::write(char c)
+{
+    helper::write(Traits<I>::peripheral(), static_cast<std::uint8_t>(c));
+}
+
+template<Instance I>
+inline void UartHandler<I>::write(std::uint8_t data)
+{
+    helper::write(Traits<I>::peripheral(), data);
+}
+
+template<Instance I>
+inline void UartHandler<I>::write(const char* str)
+{
+    while(*str)
+    {
+        write(*str++);
+    }
+}
+
+template<Instance I>
+inline void UartHandler<I>::write(const std::uint8_t* data, std::size_t length)
+{
+    while(length--)
+    {
+        write(*data++);
+    }
+}
+
+template<Instance I>
+inline char UartHandler<I>::read()
+{
+    return static_cast<char>(helper::read(Traits<I>::peripheral()));
+}
+
+template<Instance I>
+inline std::uint8_t UartHandler<I>::readByte()
+{
+    return static_cast<std::uint8_t>(helper::read(Traits<I>::peripheral()));
+}
+
+template<Instance I>
+inline void UartHandler<I>::read(std::uint8_t* buffer, std::size_t length)
+{
+    while(length--)
+    {
+        *buffer++ = readByte();
+    }
+}
+
+template<Instance I>
+inline bool UartHandler<I>::available() const noexcept
+{
+    return helper::rxReady(Traits<I>::peripheral());
+}
+
+template<Instance I>
+inline void UartHandler<I>::enable()
+{
+    helper::enable(Traits<I>::peripheral());
+}
+
+template<Instance I>
+inline void UartHandler<I>::disable()
+{
+    helper::disable(Traits<I>::peripheral());
+}
+
 } // namespace uart

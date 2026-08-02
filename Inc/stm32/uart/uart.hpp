@@ -27,13 +27,19 @@ public:
 private:
 
 public:
-//    inline void write(char);
-//
-//    inline char read();
-//
-//    inline void enable();
-//
-//    inline void disable();
+    void write(char);
+    void write(std::uint8_t);
+    void write(const char*);
+    void write(const std::uint8_t*, std::size_t);
+
+    char read();
+    std::uint8_t readByte();
+    void read(std::uint8_t*, std::size_t);
+
+    bool available() const;
+
+    void enable();
+    void disable();
 };
 
 } // namespace uart

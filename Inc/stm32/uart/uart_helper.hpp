@@ -111,11 +111,15 @@ inline void setStopBits(USART_TypeDef* uart, StopBits stop)
 
 inline std::uint16_t read(USART_TypeDef* uart)
 {
+	while(!rxReady(uart));
+
     return uart->DR;
 }
 
 inline void write(USART_TypeDef* uart, std::uint16_t data)
 {
+	while(!txReady(uart));
+
     uart->DR = data;
 }
 

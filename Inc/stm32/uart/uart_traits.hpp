@@ -4,9 +4,10 @@
 #include <cstdint>
 
 #include "stm32/common/rcc.hpp"
+#include "stm32/common/rcc_enable.hpp"
 
 #include "stm32/gpio/pin_map.hpp"
-#include "stm32/gpio/af_traits.hpp"
+#include "stm32/gpio/af/af_traits.hpp"
 
 namespace uart
 {
@@ -27,104 +28,145 @@ struct Traits;
 template<>
 struct Traits<Instance::Usart1>
 {
-	static constexpr USART_TypeDef* instance = USART1;
+    static USART_TypeDef* peripheral() noexcept
+    {
+        return USART1;
+    }
 
-	static constexpr gpio::Pin defaultTx = gpio::PA9;
-	static constexpr gpio::Pin defaultRx = gpio::PA10;
+    static constexpr IRQn_Type irq = USART1_IRQn;
 
-	static constexpr IRQn_Type irq = USART1_IRQn;
+    static constexpr rcc::Bus bus = rcc::Bus::APB2;
 
-	static void enableClock() noexcept
-	{
-		rcc::enableUartClock(USART1);
-	}
+    static constexpr gpio::af::Signal txSignal = gpio::af::Signal::USART1_TX;
+    static constexpr gpio::af::Signal rxSignal = gpio::af::Signal::USART1_RX;
 
-	static constexpr std::uint32_t busClock = rcc::apb2Clock;
+    static constexpr gpio::Pin defaultTx = gpio::af::Traits<txSignal>::pins[0];
+    static constexpr gpio::Pin defaultRx = gpio::af::Traits<txSignal>::pins[0];
+
+    static void enableClock() noexcept
+    {
+        rcc::enablePeripheralClock(peripheral());
+    }
 };
 
 template<>
 struct Traits<Instance::Usart2>
 {
-	static constexpr USART_TypeDef* instance = USART2;
-	static constexpr gpio::Pin defaultTx = gpio::PA2;
-	static constexpr gpio::Pin defaultRx = gpio::PA3;
+    static USART_TypeDef* peripheral() noexcept
+    {
+        return USART2;
+    }
 
-	static constexpr IRQn_Type irq = USART2_IRQn;
+    static constexpr IRQn_Type irq = USART2_IRQn;
 
-	void enableClock() noexcept
-	{
-		rcc::enableUartClock(USART2);
-	}
+    static constexpr rcc::Bus bus = rcc::Bus::APB1;
 
-	static constexpr std::uint32_t busClock = rcc::apb1Clock;
+    static constexpr gpio::af::Signal txSignal = gpio::af::Signal::USART2_TX;
+    static constexpr gpio::af::Signal rxSignal = gpio::af::Signal::USART2_RX;
+
+    static constexpr gpio::Pin defaultTx = gpio::af::Traits<txSignal>::pins[0];
+    static constexpr gpio::Pin defaultRx = gpio::af::Traits<txSignal>::pins[0];
+
+    static void enableClock() noexcept
+    {
+        rcc::enablePeripheralClock(peripheral());
+    }
 };
 
 template<>
 struct Traits<Instance::Usart3>
 {
-	static constexpr USART_TypeDef* instance = USART3;
-	static constexpr gpio::Pin defaultTx = gpio::PB10;
-	static constexpr gpio::Pin defaultRx = gpio::PB11;
+    static USART_TypeDef* peripheral() noexcept
+    {
+        return USART3;
+    }
 
-	static constexpr IRQn_Type irq = USART3_IRQn;
+    static constexpr IRQn_Type irq = USART3_IRQn;
 
-	void enableClock() noexcept
-	{
-		rcc::enableUartClock(USART3);
-	}
+    static constexpr rcc::Bus bus = rcc::Bus::APB1;
 
-	static constexpr std::uint32_t busClock = rcc::apb1Clock;
+    static constexpr gpio::af::Signal txSignal = gpio::af::Signal::USART3_TX;
+    static constexpr gpio::af::Signal rxSignal = gpio::af::Signal::USART3_RX;
+
+    static constexpr gpio::Pin defaultTx = gpio::af::Traits<txSignal>::pins[0];
+    static constexpr gpio::Pin defaultRx = gpio::af::Traits<txSignal>::pins[0];
+
+    static void enableClock() noexcept
+    {
+        rcc::enablePeripheralClock(peripheral());
+    }
 };
 
 template<>
 struct Traits<Instance::Uart4>
 {
-	static constexpr USART_TypeDef* instance = UART4;
-	static constexpr gpio::Pin defaultTx = gpio::PA0;
-	static constexpr gpio::Pin defaultRx = gpio::PA1;
+    static USART_TypeDef* peripheral() noexcept
+    {
+        return UART4;
+    }
 
-	static constexpr IRQn_Type irq = UART4_IRQn;
+    static constexpr IRQn_Type irq = UART4_IRQn;
 
-	void enableClock() noexcept
-	{
-		rcc::enableUartClock(UART4);
-	}
+    static constexpr rcc::Bus bus = rcc::Bus::APB1;
 
-	static constexpr std::uint32_t busClock = rcc::apb1Clock;
+    static constexpr gpio::af::Signal txSignal = gpio::af::Signal::UART4_TX;
+    static constexpr gpio::af::Signal rxSignal = gpio::af::Signal::UART4_RX;
+
+    static constexpr gpio::Pin defaultTx = gpio::af::Traits<txSignal>::pins[0];
+    static constexpr gpio::Pin defaultRx = gpio::af::Traits<txSignal>::pins[0];
+
+    static void enableClock() noexcept
+    {
+        rcc::enablePeripheralClock(peripheral());
+    }
 };
 
 template<>
 struct Traits<Instance::Uart5>
 {
-	static constexpr USART_TypeDef* instance = UART5;
-	static constexpr gpio::Pin defaultTx = gpio::PC12;
-	static constexpr gpio::Pin defaultRx = gpio::PD2;
+    static USART_TypeDef* peripheral() noexcept
+    {
+        return UART5;
+    }
 
-	static constexpr IRQn_Type irq = UART5_IRQn;
+    static constexpr IRQn_Type irq = UART5_IRQn;
 
-	void enableClock() noexcept
-	{
-		rcc::enableUartClock(UART5);
-	}
+    static constexpr rcc::Bus bus = rcc::Bus::APB1;
 
-	static constexpr std::uint32_t busClock = rcc::apb1Clock;
+    static constexpr gpio::af::Signal txSignal = gpio::af::Signal::UART5_TX;
+    static constexpr gpio::af::Signal rxSignal = gpio::af::Signal::UART5_RX;
+
+    static constexpr gpio::Pin defaultTx = gpio::af::Traits<txSignal>::pins[0];
+    static constexpr gpio::Pin defaultRx = gpio::af::Traits<txSignal>::pins[0];
+
+    static void enableClock() noexcept
+    {
+        rcc::enablePeripheralClock(peripheral());
+    }
 };
 
 template<>
 struct Traits<Instance::Usart6>
 {
-	static constexpr USART_TypeDef* instance = USART6;
-	static constexpr gpio::Pin defaultTx = gpio::PC6;
-	static constexpr gpio::Pin defaultRx = gpio::PC7;
+    static USART_TypeDef* peripheral() noexcept
+    {
+        return USART6;
+    }
 
-	static constexpr IRQn_Type irq = USART6_IRQn;
+    static constexpr IRQn_Type irq = USART6_IRQn;
 
-	void enableClock() noexcept
-	{
-		rcc::enableUartClock(USART6);
-	}
+    static constexpr rcc::Bus bus = rcc::Bus::APB2;
 
-	static constexpr std::uint32_t busClock = rcc::apb2Clock;
+    static constexpr gpio::af::Signal txSignal = gpio::af::Signal::USART6_TX;
+    static constexpr gpio::af::Signal rxSignal = gpio::af::Signal::USART6_RX;
+
+    static constexpr gpio::Pin defaultTx = gpio::af::Traits<txSignal>::pins[0];
+    static constexpr gpio::Pin defaultRx = gpio::af::Traits<txSignal>::pins[0];
+
+    static void enableClock() noexcept
+    {
+        rcc::enablePeripheralClock(peripheral());
+    }
 };
 
 } // namespace uart

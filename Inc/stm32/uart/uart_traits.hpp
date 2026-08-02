@@ -7,34 +7,10 @@
 #include "stm32/common/rcc_enable.hpp"
 
 #include "stm32/gpio/pin_map.hpp"
-#include "stm32/gpio/gpio_types.hpp"
 #include "stm32/gpio/af/af_traits.hpp"
 
 namespace uart
 {
-
-namespace detail
-{
-
-struct AsyncGpioTraits
-{
-    static constexpr gpio::Mode mode =
-        gpio::Mode::ALTERNATE;
-
-    static constexpr gpio::OutputType outputType =
-        gpio::OutputType::PUSH_PULL;
-
-    static constexpr gpio::OutputSpeed outputSpeed =
-        gpio::OutputSpeed::HIGH;
-
-    static constexpr gpio::Pull txPull =
-        gpio::Pull::NONE;
-
-    static constexpr gpio::Pull rxPull =
-        gpio::Pull::NONE;
-};
-
-} // namespace detail
 
 enum class Instance
 {
@@ -50,7 +26,7 @@ template<Instance I>
 struct Traits;
 
 template<>
-struct Traits<Instance::Usart1> : detail::AsyncGpioTraits
+struct Traits<Instance::Usart1>
 {
     static USART_TypeDef* peripheral() noexcept
     {
@@ -74,7 +50,7 @@ struct Traits<Instance::Usart1> : detail::AsyncGpioTraits
 };
 
 template<>
-struct Traits<Instance::Usart2> : detail::AsyncGpioTraits
+struct Traits<Instance::Usart2>
 {
     static USART_TypeDef* peripheral() noexcept
     {
@@ -98,7 +74,7 @@ struct Traits<Instance::Usart2> : detail::AsyncGpioTraits
 };
 
 template<>
-struct Traits<Instance::Usart3> : detail::AsyncGpioTraits
+struct Traits<Instance::Usart3>
 {
     static USART_TypeDef* peripheral() noexcept
     {
@@ -122,7 +98,7 @@ struct Traits<Instance::Usart3> : detail::AsyncGpioTraits
 };
 
 template<>
-struct Traits<Instance::Uart4> : detail::AsyncGpioTraits
+struct Traits<Instance::Uart4>
 {
     static USART_TypeDef* peripheral() noexcept
     {
@@ -146,7 +122,7 @@ struct Traits<Instance::Uart4> : detail::AsyncGpioTraits
 };
 
 template<>
-struct Traits<Instance::Uart5> : detail::AsyncGpioTraits
+struct Traits<Instance::Uart5>
 {
     static USART_TypeDef* peripheral() noexcept
     {
@@ -170,7 +146,7 @@ struct Traits<Instance::Uart5> : detail::AsyncGpioTraits
 };
 
 template<>
-struct Traits<Instance::Usart6> : detail::AsyncGpioTraits
+struct Traits<Instance::Usart6>
 {
     static USART_TypeDef* peripheral() noexcept
     {

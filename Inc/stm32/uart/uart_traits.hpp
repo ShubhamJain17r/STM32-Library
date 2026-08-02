@@ -10,7 +10,7 @@
 namespace uart
 {
 
-template<USART_TypeDef* USART>
+template<USART_TypeDef* Instance>
 struct Traits;
 
 template<>
@@ -21,7 +21,7 @@ struct Traits<USART1>
 
 	static constexpr IRQn_Type irq = USART1_IRQn;
 
-	void enableClock() noexcept
+	static void enableClock() noexcept
 	{
 		rcc::enableUartClock(USART1);
 	}

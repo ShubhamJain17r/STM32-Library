@@ -1,10 +1,12 @@
-/*
- * uart.cpp
- *
- *  Created on: 01-Aug-2026
- *      Author: shubh
- */
+#include "stm32/uart/uart.hpp"
 
+namespace uart
+{
 
+//template<USART_TypeDef* Instance>
+//UartHandler::UartHandler()
+//{
+//
+//}
 
-
+} // namespace uart

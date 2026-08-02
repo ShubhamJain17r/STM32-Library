@@ -1,15 +1,47 @@
-/*
- * af_helper.hpp
- *
- *  Created on: 02-Aug-2026
- *      Author: shubh
- */
+#pragma once
 
-#ifndef STM32_GPIO_AF_HELPER_HPP_
-#define STM32_GPIO_AF_HELPER_HPP_
+#include "stm32f446xx.h"
+#include <cstdint>
 
+#include "stm32/gpio/pin.hpp"
+#include "stm32/gpio/gpio_types.hpp"
+#include "stm32/gpio/af_types.hpp"
 
+namespace gpio
+{
 
+namespace af
+{
 
+inline void setAlternateFunction(const Pin& pin, AlternateFunction af)
+{
+	std::uint8_t index = pin.number / 8;
+	std::uint32_t pos = (pin.number % 8) * 4;
 
-#endif /* STM32_GPIO_AF_HELPER_HPP_ */
+	pin.port->AFR[index] &= ~(0xF << pos);
+	pin.port->AFR[index] |=  (af << pos);
+}
+
+template<Signal signal>
+constexpr bool supports(Pin pin)
+{
+    for(auto p : Traits<signal>::pins)
+    {
+        if(p == pin)
+            return true;
+    }
+
+    return false;
+}
+
+template<Signal signal>
+constexpr AlternateFunction alternateFunction(Pin pin)
+{
+    return supports<signal>(pin)
+            ? Traits<signal>::af
+            : AlternateFunction::INVALID;
+}
+
+} // namespace af
+
+} // namespace gpio

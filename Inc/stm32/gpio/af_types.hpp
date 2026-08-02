@@ -2,8 +2,6 @@
 
 #include <cstdint>
 
-#include "stm32/gpio/gpio_types.hpp"
-
 namespace gpio
 {
 
@@ -12,7 +10,9 @@ namespace af
 
 enum class AlternateFunction : std::uint8_t
 {
-	AF0, AF1, AF2, AF3, AF4, AF5, AF6, AF7, AF8, AF9, AF10, AF11, AF12, AF13, AF14, AF15
+	AF0, AF1, AF2, AF3, AF4, AF5, AF6, AF7, AF8, AF9, AF10, AF11, AF12, AF13, AF14, AF15,
+
+	INVALID = 0xFF
 };
 
 enum class Signal
@@ -31,13 +31,6 @@ enum class Signal
 	UART4_TX, UART4_RX,
 	UART5_TX, UART5_RX,
 	USART6_TX, USART6_RX
-};
-
-struct AlternateFunctionConfig
-{
-	OutputType outputType = OutputType::PUSH_PULL;
-	OutputSpeed outputSpeed = OutputSpeed::LOW;
-	Pull pull = Pull::NONE;
 };
 
 } // namespace af

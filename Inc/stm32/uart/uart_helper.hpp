@@ -5,6 +5,8 @@
 
 #include "stm32/uart/uart_types.hpp"
 
+#include "stm32/common/rcc.hpp"
+
 namespace uart::helper
 {
 
@@ -23,7 +25,12 @@ inline bool rxReady(USART_TypeDef* uart)
 	return uart->SR & USART_SR_RXNE;
 }
 
-inline void configureBaudRate(USART_TypeDef* uart, std::uint32_t brr);
+inline void configureBaudRate(USART_TypeDef* uart, std::uint32_t baud, rcc::Bus bus)
+{
+	const std::uint32_t freq = frequency(bus);
+
+	uart->BRR = (freq / baud);
+}
 
 inline void setOversampling(USART_TypeDef* uart, Oversampling over)
 {

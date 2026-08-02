@@ -52,7 +52,7 @@ UartHandler<I>::UartHandler(const uartConfig<I>& config)
     helper::setStopBits(uart, config.stopBits);
     helper::setMode(uart, config.mode);
 
-    helper::configureBaudRate(uart, config.baud);
+    helper::configureBaudRate(uart, config.baud, Traits<I>::bus);
 
     helper::enable(uart);
 }

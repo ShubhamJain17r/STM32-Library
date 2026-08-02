@@ -7,10 +7,34 @@
 #include "stm32/common/rcc_enable.hpp"
 
 #include "stm32/gpio/pin_map.hpp"
+#include "stm32/gpio/gpio_types.hpp"
 #include "stm32/gpio/af/af_traits.hpp"
 
 namespace uart
 {
+
+namespace detail
+{
+
+struct AsyncGpioTraits
+{
+    static constexpr gpio::Mode mode =
+        gpio::Mode::ALTERNATE;
+
+    static constexpr gpio::OutputType outputType =
+        gpio::OutputType::PUSH_PULL;
+
+    static constexpr gpio::OutputSpeed outputSpeed =
+        gpio::OutputSpeed::HIGH;
+
+    static constexpr gpio::Pull txPull =
+        gpio::Pull::NONE;
+
+    static constexpr gpio::Pull rxPull =
+        gpio::Pull::NONE;
+};
+
+} // namespace detail
 
 enum class Instance
 {
@@ -26,7 +50,7 @@ template<Instance I>
 struct Traits;
 
 template<>
-struct Traits<Instance::Usart1>
+struct Traits<Instance::Usart1> : detail::AsyncGpioTraits
 {
     static USART_TypeDef* peripheral() noexcept
     {
@@ -50,7 +74,7 @@ struct Traits<Instance::Usart1>
 };
 
 template<>
-struct Traits<Instance::Usart2>
+struct Traits<Instance::Usart2> : detail::AsyncGpioTraits
 {
     static USART_TypeDef* peripheral() noexcept
     {
@@ -74,7 +98,7 @@ struct Traits<Instance::Usart2>
 };
 
 template<>
-struct Traits<Instance::Usart3>
+struct Traits<Instance::Usart3> : detail::AsyncGpioTraits
 {
     static USART_TypeDef* peripheral() noexcept
     {
@@ -98,7 +122,7 @@ struct Traits<Instance::Usart3>
 };
 
 template<>
-struct Traits<Instance::Uart4>
+struct Traits<Instance::Uart4> : detail::AsyncGpioTraits
 {
     static USART_TypeDef* peripheral() noexcept
     {
@@ -122,7 +146,7 @@ struct Traits<Instance::Uart4>
 };
 
 template<>
-struct Traits<Instance::Uart5>
+struct Traits<Instance::Uart5> : detail::AsyncGpioTraits
 {
     static USART_TypeDef* peripheral() noexcept
     {
@@ -146,7 +170,7 @@ struct Traits<Instance::Uart5>
 };
 
 template<>
-struct Traits<Instance::Usart6>
+struct Traits<Instance::Usart6> : detail::AsyncGpioTraits
 {
     static USART_TypeDef* peripheral() noexcept
     {

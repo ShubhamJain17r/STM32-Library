@@ -39,4 +39,12 @@ enum class Oversampling : std::uint8_t
     BY8
 };
 
+enum class Interrupt : std::uint8_t
+{
+    ParityError,
+    TxEmpty,
+    TxComplete,
+    RxNotEmpty
+};
+
 } // namespace uart

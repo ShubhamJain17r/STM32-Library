@@ -123,4 +123,48 @@ inline void write(USART_TypeDef* uart, std::uint16_t data) noexcept
     uart->DR = data;
 }
 
+inline void enableInterrupt(USART_TypeDef* uart, Interrupt intr) noexcept
+{
+    switch(intr)
+    {
+        case Interrupt::ParityError:
+            uart->CR1 |= USART_CR1_PEIE;
+            break;
+
+        case Interrupt::TxEmpty:
+            uart->CR1 |= USART_CR1_TXEIE;
+            break;
+
+        case Interrupt::TxComplete:
+            uart->CR1 |= USART_CR1_TCIE;
+            break;
+
+        case Interrupt::RxNotEmpty:
+            uart->CR1 |= USART_CR1_RXNEIE;
+            break;
+    }
+}
+
+inline void disableInterrupt(USART_TypeDef* uart, Interrupt intr) noexcept
+{
+    switch(intr)
+    {
+        case Interrupt::ParityError:
+            uart->CR1 &= ~USART_CR1_PEIE;
+            break;
+
+        case Interrupt::TxEmpty:
+            uart->CR1 &= ~USART_CR1_TXEIE;
+            break;
+
+        case Interrupt::TxComplete:
+            uart->CR1 &= ~USART_CR1_TCIE;
+            break;
+
+        case Interrupt::RxNotEmpty:
+            uart->CR1 &= ~USART_CR1_RXNEIE;
+            break;
+    }
+}
+
 } // namespace uart::helper

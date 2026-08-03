@@ -77,7 +77,7 @@ template<Instance I>
 UartHandler<I>::UartHandler(const uartConfig<I>& config)
 {
 	gpio::af::configure<Traits<I>::txSignal>(config.tx, config.txPinConfig);
-	gpio::af::configure<Traits<I>::rxSignal>(config.tx, config.txPinConfig);
+	gpio::af::configure<Traits<I>::rxSignal>(config.rx, config.rxPinConfig);
 
     Traits<I>::enableClock();
 

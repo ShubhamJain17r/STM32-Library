@@ -1,6 +1,6 @@
 #include "stm32/gpio/interrupt_input.hpp"
 #include "stm32/gpio/gpio_helper.hpp"
-#include "stm32/gpio/exti/exti_manager.hpp"
+#include "stm32/exti/exti_manager.hpp"
 
 namespace gpio
 {

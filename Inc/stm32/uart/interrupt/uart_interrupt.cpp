@@ -23,18 +23,34 @@ inline USART_TypeDef* peripheral(Instance instance)
     return nullptr;
 }
 
-void UartEvent::setCallback(Instance I, Event intr, Callback cb) noexcept
+void UartEvent::setUserCallback(Instance I, Event intr, Callback cb) noexcept
 {
 	switch(intr)
 	{
 		case Event::TxEmpty:
-			callbacks_[index(I)].txEmpty = cb;
+			userCallbacks_[index(I)].txEmpty = cb;
 			break;
 		case Event::TxComplete:
-			callbacks_[index(I)].txComplete = cb;
+			userCallbacks_[index(I)].txComplete = cb;
 			break;
 		case Event::RxNotEmpty:
-			callbacks_[index(I)].rxNotEmpty = cb;
+			userCallbacks_[index(I)].rxNotEmpty = cb;
+			break;
+	}
+}
+
+void UartEvent::setDeveloperCallback(Instance I, Event intr, Callback cb) noexcept
+{
+	switch(intr)
+	{
+		case Event::TxEmpty:
+			developerCallbacks_[index(I)].txEmpty = cb;
+			break;
+		case Event::TxComplete:
+			developerCallbacks_[index(I)].txComplete = cb;
+			break;
+		case Event::RxNotEmpty:
+			developerCallbacks_[index(I)].rxNotEmpty = cb;
 			break;
 	}
 }
@@ -43,29 +59,42 @@ void UartEvent::handleEvent(Instance I) noexcept
 {
 	USART_TypeDef* uart = peripheral(I);
 
-	EventCallbacks& cb = callbacks_[index(I)];
+	EventCallbacks& dev = developerCallbacks_[index(I)];
+	EventCallbacks& user = userCallbacks_[index(I)];
 
 	if((uart->SR & USART_SR_RXNE) && (uart->CR1 & USART_CR1_RXNEIE))
 	{
-		if(cb.rxNotEmpty)
+		if(dev.rxNotEmpty)
 		{
-			cb.rxNotEmpty();
+			dev.rxNotEmpty();
+		}
+		if(user.rxNotEmpty)
+		{
+			user.rxNotEmpty();
 		}
 	}
 
 	if((uart->SR & USART_SR_TXE) && (uart->CR1 & USART_CR1_TXEIE))
 	{
-		if(cb.txEmpty)
+		if(dev.txEmpty)
 		{
-			cb.txEmpty();
+			dev.txEmpty();
+		}
+		if(user.txEmpty)
+		{
+			user.txEmpty();
 		}
 	}
 
 	if((uart->SR & USART_SR_TC) && (uart->CR1 & USART_CR1_TCIE))
 	{
-		if(cb.txComplete)
+		if(dev.txComplete)
 		{
-			cb.txComplete();
+			dev.txComplete();
+		}
+		if(user.txComplete)
+		{
+			user.txComplete();
 		}
 	}
 }

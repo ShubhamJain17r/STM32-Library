@@ -68,12 +68,14 @@ struct EventCallbacks
 class UartEvent
 {
 public:
-	static void setCallback(Instance, Event, Callback) noexcept;
+	static void setDeveloperCallback(Instance, Event, Callback) noexcept;
+	static void setUserCallback(Instance, Event, Callback) noexcept;
 
 	static void handleEvent(Instance) noexcept;
 
 private:
-	inline static EventCallbacks callbacks_[6];
+	inline static EventCallbacks developerCallbacks_[6];
+	inline static EventCallbacks userCallbacks_[6];
 };
 
 } // namespace uart::interrupt

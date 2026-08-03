@@ -17,6 +17,8 @@ template<Instance I>
 class UartHandler
 {
 private:
+	inline static RingBuffer<128> rxBuffer_;
+	inline static RingBuffer<128> txBuffer_;
 
 public:
 	explicit UartHandler();
@@ -30,6 +32,9 @@ public:
     explicit UartHandler(const uartConfig<I>& config);
 
 private:
+    void handleRXNE() noexcept;
+    void handleTXE() noexcept;
+    void handleTC() noexcept;
 
 public:
     void write(char) noexcept;
@@ -177,19 +182,19 @@ inline void UartHandler<I>::disable() noexcept
 template<Instance I>
 inline void attachReceiveCallback(Callback cb) noexcept
 {
-	interrupt::UartEvent::setCallback(I, interrupt::Event::RxNotEmpty, cb);
+	interrupt::UartEvent::setUserCallback(I, interrupt::Event::RxNotEmpty, cb);
 }
 
 template<Instance I>
 inline void attachTransmitCallback(Callback cb) noexcept
 {
-	interrupt::UartEvent::setCallback(I, interrupt::Event::TxEmpty, cb);
+	interrupt::UartEvent::setUserCallback(I, interrupt::Event::TxEmpty, cb);
 }
 
 template<Instance I>
 inline void attachTransferCompleteCallback(Callback cb) noexcept
 {
-	interrupt::UartEvent::setCallback(I, interrupt::Event::TxComplete, cb);
+	interrupt::UartEvent::setUserCallback(I, interrupt::Event::TxComplete, cb);
 }
 
 using Uart1 = UartHandler<Instance::usart1>;

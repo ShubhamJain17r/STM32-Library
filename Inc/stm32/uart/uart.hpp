@@ -8,6 +8,8 @@
 #include "stm32/uart/uart_helper.hpp"
 #include "stm32/uart/uart_config.hpp"
 
+#include "Stm32/uart/interrupt/uart_interrupt.hpp"
+
 namespace uart
 {
 
@@ -43,6 +45,10 @@ public:
 
     void enable() noexcept;
     void disable() noexcept;
+
+    void attachReceiveCallback(Callback cb) noexcept;
+    void attachTransmitCallback(Callback cb) noexcept;
+    void attachTransferCompleteCallback(Callback cb) noexcept;
 };
 
 template<Instance I>
@@ -160,6 +166,24 @@ template<Instance I>
 inline void UartHandler<I>::disable() noexcept
 {
     helper::disable(Traits<I>::peripheral());
+}
+
+template<Instance I>
+inline void attachReceiveCallback(Callback cb) noexcept
+{
+	interrupt::UartEvent::setCallback(I, interrupt::Event::RxNotEmpty, cb);
+}
+
+template<Instance I>
+inline void attachTransmitCallback(Callback cb) noexcept
+{
+	interrupt::UartEvent::setCallback(I, interrupt::Event::TxEmpty, cb);
+}
+
+template<Instance I>
+inline void attachTransferCompleteCallback(Callback cb) noexcept
+{
+	interrupt::UartEvent::setCallback(I, interrupt::Event::TxComplete, cb);
 }
 
 using Uart1 = UartHandler<Instance::usart1>;

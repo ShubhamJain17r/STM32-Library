@@ -17,9 +17,9 @@ enum class Event : std::uint8_t
 	RxNotEmpty
 };
 
-inline void enableEvent(USART_TypeDef* uart, Event intr) noexcept
+inline void enableEvent(USART_TypeDef* uart, Event ev) noexcept
 {
-    switch(intr)
+    switch(ev)
     {
         case Event::TxEmpty:
             uart->CR1 |= USART_CR1_TXEIE;
@@ -35,9 +35,9 @@ inline void enableEvent(USART_TypeDef* uart, Event intr) noexcept
     }
 }
 
-inline void disableEvent(USART_TypeDef* uart, Event intr) noexcept
+inline void disableEvent(USART_TypeDef* uart, Event ev) noexcept
 {
-    switch(intr)
+    switch(ev)
     {
         case Event::TxEmpty:
             uart->CR1 &= ~USART_CR1_TXEIE;

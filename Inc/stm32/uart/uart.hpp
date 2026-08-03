@@ -88,6 +88,10 @@ UartHandler<I>::UartHandler(const uartConfig<I>& config)
 
     auto* uart = Traits<I>::peripheral();
 
+    interrupt::enableEvent(uart, interrupt::Event::TxEmpty);
+    interrupt::enableEvent(uart, interrupt::Event::TxComplete);
+    interrupt::enableEvent(uart, interrupt::Event::RxNotEmpty);
+
     helper::setOversampling(uart, config.oversampling);
     helper::setWordLength(uart, config.wordLength);
     helper::setParity(uart, config.parity);
@@ -95,6 +99,8 @@ UartHandler<I>::UartHandler(const uartConfig<I>& config)
     helper::setMode(uart, config.mode);
 
     helper::configureBaudRate(uart, config.baud, Traits<I>::bus);
+
+    interrupt::enableIRQ(Traits<I>::irq);
 
     helper::enable(uart);
 }

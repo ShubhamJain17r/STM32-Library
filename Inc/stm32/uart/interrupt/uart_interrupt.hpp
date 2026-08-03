@@ -53,10 +53,9 @@ inline void disableEvent(USART_TypeDef* uart, Event intr) noexcept
     }
 }
 
-template<Instance I>
-inline void enableIRQ() noexcept
+inline void enableIRQ(IRQn_Type irq) noexcept
 {
-	NVIC_EnableIRQ(Traits<I>::irq);
+	NVIC_EnableIRQ(irq);
 }
 
 struct EventCallbacks

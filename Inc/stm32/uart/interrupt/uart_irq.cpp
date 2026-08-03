@@ -1,4 +1,4 @@
-#include "stm32/uart/uart_manager.hpp"
+#include <stm32/uart/interrupt/uart_interrupt.hpp>
 
 extern "C"
 {

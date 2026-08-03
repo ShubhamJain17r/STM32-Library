@@ -1,4 +1,4 @@
-#include "stm32/uart/uart_manager.hpp"
+#include <stm32/uart/interrupt/uart_interrupt.hpp>
 
 namespace uart::interrupt
 {
@@ -70,4 +70,4 @@ void UartEvent::handleEvent(Instance I) noexcept
 	}
 }
 
-}
+} // namespace uart::interrupt

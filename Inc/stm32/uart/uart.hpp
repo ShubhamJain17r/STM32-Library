@@ -3,11 +3,10 @@
 #include "stm32f446xx.h"
 #include <cstdint>
 
-#include "stm32/uart/uart_config.hpp"
-
 #include "stm32/gpio/af/af_helper.hpp"
 
 #include "stm32/uart/uart_helper.hpp"
+#include "stm32/uart/uart_config.hpp"
 
 namespace uart
 {

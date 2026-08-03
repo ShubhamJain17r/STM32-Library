@@ -8,7 +8,7 @@
 #include "stm32/uart/uart_helper.hpp"
 #include "stm32/uart/uart_config.hpp"
 
-#include "Stm32/uart/interrupt/uart_interrupt.hpp"
+#include "stm32/uart/interrupt/uart_interrupt.hpp"
 
 namespace uart
 {
@@ -17,8 +17,8 @@ template<Instance I>
 class UartHandler
 {
 private:
-	inline static RingBuffer<128> rxBuffer_;
-	inline static RingBuffer<128> txBuffer_;
+//	inline static RingBuffer<128> rxBuffer_;
+//	inline static RingBuffer<128> txBuffer_;
 
 public:
 	explicit UartHandler();

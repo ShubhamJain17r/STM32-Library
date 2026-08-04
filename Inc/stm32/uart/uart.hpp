@@ -40,9 +40,10 @@ private:
 
     void handleIDLE() noexcept;
 
-public:
     void write(char) noexcept;
     void write(std::uint8_t) noexcept;
+
+public:
     void write(const char*) noexcept;
     void write(const std::uint8_t*, std::size_t) noexcept;
 
@@ -179,18 +180,6 @@ template<Instance I>
 inline void UartHandler<I>::disable() noexcept
 {
     helper::disable(Traits<I>::peripheral());
-}
-
-template<Instance I>
-inline void attachReceiveCallback(Callback cb) noexcept
-{
-	interrupt::UartEvent::setUserCallback(I, interrupt::Event::RxNotEmpty, cb);
-}
-
-template<Instance I>
-inline void attachTransmitCallback(Callback cb) noexcept
-{
-	interrupt::UartEvent::setUserCallback(I, interrupt::Event::TxEmpty, cb);
 }
 
 template<Instance I>

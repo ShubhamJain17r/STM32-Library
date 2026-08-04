@@ -1,5 +1,6 @@
 #pragma once
 
+#include <stm32/common/buffer.hpp>
 #include "stm32f446xx.h"
 #include <cstdint>
 
@@ -10,6 +11,8 @@
 
 #include "stm32/uart/interrupt/uart_interrupt.hpp"
 
+#include "stm32/common/buffer.hpp"
+
 namespace uart
 {
 
@@ -17,8 +20,8 @@ template<Instance I>
 class UartHandler
 {
 private:
-//	inline static RingBuffer<128> rxBuffer_;
-//	inline static RingBuffer<128> txBuffer_;
+	inline static buffer::RingBuffer<char, 128> rxBuffer_;
+	inline static buffer::RingBuffer<char, 128> txBuffer_;
 
 public:
 	explicit UartHandler();

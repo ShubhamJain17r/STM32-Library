@@ -37,7 +37,8 @@ public:
 private:
     void handleRXNE() noexcept;
     void handleTXE() noexcept;
-    void handleTC() noexcept;
+
+    void handleIDLE() noexcept;
 
 public:
     void write(char) noexcept;
@@ -54,8 +55,6 @@ public:
     void enable() noexcept;
     void disable() noexcept;
 
-    void attachReceiveCallback(Callback cb) noexcept;
-    void attachTransmitCallback(Callback cb) noexcept;
     void attachTransferCompleteCallback(Callback cb) noexcept;
 };
 
@@ -96,8 +95,6 @@ UartHandler<I>::UartHandler(const uartConfig<I>& config)
 
     auto* uart = Traits<I>::peripheral();
 
-    interrupt::enableEvent(uart, interrupt::Event::TxEmpty);
-    interrupt::enableEvent(uart, interrupt::Event::TxComplete);
     interrupt::enableEvent(uart, interrupt::Event::RxNotEmpty);
 
     helper::setOversampling(uart, config.oversampling);
@@ -128,6 +125,7 @@ inline void UartHandler<I>::write(std::uint8_t data) noexcept
 template<Instance I>
 inline void UartHandler<I>::write(const char* str) noexcept
 {
+	interrupt::enableEvent(uart, interrupt::Event::TxEmpty);
     while(*str)
     {
         write(*str++);
@@ -137,6 +135,7 @@ inline void UartHandler<I>::write(const char* str) noexcept
 template<Instance I>
 inline void UartHandler<I>::write(const std::uint8_t* data, std::size_t length) noexcept
 {
+	interrupt::enableEvent(uart, interrupt::Event::TxEmpty);
     while(length--)
     {
         write(*data++);

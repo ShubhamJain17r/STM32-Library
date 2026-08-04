@@ -27,14 +27,11 @@ void UartEvent::setUserCallback(Instance I, Event intr, Callback cb) noexcept
 {
 	switch(intr)
 	{
-		case Event::TxEmpty:
-			userCallbacks_[index(I)].txEmpty = cb;
-			break;
 		case Event::TxComplete:
 			userCallbacks_[index(I)].txComplete = cb;
 			break;
-		case Event::RxNotEmpty:
-			userCallbacks_[index(I)].rxNotEmpty = cb;
+		case Event::IdleState:
+			userCallbacks_[index(I)].idleState = cb;
 			break;
 	}
 }
@@ -46,11 +43,11 @@ void UartEvent::setDeveloperCallback(Instance I, Event intr, Callback cb) noexce
 		case Event::TxEmpty:
 			developerCallbacks_[index(I)].txEmpty = cb;
 			break;
-		case Event::TxComplete:
-			developerCallbacks_[index(I)].txComplete = cb;
-			break;
 		case Event::RxNotEmpty:
 			developerCallbacks_[index(I)].rxNotEmpty = cb;
+			break;
+		case Event::IdleState:
+			userCallbacks_[index(I)].idleState = cb;
 			break;
 	}
 }
@@ -68,10 +65,6 @@ void UartEvent::handleEvent(Instance I) noexcept
 		{
 			dev.rxNotEmpty();
 		}
-		if(user.rxNotEmpty)
-		{
-			user.rxNotEmpty();
-		}
 	}
 
 	if((uart->SR & USART_SR_TXE) && (uart->CR1 & USART_CR1_TXEIE))
@@ -80,21 +73,24 @@ void UartEvent::handleEvent(Instance I) noexcept
 		{
 			dev.txEmpty();
 		}
-		if(user.txEmpty)
-		{
-			user.txEmpty();
-		}
 	}
 
 	if((uart->SR & USART_SR_TC) && (uart->CR1 & USART_CR1_TCIE))
 	{
-		if(dev.txComplete)
-		{
-			dev.txComplete();
-		}
 		if(user.txComplete)
 		{
 			user.txComplete();
+		}
+	}
+	if((uart->SR & USART_SR_IDLE) && (uart->CR1 & USART_CR1_IDLEIE))
+	{
+		if(dev.idleState)
+			{
+				dev.idleState();
+			}
+		if(user.idleState)
+		{
+			user.idleState();
 		}
 	}
 }

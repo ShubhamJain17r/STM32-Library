@@ -14,7 +14,8 @@ enum class Event : std::uint8_t
 {
 	TxEmpty,
 	TxComplete,
-	RxNotEmpty
+	RxNotEmpty,
+	IdleState
 };
 
 inline void enableEvent(USART_TypeDef* uart, Event ev) noexcept
@@ -31,6 +32,10 @@ inline void enableEvent(USART_TypeDef* uart, Event ev) noexcept
 
         case Event::RxNotEmpty:
             uart->CR1 |= USART_CR1_RXNEIE;
+            break;
+
+        case Event::IdleState:
+            uart->CR1 |= USART_CR1_IDLEIE;
             break;
     }
 }
@@ -50,6 +55,9 @@ inline void disableEvent(USART_TypeDef* uart, Event ev) noexcept
         case Event::RxNotEmpty:
             uart->CR1 &= ~USART_CR1_RXNEIE;
             break;
+        case Event::IdleState:
+            uart->CR1 &= ~USART_CR1_IDLEIE;
+            break;
     }
 }
 
@@ -63,6 +71,7 @@ struct EventCallbacks
 	Callback txEmpty = nullptr;
 	Callback txComplete = nullptr;
 	Callback rxNotEmpty = nullptr;
+	Callback idleState = nullptr;
 };
 
 class UartEvent

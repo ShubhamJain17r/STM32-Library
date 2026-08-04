@@ -1,6 +1,5 @@
 #pragma once
 
-#include <stm32/common/buffer.hpp>
 #include "stm32f446xx.h"
 #include <cstdint>
 
@@ -57,6 +56,7 @@ public:
     void disable() noexcept;
 
     void attachTransferCompleteCallback(Callback cb) noexcept;
+    void attachReceiveCompleteCallback(Callback cb) noexcept;
 };
 
 template<Instance I>
@@ -97,6 +97,7 @@ UartHandler<I>::UartHandler(const uartConfig<I>& config)
     auto* uart = Traits<I>::peripheral();
 
     interrupt::enableEvent(uart, interrupt::Event::RxNotEmpty);
+    interrupt::enableEvent(uart, interrupt::Event::IdleState);
 
     helper::setOversampling(uart, config.oversampling);
     helper::setWordLength(uart, config.wordLength);
@@ -186,6 +187,12 @@ template<Instance I>
 inline void attachTransferCompleteCallback(Callback cb) noexcept
 {
 	interrupt::UartEvent::setUserCallback(I, interrupt::Event::TxComplete, cb);
+}
+
+template<Instance I>
+inline void attachReceiveCompleteCallback(Callback cb) noexcept
+{
+	interrupt::UartEvent::setUserCallback(I, interrupt::Event::IdleState, cb);
 }
 
 using Uart1 = UartHandler<Instance::usart1>;

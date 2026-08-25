@@ -25,6 +25,11 @@ void ExtiManager::handleInterrupt(std::uint8_t line)
 
     auto& entry = table[line];
 
+    if(!entry.port)
+    {
+        return;
+    }
+
     bool state = entry.port->IDR & (1u << line);
 
     if(state)

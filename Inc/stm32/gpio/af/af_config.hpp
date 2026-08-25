@@ -18,16 +18,15 @@ struct AlternatePinConfig
 };
 
 template<Signal signal>
-void configure(const Pin& pin, const AlternatePinConfig& config)
+inline void configure(const Pin& pin, const AlternatePinConfig& config) noexcept
 {
 	pin.enableClock();
 
-	helper::setMode(pin, Mode::ALTERNATE);
+	setAlternateFunction(pin, Traits<signal>::af);
 	helper::setOutputType(pin, config.outputType);
 	helper::setOutputSpeed(pin, config.outputSpeed);
 	helper::setPull(pin, config.pull);
-
-	setAlternateFunction(pin, Traits<signal>::af);
+	helper::setMode(pin, Mode::ALTERNATE);
 }
 
 } // namespace gpio::af

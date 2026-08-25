@@ -5,7 +5,7 @@
 namespace rcc
 {
 
-inline void enablePeripheralClock(GPIO_TypeDef* port)
+inline void enablePeripheralClock(GPIO_TypeDef* port) noexcept
 {
 	if(port == GPIOA) { RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN; return; }
 	if(port == GPIOB) { RCC->AHB1ENR |= RCC_AHB1ENR_GPIOBEN; return; }
@@ -17,7 +17,7 @@ inline void enablePeripheralClock(GPIO_TypeDef* port)
 	if(port == GPIOH) { RCC->AHB1ENR |= RCC_AHB1ENR_GPIOHEN; return; }
 }
 
-inline void enablePeripheralClock(USART_TypeDef* port)
+inline void enablePeripheralClock(USART_TypeDef* port) noexcept
 {
 	if(port == USART1) { RCC->APB2ENR |= RCC_APB2ENR_USART1EN; return; }
 	if(port == USART2) { RCC->APB1ENR |= RCC_APB1ENR_USART2EN; return; }
@@ -27,7 +27,7 @@ inline void enablePeripheralClock(USART_TypeDef* port)
 	if(port == USART6) { RCC->APB2ENR |= RCC_APB2ENR_USART6EN; return; }
 }
 
-inline void enablePeripheralClock(SYSCFG_TypeDef* port)
+inline void enablePeripheralClock(SYSCFG_TypeDef* port) noexcept
 {
 	if(port == SYSCFG) RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
 }

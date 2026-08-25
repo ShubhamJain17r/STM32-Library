@@ -260,11 +260,17 @@ std::uint8_t UartHandler<I, TxBufSize, RxBufSize>::readByte() noexcept
     std::uint8_t byte;
 
     // Spin until the RXNE ISR pushes a byte into rxBuf_.
-    while(!storage_.rxBuf.pop(byte))
+    while(true)
     {
-    }
+        __disable_irq();
+        const bool popped = storage_.rxBuf.pop(byte);
+        __enable_irq();
 
-    return byte;
+        if(popped)
+        {
+            return byte;
+        }
+    }
 }
 
 template<Instance I, std::size_t TxBufSize, std::size_t RxBufSize>
@@ -279,8 +285,10 @@ void UartHandler<I, TxBufSize, RxBufSize>::read(std::uint8_t* buf, std::size_t l
 template<Instance I, std::size_t TxBufSize, std::size_t RxBufSize>
 bool UartHandler<I, TxBufSize, RxBufSize>::available() const noexcept
 {
-    // rxBuf_.size() reads a 32-bit aligned count_ — atomic on Cortex-M.
-    return !storage_.rxBuf.empty();
+    __disable_irq();
+    const bool notEmpty = !storage_.rxBuf.empty();
+    __enable_irq();
+    return notEmpty;
 }
 
 template<Instance I, std::size_t TxBufSize, std::size_t RxBufSize>

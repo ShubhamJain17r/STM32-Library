@@ -59,6 +59,10 @@ void UartEvent::setDeveloperCallback(Instance I, Event intr, stm32::Callback cb)
 void UartEvent::handleEvent(Instance I) noexcept
 {
 	USART_TypeDef* uart = peripheral(I);
+	if(!uart)
+	{
+		return;
+	}
 
 	EventCallbacks& dev = developerCallbacks_[index(I)];
 	EventCallbacks& user = userCallbacks_[index(I)];

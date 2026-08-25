@@ -8,12 +8,11 @@ DigitalOutput::DigitalOutput(Pin pin, DigitalOutputConfig config) : pin_(pin)
 {
 	pin_.enableClock();
 
-	helper::setMode(pin_, Mode::OUTPUT);
+	write(config.initialState);
 	helper::setOutputType(pin_, config.outputType);
 	helper::setOutputSpeed(pin_, config.outputSpeed);
 	helper::setPull(pin_, config.pull);
-
-	write(config.initialState);
+	helper::setMode(pin_, Mode::OUTPUT);
 }
 
 } // namespace gpio

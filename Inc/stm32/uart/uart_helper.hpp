@@ -20,16 +20,30 @@ inline bool transmissionComplete(USART_TypeDef* uart) noexcept
 	return uart->SR & USART_SR_TC;
 }
 
-inline bool rxReady(USART_TypeDef* uart)
+inline bool rxReady(USART_TypeDef* uart) noexcept
 {
 	return uart->SR & USART_SR_RXNE;
 }
 
 inline void configureBaudRate(USART_TypeDef* uart, std::uint32_t baud, rcc::Bus bus) noexcept
 {
-	const std::uint32_t freq = frequency(bus);
+	const std::uint32_t freq = rcc::frequency(bus);
+	const bool over8 = uart->CR1 & USART_CR1_OVER8;
 
-	uart->BRR = (freq / baud);
+	if(over8)
+	{
+		// OVER8=1: integer USARTDIV, fraction bits [2:0] (bit 3 cleared), per RM0390 §19.3.4
+		const std::uint32_t usartdiv = ((freq * 2u) + baud) / (baud * 2u);
+		const std::uint32_t mantissa = (usartdiv >> 4u);
+		const std::uint32_t fraction = (usartdiv & 0xFu) >> 1u;
+		uart->BRR = (mantissa << 4u) | fraction;
+	}
+	else
+	{
+		// OVER8=0: USARTDIV with rounding
+		const std::uint32_t usartdiv = (freq + (baud / 2u)) / baud;
+		uart->BRR = usartdiv;
+	}
 }
 
 inline void setOversampling(USART_TypeDef* uart, Oversampling over) noexcept
@@ -42,12 +56,12 @@ inline void setOversampling(USART_TypeDef* uart, Oversampling over) noexcept
 	}
 }
 
-inline void enable(USART_TypeDef* uart)
+inline void enable(USART_TypeDef* uart) noexcept
 {
 	uart->CR1 |= USART_CR1_UE;
 }
 
-inline void disable(USART_TypeDef* uart)
+inline void disable(USART_TypeDef* uart) noexcept
 {
 	uart->CR1 &= ~USART_CR1_UE;
 }

@@ -5,10 +5,10 @@
 
 #include "stm32/common/rcc_enable.hpp"
 
-namespace
+namespace gpio::detail
 {
 
-constexpr uint8_t GpioportIndex(GPIO_TypeDef* port)
+constexpr std::uint8_t gpioPortIndex(const GPIO_TypeDef* port) noexcept
 {
     if(port == GPIOA) return 0;
     if(port == GPIOB) return 1;
@@ -22,7 +22,7 @@ constexpr uint8_t GpioportIndex(GPIO_TypeDef* port)
     return 0xFF;
 }
 
-} // namespace
+} // namespace gpio::detail
 
 namespace gpio
 {
@@ -32,14 +32,14 @@ struct Pin
     GPIO_TypeDef* port;
     std::uint8_t number;
 
-    constexpr std::uint16_t mask() const noexcept
+    constexpr std::uint32_t mask() const noexcept
     {
-        return static_cast<std::uint16_t>(1u << number);
+        return 1U << number;
     }
 
     constexpr std::uint8_t portIndex() const noexcept
     {
-        return GpioportIndex(port);
+        return detail::gpioPortIndex(port);
     }
 
     constexpr std::uint8_t index() const noexcept

@@ -7,10 +7,10 @@
 
 #include "stm32/common/callback.hpp"
 
-namespace
+namespace exti::detail
 {
 
-constexpr IRQn_Type extiIRQ(std::uint8_t line)
+constexpr IRQn_Type extiIRQ(std::uint8_t line) noexcept
 {
     if(line <= 4)
         return static_cast<IRQn_Type>(EXTI0_IRQn + line);
@@ -21,7 +21,7 @@ constexpr IRQn_Type extiIRQ(std::uint8_t line)
     return EXTI15_10_IRQn;
 }
 
-} // namespace
+} // namespace exti::detail
 
 namespace exti
 {
@@ -62,7 +62,7 @@ inline void clearPending(std::uint8_t line) noexcept
 
 inline void enableIRQ(const gpio::Pin& pin) noexcept
 {
-	NVIC_EnableIRQ(extiIRQ(pin.number));
+	NVIC_EnableIRQ(detail::extiIRQ(pin.number));
 }
 
 struct ExtiEntry

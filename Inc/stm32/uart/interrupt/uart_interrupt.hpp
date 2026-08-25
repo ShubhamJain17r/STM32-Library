@@ -24,22 +24,18 @@ inline void enableEvent(USART_TypeDef* uart, Event ev) noexcept
     switch(ev)
     {
         case Event::TxEmpty:
-            uart->CR1 |= USART_CR1_TXEIE;
             reg::setBits(uart->CR1, USART_CR1_TXEIE);
             break;
 
         case Event::TxComplete:
-            uart->CR1 |= USART_CR1_TCIE;
             reg::setBits(uart->CR1, USART_CR1_TCIE);
             break;
 
         case Event::RxNotEmpty:
-            uart->CR1 |= USART_CR1_RXNEIE;
             reg::setBits(uart->CR1, USART_CR1_RXNEIE);
             break;
 
         case Event::IdleState:
-            uart->CR1 |= USART_CR1_IDLEIE;
             reg::setBits(uart->CR1, USART_CR1_IDLEIE);
             break;
     }
@@ -50,22 +46,18 @@ inline void disableEvent(USART_TypeDef* uart, Event ev) noexcept
     switch(ev)
     {
         case Event::TxEmpty:
-            uart->CR1 &= ~USART_CR1_TXEIE;
             reg::clearBits(uart->CR1, USART_CR1_TXEIE);
             break;
 
         case Event::TxComplete:
-            uart->CR1 &= ~USART_CR1_TCIE;
             reg::clearBits(uart->CR1, USART_CR1_TCIE);
             break;
 
         case Event::RxNotEmpty:
-            uart->CR1 &= ~USART_CR1_RXNEIE;
             reg::clearBits(uart->CR1, USART_CR1_RXNEIE);
             break;
 
         case Event::IdleState:
-            uart->CR1 &= ~USART_CR1_IDLEIE;
             reg::clearBits(uart->CR1, USART_CR1_IDLEIE);
             break;
     }

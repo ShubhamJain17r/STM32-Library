@@ -11,13 +11,9 @@ namespace gpio::af
 
 inline void setAlternateFunction(const Pin& pin, AlternateFunction af) noexcept
 {
-	const std::uint8_t index = pin.number / 8;
-	const std::uint8_t pos = (pin.number % 8) * 4;
 	const std::uint8_t index = pin.number / 8u;
 	const std::uint8_t pos = (pin.number % 8u) * 4u;
 
-	pin.port->AFR[index] &= ~(0xFU << pos);
-	pin.port->AFR[index] |=  (static_cast<std::uint32_t>(af) << pos);
 	reg::modifyBits(pin.port->AFR[index], 0xFU << pos, static_cast<std::uint32_t>(af) << pos);
 }
 

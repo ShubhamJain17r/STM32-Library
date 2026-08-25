@@ -5,37 +5,29 @@
 
 #include "stm32/common/registers.hpp"
 #include "stm32/uart/uart_types.hpp"
-
 #include "stm32/common/rcc.hpp"
 
 namespace uart::helper
 {
 
-inline bool txReady(USART_TypeDef* uart) noexcept
 inline bool txReady(const USART_TypeDef* uart) noexcept
 {
-	return uart->SR & USART_SR_TXE;
 	return reg::isAnyBitSet(uart->SR, USART_SR_TXE);
 }
 
-inline bool transmissionComplete(USART_TypeDef* uart) noexcept
 inline bool transmissionComplete(const USART_TypeDef* uart) noexcept
 {
-	return uart->SR & USART_SR_TC;
 	return reg::isAnyBitSet(uart->SR, USART_SR_TC);
 }
 
-inline bool rxReady(USART_TypeDef* uart) noexcept
 inline bool rxReady(const USART_TypeDef* uart) noexcept
 {
-	return uart->SR & USART_SR_RXNE;
 	return reg::isAnyBitSet(uart->SR, USART_SR_RXNE);
 }
 
 inline void configureBaudRate(USART_TypeDef* uart, std::uint32_t baud, rcc::Bus bus) noexcept
 {
 	const std::uint32_t freq = rcc::frequency(bus);
-	const bool over8 = uart->CR1 & USART_CR1_OVER8;
 	const bool over8 = reg::isAnyBitSet(uart->CR1, USART_CR1_OVER8);
 
 	if(over8)
@@ -44,25 +36,20 @@ inline void configureBaudRate(USART_TypeDef* uart, std::uint32_t baud, rcc::Bus 
 		const std::uint32_t usartdiv = ((freq * 2u) + baud) / (baud * 2u);
 		const std::uint32_t mantissa = (usartdiv >> 4u);
 		const std::uint32_t fraction = (usartdiv & 0xFu) >> 1u;
-		uart->BRR = (mantissa << 4u) | fraction;
 		reg::write(uart->BRR, (mantissa << 4u) | fraction);
 	}
 	else
 	{
 		// OVER8=0: USARTDIV with rounding
 		const std::uint32_t usartdiv = (freq + (baud / 2u)) / baud;
-		uart->BRR = usartdiv;
 		reg::write(uart->BRR, usartdiv);
 	}
 }
 
 inline void setOversampling(USART_TypeDef* uart, Oversampling over) noexcept
 {
-	uart->CR1 &= ~USART_CR1_OVER8;
-
 	if(over == Oversampling::BY8)
 	{
-		uart->CR1 |= USART_CR1_OVER8;
 		reg::setBits(uart->CR1, USART_CR1_OVER8);
 	}
 	else
@@ -73,23 +60,18 @@ inline void setOversampling(USART_TypeDef* uart, Oversampling over) noexcept
 
 inline void enable(USART_TypeDef* uart) noexcept
 {
-	uart->CR1 |= USART_CR1_UE;
 	reg::setBits(uart->CR1, USART_CR1_UE);
 }
 
 inline void disable(USART_TypeDef* uart) noexcept
 {
-	uart->CR1 &= ~USART_CR1_UE;
 	reg::clearBits(uart->CR1, USART_CR1_UE);
 }
 
 inline void setWordLength(USART_TypeDef* uart, WordLength len) noexcept
 {
-	uart->CR1 &= ~USART_CR1_M;
-
 	if(len == WordLength::BITS_9)
 	{
-		uart->CR1 |= USART_CR1_M;
 		reg::setBits(uart->CR1, USART_CR1_M);
 	}
 	else
@@ -100,8 +82,6 @@ inline void setWordLength(USART_TypeDef* uart, WordLength len) noexcept
 
 inline void setParity(USART_TypeDef* uart, Parity parity) noexcept
 {
-    uart->CR1 &= ~(USART_CR1_PCE | USART_CR1_PS);
-
     switch(parity)
     {
         case Parity::NONE:
@@ -109,13 +89,10 @@ inline void setParity(USART_TypeDef* uart, Parity parity) noexcept
             break;
 
         case Parity::EVEN:
-            uart->CR1 |= USART_CR1_PCE;
             reg::modifyBits(uart->CR1, USART_CR1_PS, USART_CR1_PCE);
             break;
 
         case Parity::ODD:
-            uart->CR1 |= USART_CR1_PCE
-                      |  USART_CR1_PS;
             reg::setBits(uart->CR1, USART_CR1_PCE | USART_CR1_PS);
             break;
     }
@@ -123,22 +100,17 @@ inline void setParity(USART_TypeDef* uart, Parity parity) noexcept
 
 inline void setMode(USART_TypeDef* uart, Mode mode) noexcept
 {
-    uart->CR1 &= ~(USART_CR1_TE | USART_CR1_RE);
-
     switch(mode)
     {
         case Mode::RX:
-            uart->CR1 |= USART_CR1_RE;
             reg::modifyBits(uart->CR1, USART_CR1_TE, USART_CR1_RE);
             break;
 
         case Mode::TX:
-            uart->CR1 |= USART_CR1_TE;
             reg::modifyBits(uart->CR1, USART_CR1_RE, USART_CR1_TE);
             break;
 
         case Mode::TX_RX:
-            uart->CR1 |= USART_CR1_TE | USART_CR1_RE;
             reg::setBits(uart->CR1, USART_CR1_TE | USART_CR1_RE);
             break;
     }
@@ -146,9 +118,6 @@ inline void setMode(USART_TypeDef* uart, Mode mode) noexcept
 
 inline void setStopBits(USART_TypeDef* uart, StopBits stop) noexcept
 {
-	uart->CR2 &= ~USART_CR2_STOP;
-
-    uart->CR2 |= (static_cast<uint32_t>(stop) << USART_CR2_STOP_Pos);
     reg::modifyBits(uart->CR2, USART_CR2_STOP, static_cast<std::uint32_t>(stop) << USART_CR2_STOP_Pos);
 }
 
@@ -156,7 +125,6 @@ inline std::uint16_t read(USART_TypeDef* uart) noexcept
 {
 	while(!rxReady(uart));
 
-    return uart->DR;
     return static_cast<std::uint16_t>(reg::read(uart->DR));
 }
 
@@ -164,8 +132,8 @@ inline void write(USART_TypeDef* uart, std::uint16_t data) noexcept
 {
 	while(!txReady(uart));
 
-    uart->DR = data;
     reg::write(uart->DR, data);
 }
 
 } // namespace uart::helper
+

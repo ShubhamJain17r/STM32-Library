@@ -29,43 +29,34 @@ namespace exti
 
 inline void configureExticr(const gpio::Pin& pin) noexcept
 {
-	std::uint8_t index = pin.number / 4;
-	std::uint16_t pos = (pin.number % 4) * 4;
 	const std::uint8_t index = pin.number / 4u;
 	const std::uint8_t pos = (pin.number % 4u) * 4u;
 
-	SYSCFG->EXTICR[index] &= ~(0xF << pos);
-	SYSCFG->EXTICR[index] |=  (pin.portIndex() << pos);
 	reg::modifyBits(SYSCFG->EXTICR[index], 0xFU << pos, static_cast<std::uint32_t>(pin.portIndex()) << pos);
 }
 
 inline void enableInterrupt(const gpio::Pin& pin) noexcept
 {
-	EXTI->IMR |= pin.mask();
 	reg::setBits(EXTI->IMR, pin.mask());
 }
 
 inline void disableInterrupt(const gpio::Pin& pin) noexcept
 {
-	EXTI->IMR &= ~pin.mask();
 	reg::clearBits(EXTI->IMR, pin.mask());
 }
 
 inline void enableRisingTrigger(const gpio::Pin& pin) noexcept
 {
-	EXTI->RTSR |= pin.mask();
 	reg::setBits(EXTI->RTSR, pin.mask());
 }
 
 inline void enableFallingTrigger(const gpio::Pin& pin) noexcept
 {
-	EXTI->FTSR |= pin.mask();
 	reg::setBits(EXTI->FTSR, pin.mask());
 }
 
 inline void clearPending(std::uint8_t line) noexcept
 {
-	EXTI->PR = (1u << line);
 	reg::write(EXTI->PR, 1U << line);
 }
 

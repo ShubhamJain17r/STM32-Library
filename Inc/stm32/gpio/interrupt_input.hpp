@@ -3,7 +3,6 @@
 #include "stm32f446xx.h"
 #include <cstdint>
 
-#include"stm32/common/callback.hpp"
 #include "stm32/common/registers.hpp"
 #include "stm32/common/callback.hpp"
 
@@ -42,11 +41,6 @@ private:
 public:
 	inline PinState read() const noexcept
 	{
-		if(pin_.port->IDR & pin_.mask())
-		{
-			return PinState::HIGH;
-		}
-		return PinState::LOW;
 		return reg::isAnyBitSet(pin_.port->IDR, pin_.mask()) ? PinState::HIGH : PinState::LOW;
 	}
 

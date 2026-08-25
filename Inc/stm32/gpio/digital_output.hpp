@@ -45,13 +45,11 @@ public:
 
 	inline void high() const noexcept
 	{
-		pin_.port->BSRR = pin_.mask();
 		reg::write(pin_.port->BSRR, pin_.mask());
 	}
 
 	inline void low() const noexcept
 	{
-		pin_.port->BSRR = (pin_.mask() << 16);
 		reg::write(pin_.port->BSRR, pin_.mask() << 16u);
 	}
 
@@ -62,11 +60,6 @@ public:
 
 	inline PinState read() const noexcept
 	{
-		if(pin_.port->ODR & pin_.mask())
-		{
-			return PinState::HIGH;
-		}
-		return PinState::LOW;
 		return reg::isAnyBitSet(pin_.port->ODR, pin_.mask()) ? PinState::HIGH : PinState::LOW;
 	}
 };

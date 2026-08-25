@@ -33,8 +33,6 @@ void EXTI9_5_IRQHandler()
 {
     for(int line = 5; line <= 9; ++line)
     {
-        if(EXTI->PR & (1u << line))
-        		exti::ExtiManager::handleInterrupt(line);
         if(reg::isAnyBitSet(EXTI->PR, 1U << line))
         {
             exti::ExtiManager::handleInterrupt(static_cast<std::uint8_t>(line));
@@ -46,8 +44,6 @@ void EXTI15_10_IRQHandler()
 {
     for(int line = 10; line <= 15; ++line)
     {
-        if(EXTI->PR & (1u << line))
-        		exti::ExtiManager::handleInterrupt(line);
         if(reg::isAnyBitSet(EXTI->PR, 1U << line))
         {
             exti::ExtiManager::handleInterrupt(static_cast<std::uint8_t>(line));

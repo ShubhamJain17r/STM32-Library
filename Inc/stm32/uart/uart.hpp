@@ -164,7 +164,6 @@ UartHandler<I, TxBufSize, RxBufSize>::UartHandler(const uartConfig<I>& config)
 template<Instance I, std::size_t TxBufSize, std::size_t RxBufSize>
 void UartHandler<I, TxBufSize, RxBufSize>::handleRXNE() noexcept
 {
-    const std::uint8_t byte = static_cast<std::uint8_t>(Traits<I>::peripheral()->DR);
     const std::uint8_t byte = static_cast<std::uint8_t>(reg::read(Traits<I>::peripheral()->DR));
     storage_.rxBuf.push(byte); // returns false if full; byte is discarded
 }
@@ -179,7 +178,6 @@ void UartHandler<I, TxBufSize, RxBufSize>::handleTXE() noexcept
 
     if(storage_.txBuf.pop(byte))
     {
-        Traits<I>::peripheral()->DR = byte;
         reg::write(Traits<I>::peripheral()->DR, byte);
     }
     else
@@ -200,8 +198,6 @@ void UartHandler<I, TxBufSize, RxBufSize>::handleTXE() noexcept
 template<Instance I, std::size_t TxBufSize, std::size_t RxBufSize>
 void UartHandler<I, TxBufSize, RxBufSize>::handleIDLE() noexcept
 {
-    volatile std::uint32_t tmp = Traits<I>::peripheral()->SR;
-    tmp = Traits<I>::peripheral()->DR;
     volatile std::uint32_t tmp = reg::read(Traits<I>::peripheral()->SR);
     tmp = reg::read(Traits<I>::peripheral()->DR);
     (void)tmp;

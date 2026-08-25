@@ -30,7 +30,6 @@ void ExtiManager::handleInterrupt(std::uint8_t line)
         return;
     }
 
-    bool state = entry.port->IDR & (1u << line);
     const bool state = reg::isAnyBitSet(entry.port->IDR, 1U << line);
 
     if(state)

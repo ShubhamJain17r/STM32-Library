@@ -4,9 +4,9 @@
 #include <cstdint>
 
 #include "stm32/common/registers.hpp"
-#include "stm32/gpio/pin.hpp"
-
 #include "stm32/common/callback.hpp"
+#include "stm32/gpio/pin.hpp"
+#include "stm32/exti/exti_types.hpp"
 
 namespace exti::detail
 {
@@ -45,9 +45,24 @@ inline void disableInterrupt(const gpio::Pin& pin) noexcept
 	reg::clearBits(EXTI->IMR, pin.mask());
 }
 
+inline void enableEvent(const gpio::Pin& pin) noexcept
+{
+	reg::setBits(EXTI->EMR, pin.mask());
+}
+
+inline void disableEvent(const gpio::Pin& pin) noexcept
+{
+	reg::clearBits(EXTI->EMR, pin.mask());
+}
+
 inline void enableRisingTrigger(const gpio::Pin& pin) noexcept
 {
 	reg::setBits(EXTI->RTSR, pin.mask());
+}
+
+inline void disableRisingTrigger(const gpio::Pin& pin) noexcept
+{
+	reg::clearBits(EXTI->RTSR, pin.mask());
 }
 
 inline void enableFallingTrigger(const gpio::Pin& pin) noexcept
@@ -55,9 +70,47 @@ inline void enableFallingTrigger(const gpio::Pin& pin) noexcept
 	reg::setBits(EXTI->FTSR, pin.mask());
 }
 
+inline void disableFallingTrigger(const gpio::Pin& pin) noexcept
+{
+	reg::clearBits(EXTI->FTSR, pin.mask());
+}
+
+inline void setTrigger(const gpio::Pin& pin, Trigger trigger) noexcept
+{
+    switch(trigger)
+    {
+        case Trigger::None:
+            disableRisingTrigger(pin);
+            disableFallingTrigger(pin);
+            break;
+        case Trigger::Rising:
+            enableRisingTrigger(pin);
+            disableFallingTrigger(pin);
+            break;
+        case Trigger::Falling:
+            disableRisingTrigger(pin);
+            enableFallingTrigger(pin);
+            break;
+        case Trigger::Both:
+            enableRisingTrigger(pin);
+            enableFallingTrigger(pin);
+            break;
+    }
+}
+
 inline void clearPending(std::uint8_t line) noexcept
 {
 	reg::write(EXTI->PR, 1U << line);
+}
+
+inline bool isPending(std::uint8_t line) noexcept
+{
+    return reg::isAnyBitSet(EXTI->PR, 1U << line);
+}
+
+inline void softwareTrigger(std::uint8_t line) noexcept
+{
+    reg::setBits(EXTI->SWIER, 1U << line);
 }
 
 inline void enableIRQ(const gpio::Pin& pin) noexcept
@@ -65,21 +118,33 @@ inline void enableIRQ(const gpio::Pin& pin) noexcept
 	NVIC_EnableIRQ(detail::extiIRQ(pin.number));
 }
 
+inline void disableIRQ(const gpio::Pin& pin) noexcept
+{
+	NVIC_DisableIRQ(detail::extiIRQ(pin.number));
+}
+
 struct ExtiEntry
 {
-    GPIO_TypeDef* port;
-
-    stm32::Callback rising  = nullptr;
-    stm32::Callback falling = nullptr;
+    GPIO_TypeDef*   port            = nullptr;
+    Trigger         trigger         = Trigger::None;
+    stm32::Callback callback        = nullptr;
+    EdgeCallback    edgeCallback    = nullptr;
+    stm32::Callback risingCallback  = nullptr;
+    stm32::Callback fallingCallback = nullptr;
 };
 
 class ExtiManager
 {
 public:
-    static void setRisingCallback(const gpio::Pin&, stm32::Callback);
-    static void setFallingCallback(const gpio::Pin&, stm32::Callback);
+    static bool registerPin(const gpio::Pin& pin, Trigger trigger, stm32::Callback cb = nullptr, EdgeCallback edgeCb = nullptr) noexcept;
+    static void unregisterPin(const gpio::Pin& pin) noexcept;
 
-    static void handleInterrupt(std::uint8_t line);
+    static void setCallback(const gpio::Pin& pin, stm32::Callback cb) noexcept;
+    static void setEdgeCallback(const gpio::Pin& pin, EdgeCallback cb) noexcept;
+    static void setRisingCallback(const gpio::Pin& pin, stm32::Callback cb) noexcept;
+    static void setFallingCallback(const gpio::Pin& pin, stm32::Callback cb) noexcept;
+
+    static void handleInterrupt(std::uint8_t line) noexcept;
 
 private:
     inline static ExtiEntry table[16];

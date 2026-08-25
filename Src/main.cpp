@@ -8,19 +8,38 @@
 using namespace gpio;
 using namespace uart;
 
+// Pointer to user LED for EXTI ISR callback
+static DigitalOutput* pLed = nullptr;
+
+// EXTI interrupt callback: fires when the user presses PC13 (blue button)
+void onUserButtonPressed()
+{
+    if(pLed)
+    {
+        pLed->toggle();
+    }
+}
+
 int main()
 {
-    // 1. Initialize SysTick 1ms timebase
+    // 1. Initialize SysTick 1ms monotonic timebase
     systick::init();
 
     // 2. Initialize PA5 (Nucleo green user LED)
     DigitalOutput led(PA5);
+    pLed = &led;
 
-    // 3. Initialize USART2 at 115200 baud (connected to ST-LINK Virtual COM port)
+    // 3. Initialize PC13 (Nucleo blue user button) as an EXTI interrupt on Falling Edge
+    InterruptInput userButton(PC13, exti::Trigger::Falling, onUserButtonPressed, Pull::NONE);
+
+    // 4. Initialize USART2 at 115200 baud (connected to ST-LINK Virtual COM port)
     Uart2 serial(115200);
 
-    serial.write("STM32F446RE C++17 Library Ready\r\n");
-    serial.write("Send '1' to turn ON, '0' to turn OFF, 't' to toggle\r\n");
+    serial.write("========================================\r\n");
+    serial.write("  STM32F446RE C++17 Library Active\r\n");
+    serial.write("========================================\r\n");
+    serial.write("Press the Nucleo Blue Button (PC13) to toggle LED (EXTI)\r\n");
+    serial.write("Or send commands: [1]=ON, [0]=OFF, [t]=Toggle\r\n\r\n");
 
     while(true)
     {
@@ -44,6 +63,14 @@ int main()
             {
                 led.toggle();
                 serial.write(" -> LED TOGGLED\r\n");
+            }
+            else if(c == '\r' || c == '\n')
+            {
+                serial.write("\r\n");
+            }
+            else
+            {
+                serial.write(" -> Unknown command\r\n");
             }
         }
     }

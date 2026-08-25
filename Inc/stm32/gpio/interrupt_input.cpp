@@ -1,5 +1,6 @@
 #include "stm32/gpio/interrupt_input.hpp"
 #include "stm32/gpio/gpio_helper.hpp"
+#include "stm32/common/rcc_enable.hpp"
 #include "stm32/exti/exti_manager.hpp"
 
 namespace gpio
@@ -15,21 +16,50 @@ InterruptInput::InterruptInput(Pin pin, InterruptInputConfig config) : pin_(pin)
 	rcc::enablePeripheralClock(SYSCFG);
 
 	exti::configureExticr(pin_);
+	exti::setTrigger(pin_, config.trigger);
 
-	if(config.fallingEdgeCallback)
+	exti::ExtiManager::registerPin(pin_, config.trigger, config.callback, config.edgeCallback);
+
+	if(config.risingCallback)
 	{
-		exti::enableFallingTrigger(pin_);
-		exti::ExtiManager::setFallingCallback(pin_, config.fallingEdgeCallback);
+		exti::ExtiManager::setRisingCallback(pin_, config.risingCallback);
+	}
+	if(config.fallingCallback)
+	{
+		exti::ExtiManager::setFallingCallback(pin_, config.fallingCallback);
 	}
 
-	if(config.risingEdgeCallback)
-	{
-		exti::enableRisingTrigger(pin_);
-		exti::ExtiManager::setRisingCallback(pin_, config.risingEdgeCallback);
-	}
-
+	exti::clearPending(pin_.number);
 	exti::enableInterrupt(pin_);
 	exti::enableIRQ(pin_);
+}
+
+InterruptInput::InterruptInput(Pin pin, exti::Trigger trigger, stm32::Callback cb, Pull pull)
+    : InterruptInput(pin, InterruptInputConfig{pull, trigger, cb, nullptr, nullptr, nullptr})
+{
+}
+
+InterruptInput::~InterruptInput()
+{
+	exti::disableInterrupt(pin_);
+	exti::setTrigger(pin_, exti::Trigger::None);
+	exti::clearPending(pin_.number);
+	exti::ExtiManager::unregisterPin(pin_);
+}
+
+void InterruptInput::enable() const noexcept
+{
+	exti::enableInterrupt(pin_);
+}
+
+void InterruptInput::disable() const noexcept
+{
+	exti::disableInterrupt(pin_);
+}
+
+void InterruptInput::softwareTrigger() const noexcept
+{
+	exti::softwareTrigger(pin_.number);
 }
 
 } // namespace gpio

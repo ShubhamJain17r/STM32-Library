@@ -5,18 +5,21 @@
 
 #include "stm32/common/registers.hpp"
 #include "stm32/common/callback.hpp"
-
 #include "stm32/gpio/pin.hpp"
 #include "stm32/gpio/gpio_types.hpp"
+#include "stm32/exti/exti_types.hpp"
 
 namespace gpio
 {
 
 struct InterruptInputConfig
 {
-	Pull pull = Pull::NONE;
-	stm32::Callback risingEdgeCallback  = nullptr;
-	stm32::Callback fallingEdgeCallback = nullptr;
+	Pull               pull            = Pull::NONE;
+	exti::Trigger      trigger         = exti::Trigger::Falling;
+	stm32::Callback    callback        = nullptr;
+	exti::EdgeCallback edgeCallback    = nullptr;
+	stm32::Callback    risingCallback  = nullptr;
+	stm32::Callback    fallingCallback = nullptr;
 };
 
 class InterruptInput
@@ -26,7 +29,7 @@ private:
 
 public:
 	InterruptInput() = delete;
-	~InterruptInput() = default;
+	~InterruptInput();
 
 	InterruptInput(const InterruptInput&) = delete;
 	InterruptInput& operator=(const InterruptInput&) = delete;
@@ -35,10 +38,8 @@ public:
 	InterruptInput& operator=(InterruptInput&&) = delete;
 
 	explicit InterruptInput(Pin pin, InterruptInputConfig config = {});
+	InterruptInput(Pin pin, exti::Trigger trigger, stm32::Callback cb, Pull pull = Pull::NONE);
 
-private:
-
-public:
 	inline PinState read() const noexcept
 	{
 		return reg::isAnyBitSet(pin_.port->IDR, pin_.mask()) ? PinState::HIGH : PinState::LOW;
@@ -53,6 +54,10 @@ public:
 	{
 		return !isHigh();
 	}
+
+	void enable() const noexcept;
+	void disable() const noexcept;
+	void softwareTrigger() const noexcept;
 };
 
 } // namespace gpio

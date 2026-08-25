@@ -33,5 +33,24 @@ inline void enablePeripheralClock(SYSCFG_TypeDef* port) noexcept
 	if(port == SYSCFG) reg::setBits(RCC->APB2ENR, RCC_APB2ENR_SYSCFGEN);
 }
 
-} // namespace rcc
+inline void enablePeripheralClock(TIM_TypeDef* timer) noexcept
+{
+	// APB1 Timers
+	if(timer == TIM2)  { reg::setBits(RCC->APB1ENR, RCC_APB1ENR_TIM2EN);  return; }
+	if(timer == TIM3)  { reg::setBits(RCC->APB1ENR, RCC_APB1ENR_TIM3EN);  return; }
+	if(timer == TIM4)  { reg::setBits(RCC->APB1ENR, RCC_APB1ENR_TIM4EN);  return; }
+	if(timer == TIM5)  { reg::setBits(RCC->APB1ENR, RCC_APB1ENR_TIM5EN);  return; }
+	if(timer == TIM6)  { reg::setBits(RCC->APB1ENR, RCC_APB1ENR_TIM6EN);  return; }
+	if(timer == TIM7)  { reg::setBits(RCC->APB1ENR, RCC_APB1ENR_TIM7EN);  return; }
+	if(timer == TIM12) { reg::setBits(RCC->APB1ENR, RCC_APB1ENR_TIM12EN); return; }
+	if(timer == TIM13) { reg::setBits(RCC->APB1ENR, RCC_APB1ENR_TIM13EN); return; }
+	if(timer == TIM14) { reg::setBits(RCC->APB1ENR, RCC_APB1ENR_TIM14EN); return; }
+	// APB2 Timers
+	if(timer == TIM1)  { reg::setBits(RCC->APB2ENR, RCC_APB2ENR_TIM1EN);  return; }
+	if(timer == TIM8)  { reg::setBits(RCC->APB2ENR, RCC_APB2ENR_TIM8EN);  return; }
+	if(timer == TIM9)  { reg::setBits(RCC->APB2ENR, RCC_APB2ENR_TIM9EN);  return; }
+	if(timer == TIM10) { reg::setBits(RCC->APB2ENR, RCC_APB2ENR_TIM10EN); return; }
+	if(timer == TIM11) { reg::setBits(RCC->APB2ENR, RCC_APB2ENR_TIM11EN); return; }
+}
 
+} // namespace rcc

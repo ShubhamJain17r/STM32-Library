@@ -8,6 +8,8 @@ namespace buffer
 template<typename T, std::size_t N>
 class RingBuffer
 {
+    static_assert(N > 0, "RingBuffer capacity must be greater than zero");
+
 public:
     bool push(const T& value) noexcept;
     bool pop(T& value) noexcept;

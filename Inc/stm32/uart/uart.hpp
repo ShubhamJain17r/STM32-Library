@@ -217,19 +217,20 @@ void UartHandler<I, TxBufSize, RxBufSize>::handleIDLE() noexcept
 template<Instance I, std::size_t TxBufSize, std::size_t RxBufSize>
 void UartHandler<I, TxBufSize, RxBufSize>::writeByte(std::uint8_t data) noexcept
 {
-    // Spin with interrupts enabled so the TXE ISR can drain the buffer.
-    while(storage_.txBuf.full())
+    // Spin until space is available in txBuf_ (interrupts enabled during spin)
+    while(true)
     {
+        __disable_irq();
+        const bool pushed = storage_.txBuf.push(data);
+        __enable_irq();
+
+        if(pushed)
+        {
+            break;
+        }
     }
 
-    // Protect the push from concurrent ISR pop modifying count_.
-    __disable_irq();
-    storage_.txBuf.push(data);
-    __enable_irq();
-
-    // Arm TXEIE. If the UART is idle (TXE=1), the ISR fires immediately on
-    // the next instruction and begins draining. If UART is mid-byte, it fires
-    // after the current byte completes.
+    // Arm TXEIE so the TXE ISR drains the buffer.
     interrupt::enableEvent(Traits<I>::peripheral(), interrupt::Event::TxEmpty);
 }
 

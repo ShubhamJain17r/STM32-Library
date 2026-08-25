@@ -10,8 +10,6 @@
 
 #include "stm32/uart/interrupt/uart_interrupt.hpp"
 
-#include "stm32/common/buffer.hpp"
-
 namespace uart
 {
 
@@ -19,8 +17,6 @@ template<Instance I>
 class UartHandler
 {
 private:
-	inline static buffer::RingBuffer<char, 128> rxBuffer_;
-	inline static buffer::RingBuffer<char, 128> txBuffer_;
 
 public:
 	explicit UartHandler();
@@ -72,16 +68,13 @@ UartHandler<I>::UartHandler(std::uint32_t baud)
 }
 
 template<Instance I>
-UartHandler<I>::UartHandler(gpio::Pin tx,
-                            gpio::Pin rx)
+UartHandler<I>::UartHandler(gpio::Pin tx, gpio::Pin rx)
     : UartHandler(uartConfig<I>{tx, rx})
 {
 }
 
 template<Instance I>
-UartHandler<I>::UartHandler(gpio::Pin tx,
-                            gpio::Pin rx,
-                            std::uint32_t baud)
+UartHandler<I>::UartHandler(gpio::Pin tx, gpio::Pin rx, std::uint32_t baud)
     : UartHandler(uartConfig<I>{tx, rx, baud})
 {
 }
@@ -106,6 +99,10 @@ UartHandler<I>::UartHandler(const uartConfig<I>& config)
     helper::setMode(uart, config.mode);
 
     helper::configureBaudRate(uart, config.baud, Traits<I>::bus);
+
+    interrupt::UartEvent::setDeveloperCallback(I, interrupt::Event::RxNotEmpty, (Callback)handleRXNE);
+    interrupt::UartEvent::setDeveloperCallback(I, interrupt::Event::TxEmpty, (Callback)handleTXE);
+    interrupt::UartEvent::setDeveloperCallback(I, interrupt::Event::IdleState, (Callback)handleIDLE);
 
     interrupt::enableIRQ(Traits<I>::irq);
 

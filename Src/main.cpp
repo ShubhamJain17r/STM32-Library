@@ -1,86 +1,50 @@
 #include "stm32f446xx.h"
 #include <cstdint>
-//
-//#include "stm32/gpio/gpio.hpp"
-//
-//using namespace gpio;
-//
-inline void delay(std::uint32_t t)
-{
-	for(std::uint32_t i = 0; i < t; ++i);
-}
-//
-//int main()
-//{
-//	DigitalOutput led(PA5,
-//	{
-//			.outputType = OutputType::PUSH_PULL,
-////			.outputSpeed = OutputSpeed::LOW,
-//			.pull = Pull::DOWN,
-////			.initialState = PinState::HIGH
-//	});
-//
-//	while(1)
-//	{
-//		led.write(PinState::HIGH);
-//		delay(1000000);
-//		led.write(PinState::LOW);
-//		delay(1000000);
-//
-//		led.high();
-//		delay(1000000);
-//		led.low();
-//		delay(1000000);
-//
-//		if(led.read() == PinState::LOW)
-//		{
-//			led.high();
-//		}
-//
-//		delay(2000000);
-//
-//		if(led.read() == PinState::HIGH)
-//		{
-//			led.low();
-//		}
-//
-//		delay(6000000);
-//	}
-//}
 
-#include "stm32/uart/uart.hpp"
+#include "stm32/common/systick.hpp"
 #include "stm32/gpio/gpio.hpp"
+#include "stm32/uart/uart.hpp"
 
-using namespace uart;
 using namespace gpio;
+using namespace uart;
+
 int main()
 {
-	Uart2 Serial;
-//
-//	DigitalOutput led(PA5);
-//
-//	while(1)
-//	{
-//		Serial.write("Hello World\r\n");
-//		delay(1000000);
-//
-//		if(Serial.available())
-//		{
-//			char c = Serial.read();
-//
-//			Serial.write(c);
-//
-//			if(c == 'n')
-//			{
-//				led.high();
-//			}
-//		}
-//	}
+    // 1. Initialize SysTick 1ms timebase
+    systick::init();
 
-	char c = Serial.read();
+    // 2. Initialize PA5 (Nucleo green user LED)
+    DigitalOutput led(PA5);
 
-	Serial.write(c);
+    // 3. Initialize USART2 at 115200 baud (connected to ST-LINK Virtual COM port)
+    Uart2 serial(115200);
 
-	Serial.write("Hello World\r\n");
+    serial.write("STM32F446RE C++17 Library Ready\r\n");
+    serial.write("Send '1' to turn ON, '0' to turn OFF, 't' to toggle\r\n");
 
+    while(true)
+    {
+        if(serial.available())
+        {
+            const char c = serial.read();
+            const std::uint8_t byte = static_cast<std::uint8_t>(c);
+            serial.write(&byte, 1);
+
+            if(c == '1' || c == 'H' || c == 'h')
+            {
+                led.high();
+                serial.write(" -> LED ON\r\n");
+            }
+            else if(c == '0' || c == 'L' || c == 'l')
+            {
+                led.low();
+                serial.write(" -> LED OFF\r\n");
+            }
+            else if(c == 't' || c == 'T')
+            {
+                led.toggle();
+                serial.write(" -> LED TOGGLED\r\n");
+            }
+        }
+    }
 }

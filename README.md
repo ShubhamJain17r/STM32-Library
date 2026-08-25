@@ -172,10 +172,10 @@ int main()
 | Phase | Module | Status | Description |
 | :--- | :--- | :--- | :--- |
 | **Phase 0** | **Architecture & Types** | 🟢 Complete | Namespace structure, types, callback model, static dispatch |
-| **Phase 1** | **Core Infrastructure** | 🟡 In Progress | `RingBuffer`, `Callback`, `registers.hpp` bit utilities |
-| **Phase 2** | **RCC & Clock Tree** | 🟡 In Progress | Basic frequencies & peripheral clocks; dynamic PLL tree planned |
-| **Phase 3** | **GPIO & Pin Routing** | 🟢 Stable | `DigitalInput`, `DigitalOutput`, `PinMap`, `AF` traits |
-| **Phase 4** | **SysTick & Delays** | ⚪ Planned | High-resolution tick, millisecond/microsecond delays, timeouts |
+| **Phase 1** | **Core Infrastructure** | 🟢 Complete | `RingBuffer`, `Callback`, `registers.hpp` type-safe bit utilities |
+| **Phase 2** | **RCC & Clock Tree** | 🟢 Complete | Dynamic PLL/HSE/HSI decoding, AHB/APB1/APB2 & Timer bus frequencies |
+| **Phase 3** | **GPIO & Pin Routing** | 🟢 Complete | `DigitalInput`, `DigitalOutput`, `PinMap`, `AF` traits |
+| **Phase 4** | **SysTick & Delays** | 🟢 Complete | Millisecond/microsecond timebase, `delayMs`, `delayUs`, `Timeout` |
 | **Phase 5** | **EXTI & Events** | 🟡 Refactoring | Central EXTI manager, edge dispatching improvements |
 | **Phase 6** | **Timers & PWM** | ⚪ Planned | Basic, General-purpose, Advanced timers, PWM generation |
 | **Phase 7** | **UART / USART** | 🟢 Stable | Full buffered interrupt TX/RX, parity, word length, oversampling |

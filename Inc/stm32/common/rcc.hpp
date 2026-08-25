@@ -3,6 +3,8 @@
 #include "stm32f446xx.h"
 #include <cstdint>
 
+#include "stm32/common/registers.hpp"
+
 namespace rcc
 {
 
@@ -37,6 +39,7 @@ enum class Bus : std::uint8_t
 inline std::uint32_t getSystemClock() noexcept
 {
     const std::uint32_t sws = RCC->CFGR & RCC_CFGR_SWS;
+    const std::uint32_t sws = reg::readBits(RCC->CFGR, RCC_CFGR_SWS);
 
     switch(sws)
     {
@@ -52,6 +55,9 @@ inline std::uint32_t getSystemClock() noexcept
             const std::uint32_t pllsrc = (RCC->PLLCFGR & RCC_PLLCFGR_PLLSRC) ? hseFrequency : HSI_FREQUENCY;
             const std::uint32_t pllm = RCC->PLLCFGR & RCC_PLLCFGR_PLLM;
             const std::uint32_t plln = (RCC->PLLCFGR & RCC_PLLCFGR_PLLN) >> RCC_PLLCFGR_PLLN_Pos;
+            const std::uint32_t pllsrc = reg::isAnyBitSet(RCC->PLLCFGR, RCC_PLLCFGR_PLLSRC) ? hseFrequency : HSI_FREQUENCY;
+            const std::uint32_t pllm = reg::readBits(RCC->PLLCFGR, RCC_PLLCFGR_PLLM);
+            const std::uint32_t plln = reg::readBits(RCC->PLLCFGR, RCC_PLLCFGR_PLLN) >> RCC_PLLCFGR_PLLN_Pos;
 
             if(pllm == 0) return HSI_FREQUENCY;
 
@@ -60,11 +66,13 @@ inline std::uint32_t getSystemClock() noexcept
             if(sws == RCC_CFGR_SWS_PLL)
             {
                 const std::uint32_t pllp = (((RCC->PLLCFGR & RCC_PLLCFGR_PLLP) >> RCC_PLLCFGR_PLLP_Pos) + 1u) * 2u;
+                const std::uint32_t pllp = ((reg::readBits(RCC->PLLCFGR, RCC_PLLCFGR_PLLP) >> RCC_PLLCFGR_PLLP_Pos) + 1u) * 2u;
                 return vco / pllp;
             }
             else // PLL_R
             {
                 const std::uint32_t pllr = (RCC->PLLCFGR & RCC_PLLCFGR_PLLR) >> RCC_PLLCFGR_PLLR_Pos;
+                const std::uint32_t pllr = reg::readBits(RCC->PLLCFGR, RCC_PLLCFGR_PLLR) >> RCC_PLLCFGR_PLLR_Pos;
                 return (pllr > 0) ? (vco / pllr) : vco;
             }
         }
@@ -81,6 +89,7 @@ inline std::uint32_t getHCLK() noexcept
 {
     const std::uint32_t sysclk = getSystemClock();
     const std::uint32_t hpre = (RCC->CFGR & RCC_CFGR_HPRE) >> RCC_CFGR_HPRE_Pos;
+    const std::uint32_t hpre = reg::readBits(RCC->CFGR, RCC_CFGR_HPRE) >> RCC_CFGR_HPRE_Pos;
 
     // AHB Prescaler table: 0xxx: 1, 1000: 2, 1001: 4, 1010: 8, 1011: 16, 1100: 64, 1101: 128, 1110: 256, 1111: 512
     constexpr std::uint8_t ahbShiftTable[16] = {0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 6, 7, 8, 9};
@@ -95,6 +104,7 @@ inline std::uint32_t getPCLK1() noexcept
 {
     const std::uint32_t hclk = getHCLK();
     const std::uint32_t ppre1 = (RCC->CFGR & RCC_CFGR_PPRE1) >> RCC_CFGR_PPRE1_Pos;
+    const std::uint32_t ppre1 = reg::readBits(RCC->CFGR, RCC_CFGR_PPRE1) >> RCC_CFGR_PPRE1_Pos;
 
     // APB Prescaler table: 0xx: 1, 100: 2, 101: 4, 110: 8, 111: 16
     constexpr std::uint8_t apbShiftTable[8] = {0, 0, 0, 0, 1, 2, 3, 4};
@@ -109,6 +119,7 @@ inline std::uint32_t getPCLK2() noexcept
 {
     const std::uint32_t hclk = getHCLK();
     const std::uint32_t ppre2 = (RCC->CFGR & RCC_CFGR_PPRE2) >> RCC_CFGR_PPRE2_Pos;
+    const std::uint32_t ppre2 = reg::readBits(RCC->CFGR, RCC_CFGR_PPRE2) >> RCC_CFGR_PPRE2_Pos;
 
     constexpr std::uint8_t apbShiftTable[8] = {0, 0, 0, 0, 1, 2, 3, 4};
 
@@ -146,12 +157,14 @@ inline std::uint32_t getTimerFrequency(Bus bus) noexcept
     {
         const std::uint32_t pclk1 = getPCLK1();
         const bool prescaled = (RCC->CFGR & RCC_CFGR_PPRE1) >= RCC_CFGR_PPRE1_DIV2;
+        const bool prescaled = reg::readBits(RCC->CFGR, RCC_CFGR_PPRE1) >= RCC_CFGR_PPRE1_DIV2;
         return prescaled ? (pclk1 * 2u) : pclk1;
     }
     else if(bus == Bus::APB2)
     {
         const std::uint32_t pclk2 = getPCLK2();
         const bool prescaled = (RCC->CFGR & RCC_CFGR_PPRE2) >= RCC_CFGR_PPRE2_DIV2;
+        const bool prescaled = reg::readBits(RCC->CFGR, RCC_CFGR_PPRE2) >= RCC_CFGR_PPRE2_DIV2;
         return prescaled ? (pclk2 * 2u) : pclk2;
     }
 

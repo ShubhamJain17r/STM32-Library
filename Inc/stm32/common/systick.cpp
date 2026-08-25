@@ -1,4 +1,4 @@
-﻿#include "stm32/common/systick.hpp"
+#include "stm32/common/systick.hpp"
 
 namespace
 {
@@ -24,9 +24,11 @@ std::uint32_t micros() noexcept
     {
         ms = systickMillis_;
         val = SysTick->VAL;
+        val = reg::read(SysTick->VAL);
     } while(ms != systickMillis_);
 
     load = SysTick->LOAD;
+    load = reg::read(SysTick->LOAD);
     if(load == 0) return ms * 1000u;
 
     const std::uint32_t elapsedSubTicks = load - val;

@@ -1,3 +1,4 @@
+#include "stm32/common/registers.hpp"
 #include <stm32/uart/interrupt/uart_interrupt.hpp>
 
 namespace uart::interrupt
@@ -68,6 +69,7 @@ void UartEvent::handleEvent(Instance I) noexcept
 	EventCallbacks& user = userCallbacks_[index(I)];
 
 	if((uart->SR & USART_SR_RXNE) && (uart->CR1 & USART_CR1_RXNEIE))
+	if(reg::isAnyBitSet(uart->SR, USART_SR_RXNE) && reg::isAnyBitSet(uart->CR1, USART_CR1_RXNEIE))
 	{
 		if(dev.rxNotEmpty)
 		{
@@ -76,6 +78,7 @@ void UartEvent::handleEvent(Instance I) noexcept
 	}
 
 	if((uart->SR & USART_SR_TXE) && (uart->CR1 & USART_CR1_TXEIE))
+	if(reg::isAnyBitSet(uart->SR, USART_SR_TXE) && reg::isAnyBitSet(uart->CR1, USART_CR1_TXEIE))
 	{
 		if(dev.txEmpty)
 		{
@@ -84,6 +87,7 @@ void UartEvent::handleEvent(Instance I) noexcept
 	}
 
 	if((uart->SR & USART_SR_TC) && (uart->CR1 & USART_CR1_TCIE))
+	if(reg::isAnyBitSet(uart->SR, USART_SR_TC) && reg::isAnyBitSet(uart->CR1, USART_CR1_TCIE))
 	{
 		if(user.txComplete)
 		{
@@ -91,11 +95,16 @@ void UartEvent::handleEvent(Instance I) noexcept
 		}
 	}
 	if((uart->SR & USART_SR_IDLE) && (uart->CR1 & USART_CR1_IDLEIE))
+
+	if(reg::isAnyBitSet(uart->SR, USART_SR_IDLE) && reg::isAnyBitSet(uart->CR1, USART_CR1_IDLEIE))
 	{
 		if(dev.idleState)
 			{
 				dev.idleState();
 			}
+		{
+			dev.idleState();
+		}
 		if(user.idleState)
 		{
 			user.idleState();

@@ -1,8 +1,9 @@
-﻿#pragma once
+#pragma once
 
 #include "stm32f446xx.h"
 #include <cstdint>
 
+#include "stm32/common/registers.hpp"
 #include "stm32/common/rcc.hpp"
 
 namespace systick
@@ -23,6 +24,11 @@ inline void init(std::uint32_t tickHz = 1000) noexcept
     SysTick->CTRL = SysTick_CTRL_CLKSOURCE_Msk |
                     SysTick_CTRL_TICKINT_Msk   |
                     SysTick_CTRL_ENABLE_Msk;
+    reg::write(SysTick->LOAD, reload & SysTick_LOAD_RELOAD_Msk);
+    reg::write(SysTick->VAL, 0u);
+    reg::write(SysTick->CTRL, SysTick_CTRL_CLKSOURCE_Msk |
+                              SysTick_CTRL_TICKINT_Msk   |
+                              SysTick_CTRL_ENABLE_Msk);
 }
 
 /**
@@ -31,6 +37,7 @@ inline void init(std::uint32_t tickHz = 1000) noexcept
 inline void disable() noexcept
 {
     SysTick->CTRL &= ~(SysTick_CTRL_ENABLE_Msk | SysTick_CTRL_TICKINT_Msk);
+    reg::clearBits(SysTick->CTRL, SysTick_CTRL_ENABLE_Msk | SysTick_CTRL_TICKINT_Msk);
 }
 
 /**

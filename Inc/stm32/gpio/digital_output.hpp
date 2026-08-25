@@ -3,6 +3,7 @@
 #include "stm32f446xx.h"
 #include <cstdint>
 
+#include "stm32/common/registers.hpp"
 #include "stm32/gpio/pin.hpp"
 #include "stm32/gpio/gpio_types.hpp"
 
@@ -45,11 +46,13 @@ public:
 	inline void high() const noexcept
 	{
 		pin_.port->BSRR = pin_.mask();
+		reg::write(pin_.port->BSRR, pin_.mask());
 	}
 
 	inline void low() const noexcept
 	{
 		pin_.port->BSRR = (pin_.mask() << 16);
+		reg::write(pin_.port->BSRR, pin_.mask() << 16u);
 	}
 
 	inline void toggle() const noexcept
@@ -64,6 +67,7 @@ public:
 			return PinState::HIGH;
 		}
 		return PinState::LOW;
+		return reg::isAnyBitSet(pin_.port->ODR, pin_.mask()) ? PinState::HIGH : PinState::LOW;
 	}
 };
 

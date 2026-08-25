@@ -1,3 +1,4 @@
+#include "stm32/common/registers.hpp"
 #include "stm32/exti/exti_manager.hpp"
 
 extern "C"
@@ -34,6 +35,10 @@ void EXTI9_5_IRQHandler()
     {
         if(EXTI->PR & (1u << line))
         		exti::ExtiManager::handleInterrupt(line);
+        if(reg::isAnyBitSet(EXTI->PR, 1U << line))
+        {
+            exti::ExtiManager::handleInterrupt(static_cast<std::uint8_t>(line));
+        }
     }
 }
 
@@ -43,6 +48,10 @@ void EXTI15_10_IRQHandler()
     {
         if(EXTI->PR & (1u << line))
         		exti::ExtiManager::handleInterrupt(line);
+        if(reg::isAnyBitSet(EXTI->PR, 1U << line))
+        {
+            exti::ExtiManager::handleInterrupt(static_cast<std::uint8_t>(line));
+        }
     }
 }
 

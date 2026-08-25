@@ -3,6 +3,7 @@
 #include "stm32f446xx.h"
 #include <cstdint>
 
+#include "stm32/common/registers.hpp"
 #include "stm32/gpio/pin.hpp"
 #include "stm32/gpio/gpio_types.hpp"
 
@@ -36,6 +37,7 @@ public:
 			return PinState::HIGH;
 		}
 		return PinState::LOW;
+		return reg::isAnyBitSet(pin_.port->IDR, pin_.mask()) ? PinState::HIGH : PinState::LOW;
 	}
 
 	inline bool isHigh() const noexcept

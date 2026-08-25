@@ -40,7 +40,7 @@ struct Traits<Instance::usart1>
     static constexpr gpio::af::Signal rxSignal = gpio::af::Signal::USART1_RX;
 
     static constexpr gpio::Pin defaultTx = gpio::af::Traits<txSignal>::pins[0];
-    static constexpr gpio::Pin defaultRx = gpio::af::Traits<txSignal>::pins[0];
+    static constexpr gpio::Pin defaultRx = gpio::af::Traits<rxSignal>::pins[0];
 
     static void enableClock() noexcept
     {
@@ -64,7 +64,7 @@ struct Traits<Instance::usart2>
     static constexpr gpio::af::Signal rxSignal = gpio::af::Signal::USART2_RX;
 
     static constexpr gpio::Pin defaultTx = gpio::af::Traits<txSignal>::pins[0];
-    static constexpr gpio::Pin defaultRx = gpio::af::Traits<txSignal>::pins[0];
+    static constexpr gpio::Pin defaultRx = gpio::af::Traits<rxSignal>::pins[0];
 
     static void enableClock() noexcept
     {
@@ -88,7 +88,7 @@ struct Traits<Instance::usart3>
     static constexpr gpio::af::Signal rxSignal = gpio::af::Signal::USART3_RX;
 
     static constexpr gpio::Pin defaultTx = gpio::af::Traits<txSignal>::pins[0];
-    static constexpr gpio::Pin defaultRx = gpio::af::Traits<txSignal>::pins[0];
+    static constexpr gpio::Pin defaultRx = gpio::af::Traits<rxSignal>::pins[0];
 
     static void enableClock() noexcept
     {
@@ -112,7 +112,7 @@ struct Traits<Instance::uart4>
     static constexpr gpio::af::Signal rxSignal = gpio::af::Signal::UART4_RX;
 
     static constexpr gpio::Pin defaultTx = gpio::af::Traits<txSignal>::pins[0];
-    static constexpr gpio::Pin defaultRx = gpio::af::Traits<txSignal>::pins[0];
+    static constexpr gpio::Pin defaultRx = gpio::af::Traits<rxSignal>::pins[0];
 
     static void enableClock() noexcept
     {
@@ -136,7 +136,7 @@ struct Traits<Instance::uart5>
     static constexpr gpio::af::Signal rxSignal = gpio::af::Signal::UART5_RX;
 
     static constexpr gpio::Pin defaultTx = gpio::af::Traits<txSignal>::pins[0];
-    static constexpr gpio::Pin defaultRx = gpio::af::Traits<txSignal>::pins[0];
+    static constexpr gpio::Pin defaultRx = gpio::af::Traits<rxSignal>::pins[0];
 
     static void enableClock() noexcept
     {
@@ -160,7 +160,7 @@ struct Traits<Instance::usart6>
     static constexpr gpio::af::Signal rxSignal = gpio::af::Signal::USART6_RX;
 
     static constexpr gpio::Pin defaultTx = gpio::af::Traits<txSignal>::pins[0];
-    static constexpr gpio::Pin defaultRx = gpio::af::Traits<txSignal>::pins[0];
+    static constexpr gpio::Pin defaultRx = gpio::af::Traits<rxSignal>::pins[0];
 
     static void enableClock() noexcept
     {

@@ -1,3 +1,14 @@
+/**
+ * @file rcc.hpp
+ * @brief Dynamic RCC Clock Tree frequency decoding for STM32F446
+ * 
+ * Computes exact real-time clock frequencies by decoding hardware registers:
+ * - SYSCLK (HSI, HSE, Main PLL_P, Main PLL_R)
+ * - HCLK (AHB bus clock)
+ * - PCLK1 (APB1 peripheral clock) & PCLK2 (APB2 peripheral clock)
+ * - Timer clock frequencies on APB1 and APB2 bus multipliers
+ */
+
 #pragma once
 
 #include "stm32f446xx.h"
@@ -57,7 +68,8 @@ inline std::uint32_t getSystemClock() noexcept
 
             if(pllm == 0) return HSI_FREQUENCY;
 
-            const std::uint32_t vco = (pllsrc / pllm) * plln;
+            // 64-bit intermediate arithmetic prevents both integer division truncation and 32-bit overflow
+            const std::uint32_t vco = static_cast<std::uint32_t>((static_cast<std::uint64_t>(pllsrc) * plln) / pllm);
 
             if(sws == RCC_CFGR_SWS_PLL)
             {
@@ -161,5 +173,3 @@ inline std::uint32_t getTimerFrequency(Bus bus) noexcept
 }
 
 } // namespace rcc
-
-

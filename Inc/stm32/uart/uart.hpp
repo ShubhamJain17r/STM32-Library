@@ -1,3 +1,15 @@
+/**
+ * @file uart.hpp
+ * @brief High-level asynchronous, interrupt-driven UART driver
+ * 
+ * Provides:
+ * - Non-blocking interrupt-driven transmission & reception using ring buffers
+ * - Type aliases for all USART/UART instances (Uart1 through Uart6)
+ * - Configurable baud rate, oversampling, parity, stop bits, and word length
+ * - Clean stream API: write(str), write(data, len), read(), readByte(), available()
+ * - User-level callbacks for Transfer Complete (TC) and Idle Line Detection (IDLE)
+ */
+
 #pragma once
 
 #include "stm32f446xx.h"
@@ -11,31 +23,10 @@
 
 #include "stm32/uart/uart_helper.hpp"
 #include "stm32/uart/uart_config.hpp"
-
 #include "stm32/uart/interrupt/uart_interrupt.hpp"
 
 namespace uart
 {
-
-// ----------------------------------------------------------------------------
-// UartHandler<Instance, TxBufSize, RxBufSize>
-//
-// Interrupt-driven UART abstraction.
-//
-// TX path: write() pushes bytes into txBuf_ and enables TXEIE. The TXE ISR
-//          (handleTXE) drains txBuf_ one byte at a time and disables TXEIE
-//          when the buffer is empty.
-//
-// RX path: The RXNE ISR (handleRXNE) reads DR and pushes bytes into rxBuf_.
-//          available() and read() operate on rxBuf_, never directly on DR.
-//
-// Handlers are static member functions — valid plain function pointers with
-// no 'this' context required. Per-instance state lives in 'inline static
-// Storage storage_', which is valid because only one hardware UART instance
-// of each 'I' can physically exist.
-//
-// TxBufSize, RxBufSize: compile-time ring buffer sizes in bytes. Default 64.
-// ----------------------------------------------------------------------------
 
 template<Instance I, std::size_t TxBufSize = 64, std::size_t RxBufSize = 64>
 class UartHandler
@@ -50,16 +41,12 @@ private:
         buffer::RingBuffer<std::uint8_t, RxBufSize> rxBuf;
     };
 
-    // One storage instance per template instantiation. Shared by all objects
-    // of the same UartHandler<I, TxBufSize, RxBufSize> type.
     inline static Storage storage_;
 
-    // Static ISR handlers — registered as stm32::Callback (void(*)()).
     static void handleRXNE() noexcept;
     static void handleTXE()  noexcept;
     static void handleIDLE() noexcept;
 
-    // Internal single-byte write — pushes to txBuf_ and arms TXEIE.
     static void writeByte(std::uint8_t data) noexcept;
 
 public:
@@ -70,33 +57,52 @@ public:
     UartHandler(UartHandler&&)                 = delete;
     UartHandler& operator=(UartHandler&&)      = delete;
 
-    // Constructors — all delegate to the config constructor.
     explicit UartHandler();
     explicit UartHandler(std::uint32_t baud);
     explicit UartHandler(gpio::Pin tx, gpio::Pin rx);
     explicit UartHandler(gpio::Pin tx, gpio::Pin rx, std::uint32_t baud);
     explicit UartHandler(const uartConfig<I>& config);
 
-    // TX — queues bytes into txBuf_. Spins only if the TX buffer is full.
+    /**
+     * @brief Writes a null-terminated string to the TX buffer.
+     */
     void write(const char* str) noexcept;
+
+    /**
+     * @brief Writes a byte array of specified length to the TX buffer.
+     */
     void write(const std::uint8_t* data, std::size_t length) noexcept;
 
-    // RX — drains rxBuf_. read()/readByte() block until a byte is available.
-    char         read()                               noexcept;
-    std::uint8_t readByte()                           noexcept;
-    void         read(std::uint8_t* buf, std::size_t length) noexcept;
+    /**
+     * @brief Reads a single character from the RX buffer (blocks if empty).
+     */
+    char read() noexcept;
 
+    /**
+     * @brief Reads a single byte from the RX buffer (blocks if empty).
+     */
+    std::uint8_t readByte() noexcept;
+
+    /**
+     * @brief Reads multiple bytes from the RX buffer into a destination buffer.
+     */
+    void read(std::uint8_t* buf, std::size_t length) noexcept;
+
+    /**
+     * @brief Returns true if one or more bytes are available in the RX buffer.
+     */
     bool available() const noexcept;
 
     void enable()  noexcept;
     void disable() noexcept;
 
-    // User-level callbacks invoked from the ISR after developer handlers run.
     void attachTransferCompleteCallback(stm32::Callback cb) noexcept;
     void attachReceiveCompleteCallback(stm32::Callback cb)  noexcept;
 };
 
-// --- Constructor implementations --------------------------------------------
+// ---------------------------------------------------------------------------
+// Implementation
+// ---------------------------------------------------------------------------
 
 template<Instance I, std::size_t TxBufSize, std::size_t RxBufSize>
 UartHandler<I, TxBufSize, RxBufSize>::UartHandler()
@@ -131,14 +137,11 @@ UartHandler<I, TxBufSize, RxBufSize>::UartHandler(const uartConfig<I>& config)
     auto* uart = Traits<I>::peripheral();
 
     // 3. Register static handlers with the interrupt dispatch layer.
-    //    Static member functions have type void(*)() — no UB, no this-pointer needed.
     interrupt::UartEvent::setDeveloperCallback(I, interrupt::Event::RxNotEmpty, &UartHandler::handleRXNE);
     interrupt::UartEvent::setDeveloperCallback(I, interrupt::Event::TxEmpty,    &UartHandler::handleTXE);
     interrupt::UartEvent::setDeveloperCallback(I, interrupt::Event::IdleState,  &UartHandler::handleIDLE);
 
     // 4. Enable hardware interrupt sources.
-    //    TXEIE is NOT enabled here — it is enabled on-demand in writeByte()
-    //    only when data is queued, to avoid a spurious immediate TXE interrupt.
     interrupt::enableEvent(uart, interrupt::Event::RxNotEmpty);
     interrupt::enableEvent(uart, interrupt::Event::IdleState);
 
@@ -149,7 +152,6 @@ UartHandler<I, TxBufSize, RxBufSize>::UartHandler(const uartConfig<I>& config)
     helper::setStopBits(uart, config.stopBits);
     helper::setMode(uart, config.mode);
 
-    // configureBaudRate reads CR1.OVER8, which must be set before this call.
     helper::configureBaudRate(uart, config.baud, Traits<I>::bus);
 
     // 6. Enable the NVIC line and the UART peripheral.
@@ -157,20 +159,13 @@ UartHandler<I, TxBufSize, RxBufSize>::UartHandler(const uartConfig<I>& config)
     helper::enable(uart);
 }
 
-// --- Static ISR handlers ----------------------------------------------------
-
-// handleRXNE: called by the ISR when a new byte has arrived in DR.
-// Reading DR clears the RXNE flag. Drop silently if rxBuf_ is full.
 template<Instance I, std::size_t TxBufSize, std::size_t RxBufSize>
 void UartHandler<I, TxBufSize, RxBufSize>::handleRXNE() noexcept
 {
     const std::uint8_t byte = static_cast<std::uint8_t>(reg::read(Traits<I>::peripheral()->DR));
-    storage_.rxBuf.push(byte); // returns false if full; byte is discarded
+    storage_.rxBuf.push(byte);
 }
 
-// handleTXE: called by the ISR when DR is ready for the next TX byte.
-// If the TX buffer has data, write the next byte. If empty, disarm TXEIE
-// so the ISR stops firing.
 template<Instance I, std::size_t TxBufSize, std::size_t RxBufSize>
 void UartHandler<I, TxBufSize, RxBufSize>::handleTXE() noexcept
 {
@@ -182,19 +177,10 @@ void UartHandler<I, TxBufSize, RxBufSize>::handleTXE() noexcept
     }
     else
     {
-        // Buffer drained — disarm TXEIE. writeByte() will re-arm it on the
-        // next write.
         interrupt::disableEvent(Traits<I>::peripheral(), interrupt::Event::TxEmpty);
     }
 }
 
-// handleIDLE: called by the ISR when the RX line has been idle for one
-// frame duration after receiving data (useful for framing variable-length
-// messages).
-// The IDLE flag (STM32F4) is cleared by reading SR then DR. The SR was
-// already read in handleEvent(). Reading DR here completes the sequence.
-// By the time IDLE fires, all pending RXNE events have been processed first
-// inside handleEvent(), so this DR read does not consume a valid byte.
 template<Instance I, std::size_t TxBufSize, std::size_t RxBufSize>
 void UartHandler<I, TxBufSize, RxBufSize>::handleIDLE() noexcept
 {
@@ -203,17 +189,9 @@ void UartHandler<I, TxBufSize, RxBufSize>::handleIDLE() noexcept
     (void)tmp;
 }
 
-// --- writeByte --------------------------------------------------------------
-
-// Pushes one byte into txBuf_ and arms TXEIE.
-// Spins (with interrupts enabled) if the TX buffer is full, allowing the TXE
-// ISR to drain it before we continue.
-// A brief critical section (disable_irq) protects the RingBuffer count_ field
-// from a concurrent ISR pop.
 template<Instance I, std::size_t TxBufSize, std::size_t RxBufSize>
 void UartHandler<I, TxBufSize, RxBufSize>::writeByte(std::uint8_t data) noexcept
 {
-    // Spin until space is available in txBuf_ (interrupts enabled during spin)
     while(true)
     {
         __disable_irq();
@@ -226,11 +204,8 @@ void UartHandler<I, TxBufSize, RxBufSize>::writeByte(std::uint8_t data) noexcept
         }
     }
 
-    // Arm TXEIE so the TXE ISR drains the buffer.
     interrupt::enableEvent(Traits<I>::peripheral(), interrupt::Event::TxEmpty);
 }
-
-// --- Public write / read ---------------------------------------------------
 
 template<Instance I, std::size_t TxBufSize, std::size_t RxBufSize>
 void UartHandler<I, TxBufSize, RxBufSize>::write(const char* str) noexcept
@@ -261,7 +236,6 @@ std::uint8_t UartHandler<I, TxBufSize, RxBufSize>::readByte() noexcept
 {
     std::uint8_t byte;
 
-    // Spin until the RXNE ISR pushes a byte into rxBuf_.
     while(true)
     {
         __disable_irq();
@@ -317,10 +291,9 @@ void UartHandler<I, TxBufSize, RxBufSize>::attachReceiveCompleteCallback(stm32::
     interrupt::UartEvent::setUserCallback(I, interrupt::Event::IdleState, cb);
 }
 
-// --- Convenience aliases ---------------------------------------------------
-// Default buffer sizes (64 bytes TX, 64 bytes RX).
-// For non-default sizes: UartHandler<Instance::usart2, 128, 256> serial;
-
+// ---------------------------------------------------------------------------
+// Convenient Type Aliases
+// ---------------------------------------------------------------------------
 using Uart1 = UartHandler<Instance::usart1>;
 using Uart2 = UartHandler<Instance::usart2>;
 using Uart3 = UartHandler<Instance::usart3>;
@@ -329,4 +302,3 @@ using Uart5 = UartHandler<Instance::uart5>;
 using Uart6 = UartHandler<Instance::usart6>;
 
 } // namespace uart
-

@@ -1,3 +1,11 @@
+/**
+ * @file buffer.hpp
+ * @brief Statically allocated, type-safe circular ring buffer template
+ * 
+ * Used for interrupt-driven communications (UART RX/TX, SPI, I2C buffers).
+ * Provides FIFO push/pop semantics with compile-time capacity checking.
+ */
+
 #pragma once
 
 #include <cstdint>
@@ -11,20 +19,52 @@ class RingBuffer
     static_assert(N > 0, "RingBuffer capacity must be greater than zero");
 
 public:
+    /**
+     * @brief Pushes an item into the buffer.
+     * @return true if pushed successfully, false if the buffer is full.
+     */
     bool push(const T& value) noexcept;
+
+    /**
+     * @brief Pops the oldest item from the buffer.
+     * @return true if popped successfully, false if the buffer is empty.
+     */
     bool pop(T& value) noexcept;
 
+    /**
+     * @brief Returns true if the buffer contains 0 elements.
+     */
     bool empty() const noexcept;
+
+    /**
+     * @brief Returns true if the buffer has reached maximum capacity N.
+     */
     bool full() const noexcept;
 
+    /**
+     * @brief Clears the buffer indices and count to 0.
+     */
     void clear() noexcept;
 
+    /**
+     * @brief Returns the current number of elements in the buffer.
+     */
     std::size_t size() const noexcept;
+
+    /**
+     * @brief Returns the maximum capacity N of the buffer.
+     */
     constexpr std::size_t capacity() const noexcept;
 
+    /**
+     * @brief Returns a reference to the front (oldest) element without removing it.
+     */
     T& front() noexcept;
     const T& front() const noexcept;
 
+    /**
+     * @brief Returns a reference to the back (newest) element.
+     */
     T& back() noexcept;
     const T& back() const noexcept;
 
@@ -44,7 +84,6 @@ bool RingBuffer<T, N>::push(const T& value) noexcept
     }
 
     buffer_[head_] = value;
-
     head_++;
 
     if(head_ == N)
@@ -53,7 +92,6 @@ bool RingBuffer<T, N>::push(const T& value) noexcept
     }
 
     count_++;
-
     return true;
 }
 
@@ -66,7 +104,6 @@ bool RingBuffer<T, N>::pop(T& value) noexcept
     }
 
     value = buffer_[tail_];
-
     tail_++;
 
     if(tail_ == N)
@@ -75,7 +112,6 @@ bool RingBuffer<T, N>::pop(T& value) noexcept
     }
 
     count_--;
-
     return true;
 }
 
@@ -127,7 +163,6 @@ template<typename T, std::size_t N>
 T& RingBuffer<T, N>::back() noexcept
 {
     std::size_t index = (head_ == 0) ? N - 1 : head_ - 1;
-
     return buffer_[index];
 }
 
@@ -135,7 +170,6 @@ template<typename T, std::size_t N>
 const T& RingBuffer<T, N>::back() const noexcept
 {
     std::size_t index = (head_ == 0) ? N - 1 : head_ - 1;
-
     return buffer_[index];
 }
 

@@ -1,3 +1,14 @@
+/**
+ * @file systick.hpp
+ * @brief High-precision monotonic millisecond & microsecond timebase driver
+ * 
+ * Provides:
+ * - 1ms monotonic tick counter (`millis()`)
+ * - Sub-millisecond microsecond resolution counter (`micros()`)
+ * - Blocking delays (`delayMs()`, `delayUs()`)
+ * - RAII non-blocking `systick::Timeout` tracker
+ */
+
 #pragma once
 
 #include "stm32f446xx.h"
@@ -19,11 +30,6 @@ inline void init(std::uint32_t tickHz = 1000) noexcept
     const std::uint32_t hclk = rcc::getHCLK();
     const std::uint32_t reload = (hclk / tickHz) - 1u;
 
-    SysTick->LOAD = reload & SysTick_LOAD_RELOAD_Msk;
-    SysTick->VAL  = 0;
-    SysTick->CTRL = SysTick_CTRL_CLKSOURCE_Msk |
-                    SysTick_CTRL_TICKINT_Msk   |
-                    SysTick_CTRL_ENABLE_Msk;
     reg::write(SysTick->LOAD, reload & SysTick_LOAD_RELOAD_Msk);
     reg::write(SysTick->VAL, 0u);
     reg::write(SysTick->CTRL, SysTick_CTRL_CLKSOURCE_Msk |
@@ -36,7 +42,6 @@ inline void init(std::uint32_t tickHz = 1000) noexcept
  */
 inline void disable() noexcept
 {
-    SysTick->CTRL &= ~(SysTick_CTRL_ENABLE_Msk | SysTick_CTRL_TICKINT_Msk);
     reg::clearBits(SysTick->CTRL, SysTick_CTRL_ENABLE_Msk | SysTick_CTRL_TICKINT_Msk);
 }
 
@@ -53,6 +58,7 @@ std::uint32_t micros() noexcept;
 
 /**
  * @brief Blocking millisecond delay using the SysTick millisecond counter.
+ * @param ms Duration in milliseconds.
  */
 inline void delayMs(std::uint32_t ms) noexcept
 {
@@ -64,6 +70,7 @@ inline void delayMs(std::uint32_t ms) noexcept
 
 /**
  * @brief Blocking microsecond delay using the SysTick microsecond counter.
+ * @param us Duration in microseconds.
  */
 inline void delayUs(std::uint32_t us) noexcept
 {

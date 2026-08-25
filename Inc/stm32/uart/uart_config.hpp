@@ -1,3 +1,8 @@
+/**
+ * @file uart_config.hpp
+ * @brief Configuration structures and defaults for UART / USART peripherals
+ */
+
 #pragma once
 
 #include "stm32f446xx.h"
@@ -5,7 +10,6 @@
 
 #include "stm32/uart/uart_traits.hpp"
 #include "stm32/uart/uart_types.hpp"
-
 #include "stm32/gpio/af/af_config.hpp"
 
 namespace uart
@@ -15,7 +19,6 @@ template<Instance I>
 struct uartConfig
 {
     gpio::Pin tx = Traits<I>::defaultTx;
-
     gpio::Pin rx = Traits<I>::defaultRx;
 
     std::uint32_t baud = 115200;
@@ -24,13 +27,9 @@ struct uartConfig
     gpio::af::AlternatePinConfig rxPinConfig = {};
 
     Mode mode = Mode::TX_RX;
-
     WordLength wordLength = WordLength::BITS_8;
-
     StopBits stopBits = StopBits::ONE;
-
     Parity parity = Parity::NONE;
-
     Oversampling oversampling = Oversampling::BY16;
 
     constexpr uartConfig() = default;
@@ -51,5 +50,9 @@ struct uartConfig
           baud(baudRate)
     {}
 };
+
+// PascalCase alias matching DigitalOutputConfig / InterruptInputConfig naming convention
+template<Instance I>
+using UartConfig = uartConfig<I>;
 
 } // namespace uart

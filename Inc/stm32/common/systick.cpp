@@ -1,3 +1,8 @@
+/**
+ * @file systick.cpp
+ * @brief Implementation of SysTick millis/micros counter and ISR handler
+ */
+
 #include "stm32/common/systick.hpp"
 
 namespace
@@ -23,11 +28,9 @@ std::uint32_t micros() noexcept
     do
     {
         ms = systickMillis_;
-        val = SysTick->VAL;
         val = reg::read(SysTick->VAL);
     } while(ms != systickMillis_);
 
-    load = SysTick->LOAD;
     load = reg::read(SysTick->LOAD);
     if(load == 0) return ms * 1000u;
 

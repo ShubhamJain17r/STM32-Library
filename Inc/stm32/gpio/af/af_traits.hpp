@@ -5,7 +5,7 @@
 
 #include "stm32/gpio/af/af_types.hpp"
 
-#include "Stm32/gpio/pin_map.hpp"
+#include "stm32/gpio/pin_map.hpp"
 
 namespace gpio::af
 {

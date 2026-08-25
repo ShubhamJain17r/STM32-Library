@@ -47,7 +47,7 @@ void UartEvent::setDeveloperCallback(Instance I, Event intr, Callback cb) noexce
 			developerCallbacks_[index(I)].rxNotEmpty = cb;
 			break;
 		case Event::IdleState:
-			userCallbacks_[index(I)].idleState = cb;
+			developerCallbacks_[index(I)].idleState = cb;
 			break;
 	}
 }

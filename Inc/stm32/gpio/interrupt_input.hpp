@@ -14,8 +14,8 @@ namespace gpio
 struct InterruptInputConfig
 {
 	Pull pull = Pull::NONE;
-	Callback risingEdgeCallback = nullptr;
-	Callback fallingEdgeCallback = nullptr;
+	stm32::Callback risingEdgeCallback  = nullptr;
+	stm32::Callback fallingEdgeCallback = nullptr;
 };
 
 class InterruptInput

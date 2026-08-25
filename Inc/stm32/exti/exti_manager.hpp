@@ -69,15 +69,15 @@ struct ExtiEntry
 {
     GPIO_TypeDef* port;
 
-    Callback rising = nullptr;
-    Callback falling = nullptr;
+    stm32::Callback rising  = nullptr;
+    stm32::Callback falling = nullptr;
 };
 
 class ExtiManager
 {
 public:
-    static void setRisingCallback(const gpio::Pin&, Callback);
-    static void setFallingCallback(const gpio::Pin&, Callback);
+    static void setRisingCallback(const gpio::Pin&, stm32::Callback);
+    static void setFallingCallback(const gpio::Pin&, stm32::Callback);
 
     static void handleInterrupt(std::uint8_t line);
 

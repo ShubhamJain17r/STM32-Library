@@ -23,7 +23,7 @@ inline USART_TypeDef* peripheral(Instance instance)
     return nullptr;
 }
 
-void UartEvent::setUserCallback(Instance I, Event intr, Callback cb) noexcept
+void UartEvent::setUserCallback(Instance I, Event intr, stm32::Callback cb) noexcept
 {
 	switch(intr)
 	{
@@ -33,10 +33,12 @@ void UartEvent::setUserCallback(Instance I, Event intr, Callback cb) noexcept
 		case Event::IdleState:
 			userCallbacks_[index(I)].idleState = cb;
 			break;
+		default:
+			break;
 	}
 }
 
-void UartEvent::setDeveloperCallback(Instance I, Event intr, Callback cb) noexcept
+void UartEvent::setDeveloperCallback(Instance I, Event intr, stm32::Callback cb) noexcept
 {
 	switch(intr)
 	{
@@ -48,6 +50,8 @@ void UartEvent::setDeveloperCallback(Instance I, Event intr, Callback cb) noexce
 			break;
 		case Event::IdleState:
 			developerCallbacks_[index(I)].idleState = cb;
+			break;
+		default:
 			break;
 	}
 }

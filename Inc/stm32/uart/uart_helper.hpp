@@ -27,27 +27,9 @@ inline bool rxReady(USART_TypeDef* uart)
 
 inline void configureBaudRate(USART_TypeDef* uart, std::uint32_t baud, rcc::Bus bus) noexcept
 {
-	const std::uint32_t freq = rcc::frequency(bus);
+	const std::uint32_t freq = frequency(bus);
 
-	const bool over8 = uart->CR1 & USART_CR1_OVER8;
-
-	if(over8)
-	{
-		// OVER8=1: USARTDIV = fCK / (8 * baud), scaled by 2 for rounding
-		// BRR[2:0] = lower nibble >> 1, BRR[3] must be cleared
-		// Formula from RM0390 §19.3.4
-		const std::uint32_t usartdiv = ((freq * 2u) + baud) / (baud * 2u); // rounded
-		// Mantissa is bits [15:4]; fraction for OVER8 is bits [2:0] (bit 3 always 0)
-		const std::uint32_t mantissa = (usartdiv >> 4u);
-		const std::uint32_t fraction = (usartdiv & 0xFu) >> 1u; // shift fraction right by 1
-		uart->BRR = (mantissa << 4u) | fraction;
-	}
-	else
-	{
-		// OVER8=0: USARTDIV = fCK / (16 * baud), rounded
-		const std::uint32_t usartdiv = (freq + (baud / 2u)) / baud;
-		uart->BRR = usartdiv;
-	}
+	uart->BRR = (freq / baud);
 }
 
 inline void setOversampling(USART_TypeDef* uart, Oversampling over) noexcept

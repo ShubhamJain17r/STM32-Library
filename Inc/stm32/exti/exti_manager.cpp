@@ -3,19 +3,19 @@
 namespace exti
 {
 
-void ExtiManager::setRisingCallback(const gpio::Pin& pin, Callback cb)
+void ExtiManager::setRisingCallback(const gpio::Pin& pin, stm32::Callback cb)
 {
     auto& entry = table[pin.number];
 
-    entry.port = pin.port;
+    entry.port   = pin.port;
     entry.rising = cb;
 }
 
-void ExtiManager::setFallingCallback(const gpio::Pin& pin, Callback cb)
+void ExtiManager::setFallingCallback(const gpio::Pin& pin, stm32::Callback cb)
 {
     auto& entry = table[pin.number];
 
-    entry.port = pin.port;
+    entry.port    = pin.port;
     entry.falling = cb;
 }
 

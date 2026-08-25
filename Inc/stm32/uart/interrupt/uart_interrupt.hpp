@@ -68,17 +68,17 @@ inline void enableIRQ(IRQn_Type irq) noexcept
 
 struct EventCallbacks
 {
-	Callback txEmpty = nullptr;
-	Callback txComplete = nullptr;
-	Callback rxNotEmpty = nullptr;
-	Callback idleState = nullptr;
+	stm32::Callback txEmpty    = nullptr;
+	stm32::Callback txComplete = nullptr;
+	stm32::Callback rxNotEmpty = nullptr;
+	stm32::Callback idleState  = nullptr;
 };
 
 class UartEvent
 {
 public:
-	static void setDeveloperCallback(Instance, Event, Callback) noexcept;
-	static void setUserCallback(Instance, Event, Callback) noexcept;
+	static void setDeveloperCallback(Instance, Event, stm32::Callback) noexcept;
+	static void setUserCallback(Instance, Event, stm32::Callback) noexcept;
 
 	static void handleEvent(Instance) noexcept;
 

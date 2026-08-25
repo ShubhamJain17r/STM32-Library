@@ -137,4 +137,4 @@ const T& RingBuffer<T, N>::back() const noexcept
     return buffer_[index];
 }
 
-} // namespace buffer
+} // namesapce buffer

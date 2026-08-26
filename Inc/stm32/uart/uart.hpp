@@ -303,4 +303,11 @@ using Uart4 = UartHandler<Instance::uart4>;
 using Uart5 = UartHandler<Instance::uart5>;
 using Uart6 = UartHandler<Instance::usart6>;
 
+using Uart1Config = UartConfig<Instance::usart1>;
+using Uart2Config = UartConfig<Instance::usart2>;
+using Uart3Config = UartConfig<Instance::usart3>;
+using Uart4Config = UartConfig<Instance::uart4>;
+using Uart5Config = UartConfig<Instance::uart5>;
+using Uart6Config = UartConfig<Instance::usart6>;
+
 } // namespace uart

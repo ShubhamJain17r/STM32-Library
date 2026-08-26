@@ -27,6 +27,7 @@ Each peripheral subsystem has its own exhaustive guide covering hardware archite
 | **UART / USART** | [📖 `docs/05_uart.md`](docs/05_uart.md) | `Uart1`..`Uart6`, buffered asynchronous TX/RX, parity, oversampling, IDLE/TC events. |
 | **Timers & PWM** | [📖 `docs/06_timers_and_pwm.md`](docs/06_timers_and_pwm.md) | All 14 timers (`TIM1`..`TIM14`), Timebase, OPM, multi-channel PWM, OC, Input Capture. |
 | **Common Utilities** | [📖 `docs/07_common_utilities.md`](docs/07_common_utilities.md) | `reg::` helpers, static `RingBuffer<T, N>`, standard `stm32::Callback`. |
+| **SPI Subsystem** | [📖 `docs/08_spi.md`](docs/08_spi.md) | `Spi1`..`Spi4`, full/half duplex, modes 0..3, 8/16-bit, auto-baud, RAII `ChipSelectGuard`. |
 
 ---
 
@@ -44,10 +45,37 @@ Standalone, copy-pasteable bare-metal example applications located in the `Examp
 | 06 | **Timer Interrupt** | [`Examples/06_timer_periodic_interrupt/main.cpp`](Examples/06_timer_periodic_interrupt/main.cpp) | Periodic 2 Hz hardware interrupt using `Timer2`. |
 | 07 | **PWM Breathing LED** | [`Examples/07_pwm_led_breathing/main.cpp`](Examples/07_pwm_led_breathing/main.cpp) | Smooth 1 kHz hardware PWM LED breathing on PA6 (`TIM3_CH1`). |
 | 08 | **Input Capture** | [`Examples/08_input_capture/main.cpp`](Examples/08_input_capture/main.cpp) | 32-bit input capture timestamp & period measurement on PA0 (`TIM2_CH1`). |
+| 09 | **SPI Loopback** | [`Examples/09_spi_loopback_poll/main.cpp`](Examples/09_spi_loopback_poll/main.cpp) | 5 MHz full-duplex loopback packet exchange on `SPI1`. |
+| 10 | **SPI Sensor / Flash** | [`Examples/10_spi_sensor_read/main.cpp`](Examples/10_spi_sensor_read/main.cpp) | SPI device register read with RAII `ChipSelectGuard`. |
 
 ---
 
 ## 4. Code Snippets
+
+### Hardware SPI Master
+```cpp
+#include "stm32/spi/spi.hpp"
+#include "stm32/gpio/gpio.hpp"
+
+using namespace spi;
+using namespace gpio;
+
+int main()
+{
+    // Initialize SPI1 at 10 MHz in Mode 0 (Auto-configures PA5 SCK, PA6 MISO, PA7 MOSI)
+    Spi1 spi(10'000'000, SpiMode::Mode0);
+
+    // Full-duplex single byte exchange
+    std::uint8_t rx = spi.transfer(0x55);
+
+    // Buffer transfer
+    std::uint8_t tx[4] = {0x01, 0x02, 0x03, 0x04};
+    std::uint8_t rxBuf[4];
+    spi.transfer(tx, rxBuf, 4);
+
+    while(true) {}
+}
+```
 
 ### Hardware PWM Generation
 ```cpp
@@ -71,30 +99,6 @@ int main()
 }
 ```
 
-### Buffered Interrupt UART
-```cpp
-#include "stm32/uart/uart.hpp"
-
-using namespace uart;
-
-int main()
-{
-    // Initialize USART2 at 115200 baud with 64-byte TX/RX ring buffers
-    Uart2 serial(115200);
-
-    serial.write("STM32 Bare-Metal C++17 Ready\r\n");
-
-    while(true)
-    {
-        if(serial.available())
-        {
-            char c = serial.read();
-            serial.write(&c, 1);
-        }
-    }
-}
-```
-
 ---
 
 ## 5. Development Roadmap
@@ -109,7 +113,7 @@ int main()
 | **Phase 5** | **EXTI & Events** | 🟢 Complete | Trigger tracking, edge-aware callbacks, collision safety |
 | **Phase 6** | **Timers & PWM** | 🟢 Complete | All 14 timers, Timebase, OPM, multi-channel PWM, OC, IC |
 | **Phase 7** | **UART / USART** | 🟢 Complete | Full buffered interrupt TX/RX, parity, oversampling |
-| **Phase 8** | **SPI Subsystem** | ⚪ Planned | Master/Slave `SPI1`..`SPI4`, polling, interrupt & DMA |
+| **Phase 8** | **SPI Subsystem** | 🟢 Complete | `SPI1`..`SPI4`, modes 0..3, 8/16-bit, polling/async, RAII CS |
 | **Phase 9** | **I2C Subsystem** | ⚪ Planned | Master/Slave `I2C1`..`I2C3` (100 kHz & 400 kHz) |
 | **Phase 10** | **ADC Subsystem** | ⚪ Planned | Single channel, scan mode, continuous conversion |
 | **Phase 11** | **DMA Subsystem** | ⚪ Planned | High-speed streams for UART, SPI, I2C, ADC |

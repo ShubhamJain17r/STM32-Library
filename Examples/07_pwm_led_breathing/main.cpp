@@ -9,9 +9,9 @@
  */
 
 #include "stm32f446xx.h"
-#include "stm32/common/systick.hpp"
+#include "stm32/common/systick/systick.hpp"
 #include "stm32/gpio/gpio.hpp"
-#include "stm32/timer/pwm.hpp"
+#include "stm32/timer/timer.hpp"
 
 using namespace gpio;
 using namespace timer;
@@ -47,4 +47,3 @@ int main()
         systick::delayMs(15);
     }
 }
-

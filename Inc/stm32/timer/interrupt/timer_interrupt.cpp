@@ -1,5 +1,5 @@
 #include "stm32/timer/interrupt/timer_interrupt.hpp"
-#include "stm32/timer/timer_helper.hpp"
+#include "stm32/timer/core/timer_helper.hpp"
 
 namespace timer::interrupt
 {
@@ -9,7 +9,7 @@ static constexpr std::size_t index(Instance I) noexcept
     return static_cast<std::size_t>(I);
 }
 
-static TIM_TypeDef* peripheral(Instance I) noexcept
+static TIM_TypeDef* getPeripheral(Instance I) noexcept
 {
     switch(I)
     {
@@ -38,8 +38,8 @@ void TimerEvent::setUpdateCallback(Instance I, stm32::Callback cb) noexcept
 
 void TimerEvent::setChannelCallback(Instance I, Channel ch, stm32::Callback cb) noexcept
 {
-    const auto chIdx = static_cast<std::size_t>(ch) - 1u;
-    if(chIdx < 4u)
+    const auto chIdx = static_cast<std::uint8_t>(ch) - 1U;
+    if(chIdx < 4)
     {
         callbacks_[index(I)].channelCallback[chIdx] = cb;
     }
@@ -47,8 +47,8 @@ void TimerEvent::setChannelCallback(Instance I, Channel ch, stm32::Callback cb) 
 
 void TimerEvent::setCaptureCallback(Instance I, Channel ch, ChannelCallback cb) noexcept
 {
-    const auto chIdx = static_cast<std::size_t>(ch) - 1u;
-    if(chIdx < 4u)
+    const auto chIdx = static_cast<std::uint8_t>(ch) - 1U;
+    if(chIdx < 4)
     {
         callbacks_[index(I)].captureCallback[chIdx] = cb;
     }
@@ -56,31 +56,31 @@ void TimerEvent::setCaptureCallback(Instance I, Channel ch, ChannelCallback cb) 
 
 void TimerEvent::handleEvent(Instance I) noexcept
 {
-    TIM_TypeDef* timer = peripheral(I);
-    if(!timer) return;
+    auto* tim = getPeripheral(I);
+    if(!tim) return;
 
-    auto& cb = callbacks_[index(I)];
+    const auto& cb = callbacks_[index(I)];
 
-    // Handle Update Interrupt Flag (UIF)
-    if(helper::isUpdateFlag(timer) && reg::isAnyBitSet(timer->DIER, TIM_DIER_UIE))
+    // Check Update Interrupt Flag (UIF)
+    if(helper::isUpdateFlag(tim) && reg::isAnyBitSet(tim->DIER, TIM_DIER_UIE))
     {
-        helper::clearUpdateFlag(timer);
+        helper::clearUpdateFlag(tim);
         if(cb.updateCallback)
         {
             cb.updateCallback();
         }
     }
 
-    // Handle Channel 1..4 Capture/Compare Flags
-    for(std::uint8_t c = 1u; c <= 4u; ++c)
+    // Check CC1..CC4 Flags (CC1IF..CC4IF)
+    for(std::uint8_t ch = 1; ch <= 4; ++ch)
     {
-        const auto ch = static_cast<Channel>(c);
-        const auto chIdx = static_cast<std::size_t>(c - 1u);
-        const std::uint32_t ieMask = 1U << c;
+        const auto channel = static_cast<Channel>(ch);
+        const auto chIdx = ch - 1U;
+        const auto dierMask = 1U << ch;
 
-        if(helper::isChannelFlag(timer, ch) && reg::isAnyBitSet(timer->DIER, ieMask))
+        if(helper::isChannelFlag(tim, channel) && reg::isAnyBitSet(tim->DIER, dierMask))
         {
-            helper::clearChannelFlag(timer, ch);
+            helper::clearChannelFlag(tim, channel);
 
             if(cb.channelCallback[chIdx])
             {
@@ -89,7 +89,8 @@ void TimerEvent::handleEvent(Instance I) noexcept
 
             if(cb.captureCallback[chIdx])
             {
-                cb.captureCallback[chIdx](helper::getCapture(timer, ch));
+                const std::uint32_t val = helper::getCapture(tim, channel);
+                cb.captureCallback[chIdx](val);
             }
         }
     }

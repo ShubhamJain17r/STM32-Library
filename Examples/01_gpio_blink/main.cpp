@@ -9,7 +9,7 @@
  */
 
 #include "stm32f446xx.h"
-#include "stm32/common/systick.hpp"
+#include "stm32/common/systick/systick.hpp"
 #include "stm32/gpio/gpio.hpp"
 
 using namespace gpio;
@@ -34,4 +34,3 @@ int main()
         systick::delayMs(500);
     }
 }
-

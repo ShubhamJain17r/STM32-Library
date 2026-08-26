@@ -15,14 +15,16 @@
 #include "stm32f446xx.h"
 #include <cstdint>
 
-#include "stm32/common/registers.hpp"
-#include "stm32/common/callback.hpp"
-#include "stm32/common/buffer.hpp"
+#include "stm32/common/registers/registers.hpp"
+#include "stm32/common/callback/callback.hpp"
+#include "stm32/common/buffer/buffer.hpp"
 
 #include "stm32/gpio/af/af_helper.hpp"
 
-#include "stm32/uart/uart_helper.hpp"
-#include "stm32/uart/uart_config.hpp"
+#include "stm32/uart/core/uart_types.hpp"
+#include "stm32/uart/core/uart_traits.hpp"
+#include "stm32/uart/core/uart_config.hpp"
+#include "stm32/uart/core/uart_helper.hpp"
 #include "stm32/uart/interrupt/uart_interrupt.hpp"
 
 namespace uart

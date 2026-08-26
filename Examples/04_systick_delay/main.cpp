@@ -10,7 +10,7 @@
  */
 
 #include "stm32f446xx.h"
-#include "stm32/common/systick.hpp"
+#include "stm32/common/systick/systick.hpp"
 #include "stm32/gpio/gpio.hpp"
 
 using namespace gpio;
@@ -38,4 +38,3 @@ int main()
         // Other tasks can run continuously here without being blocked by delay loops!
     }
 }
-

@@ -3,9 +3,9 @@
 #include "stm32f446xx.h"
 #include <cstdint>
 
-#include "stm32/common/callback.hpp"
-#include "stm32/timer/timer_types.hpp"
-#include "stm32/timer/timer_traits.hpp"
+#include "stm32/common/callback/callback.hpp"
+#include "stm32/timer/core/timer_types.hpp"
+#include "stm32/timer/core/timer_traits.hpp"
 
 namespace timer::interrupt
 {

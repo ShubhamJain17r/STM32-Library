@@ -10,7 +10,7 @@
 
 #include "stm32f446xx.h"
 #include "stm32/gpio/gpio.hpp"
-#include "stm32/timer/input_capture.hpp"
+#include "stm32/timer/timer.hpp"
 #include "stm32/uart/uart.hpp"
 
 using namespace gpio;
@@ -46,4 +46,3 @@ int main()
         __WFI();
     }
 }
-

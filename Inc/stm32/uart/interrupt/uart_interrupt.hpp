@@ -3,10 +3,9 @@
 #include "stm32f446xx.h"
 #include <cstdint>
 
-#include "stm32/common/registers.hpp"
-#include "stm32/common/callback.hpp"
-
-#include "stm32/uart/uart_traits.hpp"
+#include "stm32/common/registers/registers.hpp"
+#include "stm32/common/callback/callback.hpp"
+#include "stm32/uart/core/uart_traits.hpp"
 
 namespace uart::interrupt
 {

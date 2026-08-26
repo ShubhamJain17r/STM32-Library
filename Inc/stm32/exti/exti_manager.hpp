@@ -3,9 +3,9 @@
 #include "stm32f446xx.h"
 #include <cstdint>
 
-#include "stm32/common/registers.hpp"
-#include "stm32/common/callback.hpp"
-#include "stm32/gpio/pin.hpp"
+#include "stm32/common/registers/registers.hpp"
+#include "stm32/common/callback/callback.hpp"
+#include "stm32/gpio/core/pin.hpp"
 #include "stm32/exti/exti_types.hpp"
 
 namespace exti::detail

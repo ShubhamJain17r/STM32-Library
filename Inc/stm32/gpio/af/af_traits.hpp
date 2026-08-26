@@ -4,8 +4,7 @@
 #include <array>
 
 #include "stm32/gpio/af/af_types.hpp"
-
-#include "stm32/gpio/pin_map.hpp"
+#include "stm32/gpio/core/pin_map.hpp"
 
 namespace gpio::af
 {

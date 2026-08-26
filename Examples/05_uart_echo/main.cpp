@@ -9,7 +9,7 @@
  */
 
 #include "stm32f446xx.h"
-#include "stm32/common/systick.hpp"
+#include "stm32/common/systick/systick.hpp"
 #include "stm32/gpio/gpio.hpp"
 #include "stm32/uart/uart.hpp"
 
@@ -61,6 +61,7 @@ int main()
 
                 case 't':
                 case 'T':
+                case 't':
                     led.toggle();
                     serial.write(" -> LED Toggled\r\n");
                     break;
@@ -77,4 +78,3 @@ int main()
         }
     }
 }
-

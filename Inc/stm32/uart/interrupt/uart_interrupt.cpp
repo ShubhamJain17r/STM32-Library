@@ -1,5 +1,5 @@
-#include "stm32/common/registers.hpp"
-#include <stm32/uart/interrupt/uart_interrupt.hpp>
+#include "stm32/common/registers/registers.hpp"
+#include "stm32/uart/interrupt/uart_interrupt.hpp"
 
 namespace uart::interrupt
 {
@@ -9,19 +9,18 @@ static constexpr std::size_t index(Instance I)
 	return static_cast<std::size_t>(I);
 }
 
-inline USART_TypeDef* peripheral(Instance instance)
+static USART_TypeDef* getPeripheral(Instance I) noexcept
 {
-    switch(instance)
-    {
-        case Instance::usart1: return USART1;
-        case Instance::usart2: return USART2;
-        case Instance::usart3: return USART3;
-        case Instance::uart4:  return UART4;
-        case Instance::uart5:  return UART5;
-        case Instance::usart6: return USART6;
-    }
-
-    return nullptr;
+	switch(I)
+	{
+		case Instance::usart1: return USART1;
+		case Instance::usart2: return USART2;
+		case Instance::usart3: return USART3;
+		case Instance::uart4:  return UART4;
+		case Instance::uart5:  return UART5;
+		case Instance::usart6: return USART6;
+	}
+	return nullptr;
 }
 
 void UartEvent::setUserCallback(Instance I, Event intr, stm32::Callback cb) noexcept
@@ -31,9 +30,11 @@ void UartEvent::setUserCallback(Instance I, Event intr, stm32::Callback cb) noex
 		case Event::TxComplete:
 			userCallbacks_[index(I)].txComplete = cb;
 			break;
+
 		case Event::IdleState:
 			userCallbacks_[index(I)].idleState = cb;
 			break;
+
 		default:
 			break;
 	}
@@ -46,29 +47,28 @@ void UartEvent::setDeveloperCallback(Instance I, Event intr, stm32::Callback cb)
 		case Event::TxEmpty:
 			developerCallbacks_[index(I)].txEmpty = cb;
 			break;
+
 		case Event::RxNotEmpty:
 			developerCallbacks_[index(I)].rxNotEmpty = cb;
 			break;
+
 		case Event::IdleState:
 			developerCallbacks_[index(I)].idleState = cb;
 			break;
+
 		default:
 			break;
 	}
 }
 
-void UartEvent::handleEvent(Instance I) noexcept
+static void handleInstance(Instance I, USART_TypeDef* uart, const EventCallbacks& dev, const EventCallbacks& user)
 {
-	USART_TypeDef* uart = peripheral(I);
-	if(!uart)
-	{
-		return;
-	}
+	(void)I;
+	const std::uint32_t status   = reg::read(uart->SR);
+	const std::uint32_t control1 = reg::read(uart->CR1);
 
-	EventCallbacks& dev = developerCallbacks_[index(I)];
-	EventCallbacks& user = userCallbacks_[index(I)];
-
-	if(reg::isAnyBitSet(uart->SR, USART_SR_RXNE) && reg::isAnyBitSet(uart->CR1, USART_CR1_RXNEIE))
+	// 1. RXNE (Read data register not empty)
+	if((status & USART_SR_RXNE) && (control1 & USART_CR1_RXNEIE))
 	{
 		if(dev.rxNotEmpty)
 		{
@@ -76,7 +76,8 @@ void UartEvent::handleEvent(Instance I) noexcept
 		}
 	}
 
-	if(reg::isAnyBitSet(uart->SR, USART_SR_TXE) && reg::isAnyBitSet(uart->CR1, USART_CR1_TXEIE))
+	// 2. TXE (Transmit data register empty)
+	if((status & USART_SR_TXE) && (control1 & USART_CR1_TXEIE))
 	{
 		if(dev.txEmpty)
 		{
@@ -84,7 +85,8 @@ void UartEvent::handleEvent(Instance I) noexcept
 		}
 	}
 
-	if(reg::isAnyBitSet(uart->SR, USART_SR_TC) && reg::isAnyBitSet(uart->CR1, USART_CR1_TCIE))
+	// 3. TC (Transmission complete)
+	if((status & USART_SR_TC) && (control1 & USART_CR1_TCIE))
 	{
 		if(user.txComplete)
 		{
@@ -92,7 +94,8 @@ void UartEvent::handleEvent(Instance I) noexcept
 		}
 	}
 
-	if(reg::isAnyBitSet(uart->SR, USART_SR_IDLE) && reg::isAnyBitSet(uart->CR1, USART_CR1_IDLEIE))
+	// 4. IDLE (Idle line detected)
+	if((status & USART_SR_IDLE) && (control1 & USART_CR1_IDLEIE))
 	{
 		if(dev.idleState)
 		{
@@ -103,6 +106,17 @@ void UartEvent::handleEvent(Instance I) noexcept
 			user.idleState();
 		}
 	}
+}
+
+void UartEvent::handleEvent(Instance I)
+{
+	auto* uart = getPeripheral(I);
+	if(!uart) return;
+
+	handleInstance(I,
+	               uart,
+	               developerCallbacks_[index(I)],
+	               userCallbacks_[index(I)]);
 }
 
 } // namespace uart::interrupt

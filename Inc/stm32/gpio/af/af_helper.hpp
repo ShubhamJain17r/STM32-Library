@@ -3,7 +3,7 @@
 #include "stm32f446xx.h"
 #include <cstdint>
 
-#include "stm32/common/registers.hpp"
+#include "stm32/common/registers/registers.hpp"
 #include "stm32/gpio/af/af_traits.hpp"
 
 namespace gpio::af

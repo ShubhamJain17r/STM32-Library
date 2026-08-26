@@ -58,5 +58,12 @@ inline void enablePeripheralClock(TIM_TypeDef* timer) noexcept
 	if(timer == TIM11) { reg::setBits(RCC->APB2ENR, RCC_APB2ENR_TIM11EN); return; }
 }
 
-} // namespace rcc
+inline void enablePeripheralClock(SPI_TypeDef* spi) noexcept
+{
+	if(spi == SPI1) { reg::setBits(RCC->APB2ENR, RCC_APB2ENR_SPI1EN); return; }
+	if(spi == SPI2) { reg::setBits(RCC->APB1ENR, RCC_APB1ENR_SPI2EN); return; }
+	if(spi == SPI3) { reg::setBits(RCC->APB1ENR, RCC_APB1ENR_SPI3EN); return; }
+	if(spi == SPI4) { reg::setBits(RCC->APB2ENR, RCC_APB2ENR_SPI4EN); return; }
+}
 
+} // namespace rcc

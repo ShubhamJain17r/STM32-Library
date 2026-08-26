@@ -5,10 +5,12 @@
 #include "stm32/gpio/gpio.hpp"
 #include "stm32/uart/uart.hpp"
 #include "stm32/timer/timer.hpp"
+#include "stm32/spi/spi.hpp"
 
 using namespace gpio;
 using namespace uart;
 using namespace timer;
+using namespace spi;
 
 // Pointers for ISR callbacks
 static DigitalOutput* pLed = nullptr;
@@ -68,7 +70,18 @@ int main()
     pwm.start();
     pPwm = &pwm;
 
-    serial.write("[OK] SysTick, GPIO, EXTI, UART, Timer, and PWM initialized.\r\n");
+    // 7. Configure SPI1 at 2 MHz on PB3 (SCK), PB4 (MISO), PB5 (MOSI)
+    Spi1Config spiCfg;
+    spiCfg.sck         = PB3;
+    spiCfg.miso        = PB4;
+    spiCfg.mosi        = PB5;
+    spiCfg.baudRateHz  = 2'000'000;
+    spiCfg.spiMode     = SpiMode::Mode0;
+    spiCfg.slaveSelect = SlaveSelect::Software;
+
+    Spi1 spi(spiCfg);
+
+    serial.write("[OK] SysTick, GPIO, EXTI, UART, Timer, PWM, and SPI initialized.\r\n");
 
     systick::Timeout printTimer(1000); // Non-blocking 1s status report
 
@@ -82,7 +95,6 @@ int main()
             serial.write("Uptime: ");
             char buf[16];
             uint32_t sec = systick::millis() / 1000;
-            // Simple integer to ascii
             int idx = 0;
             if(sec == 0) buf[idx++] = '0';
             else

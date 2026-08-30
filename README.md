@@ -28,6 +28,7 @@ Each peripheral subsystem has its own exhaustive guide covering hardware archite
 | **Timers & PWM** | [📖 `docs/06_timers_and_pwm.md`](docs/06_timers_and_pwm.md) | All 14 timers (`TIM1`..`TIM14`), Timebase, OPM, multi-channel PWM, OC, Input Capture. |
 | **Common Utilities** | [📖 `docs/07_common_utilities.md`](docs/07_common_utilities.md) | `reg::` helpers, static `RingBuffer<T, N>`, standard `stm32::Callback`. |
 | **SPI Subsystem** | [📖 `docs/08_spi.md`](docs/08_spi.md) | `Spi1`..`Spi4`, full/half duplex, modes 0..3, 8/16-bit, auto-baud, RAII `ChipSelectGuard`. |
+| **I2C Subsystem** | [📖 `docs/09_i2c.md`](docs/09_i2c.md) | `I2c1`..`I2c3`, 100/400 kHz, auto-timing, timeout guarding, bus scanner, recovery. |
 
 ---
 
@@ -47,10 +48,34 @@ Standalone, copy-pasteable bare-metal example applications located in the `Examp
 | 08 | **Input Capture** | [`Examples/08_input_capture/main.cpp`](Examples/08_input_capture/main.cpp) | 32-bit input capture timestamp & period measurement on PA0 (`TIM2_CH1`). |
 | 09 | **SPI Loopback** | [`Examples/09_spi_loopback_poll/main.cpp`](Examples/09_spi_loopback_poll/main.cpp) | 5 MHz full-duplex loopback packet exchange on `SPI1`. |
 | 10 | **SPI Sensor / Flash** | [`Examples/10_spi_sensor_read/main.cpp`](Examples/10_spi_sensor_read/main.cpp) | SPI device register read with RAII `ChipSelectGuard`. |
+| 11 | **I2C Bus Scanner** | [`Examples/11_i2c_scanner/main.cpp`](Examples/11_i2c_scanner/main.cpp) | Active 7-bit bus scanner (`0x08`–`0x77`) with serial reporting. |
+| 12 | **I2C Sensor Read** | [`Examples/12_i2c_sensor_read/main.cpp`](Examples/12_i2c_sensor_read/main.cpp) | 400 kHz Fast Mode sensor register read / write operations. |
 
 ---
 
 ## 4. Code Snippets
+
+### Hardware I2C Master & Sensor Read
+```cpp
+#include "stm32/i2c/i2c.hpp"
+
+using namespace i2c;
+
+int main()
+{
+    // Initialize I2C1 at 400 kHz Fast Mode (Auto-configures PB8 SCL, PB9 SDA in Open-Drain AF4)
+    I2c1 i2c(400'000);
+
+    // Read WHO_AM_I register (0x75) from MPU6050 (0x68)
+    std::uint8_t chipId = 0;
+    if(i2c.readRegister(0x68, 0x75, chipId))
+    {
+        // chipId == 0x68
+    }
+
+    while(true) {}
+}
+```
 
 ### Hardware SPI Master
 ```cpp
@@ -77,28 +102,6 @@ int main()
 }
 ```
 
-### Hardware PWM Generation
-```cpp
-#include "stm32/timer/timer.hpp"
-#include "stm32/gpio/gpio.hpp"
-
-using namespace timer;
-using namespace gpio;
-
-int main()
-{
-    // Initialize Timer3 at 20 kHz PWM
-    Pwm3 pwm(20'000);
-
-    // Automatically configures PA6 as TIM3_CH1 (AF2 Push-Pull)
-    pwm.enableChannel(Channel::CH1, PA6);
-    pwm.setDutyCycle(Channel::CH1, 75.0f); // 75% duty cycle
-    pwm.start();
-
-    while(true) {}
-}
-```
-
 ---
 
 ## 5. Development Roadmap
@@ -114,6 +117,6 @@ int main()
 | **Phase 6** | **Timers & PWM** | 🟢 Complete | All 14 timers, Timebase, OPM, multi-channel PWM, OC, IC |
 | **Phase 7** | **UART / USART** | 🟢 Complete | Full buffered interrupt TX/RX, parity, oversampling |
 | **Phase 8** | **SPI Subsystem** | 🟢 Complete | `SPI1`..`SPI4`, modes 0..3, 8/16-bit, polling/async, RAII CS |
-| **Phase 9** | **I2C Subsystem** | ⚪ Planned | Master/Slave `I2C1`..`I2C3` (100 kHz & 400 kHz) |
+| **Phase 9** | **I2C Subsystem** | 🟢 Complete | `I2C1`..`I2C3`, 100/400 kHz, auto-timing, timeout guard, scanner |
 | **Phase 10** | **ADC Subsystem** | ⚪ Planned | Single channel, scan mode, continuous conversion |
 | **Phase 11** | **DMA Subsystem** | ⚪ Planned | High-speed streams for UART, SPI, I2C, ADC |

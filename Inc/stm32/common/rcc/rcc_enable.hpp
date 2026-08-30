@@ -66,4 +66,11 @@ inline void enablePeripheralClock(SPI_TypeDef* spi) noexcept
 	if(spi == SPI4) { reg::setBits(RCC->APB2ENR, RCC_APB2ENR_SPI4EN); return; }
 }
 
+inline void enablePeripheralClock(I2C_TypeDef* i2c) noexcept
+{
+	if(i2c == I2C1) { reg::setBits(RCC->APB1ENR, RCC_APB1ENR_I2C1EN); return; }
+	if(i2c == I2C2) { reg::setBits(RCC->APB1ENR, RCC_APB1ENR_I2C2EN); return; }
+	if(i2c == I2C3) { reg::setBits(RCC->APB1ENR, RCC_APB1ENR_I2C3EN); return; }
+}
+
 } // namespace rcc

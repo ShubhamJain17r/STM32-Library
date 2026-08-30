@@ -6,11 +6,13 @@
 #include "stm32/uart/uart.hpp"
 #include "stm32/timer/timer.hpp"
 #include "stm32/spi/spi.hpp"
+#include "stm32/i2c/i2c.hpp"
 
 using namespace gpio;
 using namespace uart;
 using namespace timer;
 using namespace spi;
+using namespace i2c;
 
 // Pointers for ISR callbacks
 static DigitalOutput* pLed = nullptr;
@@ -81,7 +83,10 @@ int main()
 
     Spi1 spi(spiCfg);
 
-    serial.write("[OK] SysTick, GPIO, EXTI, UART, Timer, PWM, and SPI initialized.\r\n");
+    // 8. Configure I2C1 at 100 kHz on PB8 (SCL) and PB9 (SDA)
+    I2c1 i2c(100'000);
+
+    serial.write("[OK] SysTick, GPIO, EXTI, UART, Timer, PWM, SPI, and I2C initialized.\r\n");
 
     systick::Timeout printTimer(1000); // Non-blocking 1s status report
 

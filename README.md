@@ -14,50 +14,56 @@ A modern, type-safe, zero-cost, and modular C++17 peripheral library for STM32 m
 
 ---
 
-## 2. Dedicated Peripheral Documentation (`docs/`)
+## 2. Dedicated Peripheral Documentation Subtrees (`docs/`)
 
-Each peripheral subsystem has its own exhaustive guide covering hardware architecture, feature matrix, API reference, pin mappings, and syntax examples:
+Each peripheral subsystem has its own dedicated directory containing comprehensive documentation, hardware mapping, configuration breakdowns, and standalone multi-configuration example source files:
 
-| Module | Documentation Guide | Key Features |
-| :--- | :--- | :--- |
-| **RCC & Clock Tree** | [📖 `docs/01_rcc_and_clocks.md`](docs/01_rcc_and_clocks.md) | Dynamic SYSCLK, HCLK, PCLK1/2, and timer multiplier decoding (up to 180 MHz). |
-| **SysTick Timebase** | [📖 `docs/02_systick_timebase.md`](docs/02_systick_timebase.md) | Monotonic `millis()`, high-res `micros()`, blocking delays, and RAII `Timeout`. |
-| **GPIO Subsystem** | [📖 `docs/03_gpio.md`](docs/03_gpio.md) | `DigitalOutput`, `DigitalInput`, `InterruptInput`, pin maps (`PA0`..`PH15`), AF traits. |
-| **EXTI Interrupts** | [📖 `docs/04_exti_interrupts.md`](docs/04_exti_interrupts.md) | Race-free trigger tracking, collision safety, edge callbacks, software triggers. |
-| **UART / USART** | [📖 `docs/05_uart.md`](docs/05_uart.md) | `Uart1`..`Uart6`, buffered asynchronous TX/RX, parity, oversampling, IDLE/TC events. |
-| **Timers & PWM** | [📖 `docs/06_timers_and_pwm.md`](docs/06_timers_and_pwm.md) | All 14 timers (`TIM1`..`TIM14`), Timebase, OPM, multi-channel PWM, OC, Input Capture. |
-| **Common Utilities** | [📖 `docs/07_common_utilities.md`](docs/07_common_utilities.md) | `reg::` helpers, static `RingBuffer<T, N>`, standard `stm32::Callback`. |
-| **SPI Subsystem** | [📖 `docs/08_spi.md`](docs/08_spi.md) | `Spi1`..`Spi4`, full/half duplex, modes 0..3, 8/16-bit, auto-baud, RAII `ChipSelectGuard`. |
-| **I2C Subsystem** | [📖 `docs/09_i2c.md`](docs/09_i2c.md) | `I2c1`..`I2c3`, 100/400 kHz, auto-timing, timeout guarding, bus scanner, recovery. |
-| **ADC Subsystem** | [📖 `docs/10_adc.md`](docs/10_adc.md) | `Adc1`..`Adc3`, 12-bit, auto-analog GPIO, scan/continuous, internal Temp/VREF, AWD. |
-
----
-
-## 3. Quickstart Examples Catalogue (`Examples/`)
-
-Standalone, copy-pasteable bare-metal example applications located in the `Examples/` folder:
-
-| # | Example Project | Source Code | Highlights |
-| :-: | :--- | :--- | :--- |
-| 01 | **GPIO Blink** | [`Examples/01_gpio_blink/main.cpp`](Examples/01_gpio_blink/main.cpp) | Basic `DigitalOutput` on PA5 with `systick::delayMs`. |
-| 02 | **Button Polling** | [`Examples/02_gpio_button_poll/main.cpp`](Examples/02_gpio_button_poll/main.cpp) | Active-low button polling on PC13 with `DigitalInput`. |
-| 03 | **EXTI Interrupt** | [`Examples/03_exti_interrupt/main.cpp`](Examples/03_exti_interrupt/main.cpp) | Falling-edge external button interrupt with `__WFI()`. |
-| 04 | **SysTick & Timeout** | [`Examples/04_systick_delay/main.cpp`](Examples/04_systick_delay/main.cpp) | High-res microsecond reads & non-blocking `systick::Timeout`. |
-| 05 | **Buffered UART** | [`Examples/05_uart_echo/main.cpp`](Examples/05_uart_echo/main.cpp) | Interrupt-driven USART2 echo with ring buffer character processing. |
-| 06 | **Timer Interrupt** | [`Examples/06_timer_periodic_interrupt/main.cpp`](Examples/06_timer_periodic_interrupt/main.cpp) | Periodic 2 Hz hardware interrupt using `Timer2`. |
-| 07 | **PWM Breathing LED** | [`Examples/07_pwm_led_breathing/main.cpp`](Examples/07_pwm_led_breathing/main.cpp) | Smooth 1 kHz hardware PWM LED breathing on PA6 (`TIM3_CH1`). |
-| 08 | **Input Capture** | [`Examples/08_input_capture/main.cpp`](Examples/08_input_capture/main.cpp) | 32-bit input capture timestamp & period measurement on PA0 (`TIM2_CH1`). |
-| 09 | **SPI Loopback** | [`Examples/09_spi_loopback_poll/main.cpp`](Examples/09_spi_loopback_poll/main.cpp) | 5 MHz full-duplex loopback packet exchange on `SPI1`. |
-| 10 | **SPI Sensor / Flash** | [`Examples/10_spi_sensor_read/main.cpp`](Examples/10_spi_sensor_read/main.cpp) | SPI device register read with RAII `ChipSelectGuard`. |
-| 11 | **I2C Bus Scanner** | [`Examples/11_i2c_scanner/main.cpp`](Examples/11_i2c_scanner/main.cpp) | Active 7-bit bus scanner (`0x08`–`0x77`) with serial reporting. |
-| 12 | **I2C Sensor Read** | [`Examples/12_i2c_sensor_read/main.cpp`](Examples/12_i2c_sensor_read/main.cpp) | 400 kHz Fast Mode sensor register read / write operations. |
-| 13 | **ADC Single Channel** | [`Examples/13_adc_single_channel/main.cpp`](Examples/13_adc_single_channel/main.cpp) | 12-bit analog voltage conversion on PA0 with floating-point calculation. |
-| 14 | **ADC Internal Sensors**| [`Examples/14_adc_internal_temperature/main.cpp`](Examples/14_adc_internal_temperature/main.cpp) | MCU die temperature sensor & internal $V_{\text{REFINT}}$ measurement. |
-| 15 | **ADC Analog Watchdog** | [`Examples/15_adc_analog_watchdog/main.cpp`](Examples/15_adc_analog_watchdog/main.cpp) | Hardware out-of-bounds voltage monitoring with interrupt alert. |
+| Peripheral Subsystem | Documentation Guide | Key Features | Examples Included |
+| :--- | :--- | :--- | :--- |
+| **RCC & Clocks** | [📖 `docs/rcc/README.md`](docs/rcc/README.md) | Dynamic SYSCLK, HCLK, PCLK1/2, and timer multipliers. | [`docs/rcc/examples/`](docs/rcc/examples/) |
+| **SysTick Timebase** | [📖 `docs/systick/README.md`](docs/systick/README.md) | Monotonic `millis()`, `micros()`, delays, `Timeout`. | [`docs/systick/examples/`](docs/systick/examples/) |
+| **GPIO Subsystem** | [📖 `docs/gpio/README.md`](docs/gpio/README.md) | `DigitalOutput`, `DigitalInput`, `InterruptInput`, AF. | [`docs/gpio/examples/`](docs/gpio/examples/) |
+| **EXTI Interrupts** | [📖 `docs/exti/README.md`](docs/exti/README.md) | Race-free line tracking, collision safety, edge callbacks. | [`docs/exti/examples/`](docs/exti/examples/) |
+| **Timers & PWM** | [📖 `docs/timer/README.md`](docs/timer/README.md) | All 14 timers, Timebase, PWM, OC, Input Capture, OPM. | [`docs/timer/examples/`](docs/timer/examples/) |
+| **UART / USART** | [📖 `docs/uart/README.md`](docs/uart/README.md) | `Uart1`..`Uart6`, buffered interrupt TX/RX, parity. | [`docs/uart/examples/`](docs/uart/examples/) |
+| **SPI Subsystem** | [📖 `docs/spi/README.md`](docs/spi/README.md) | `Spi1`..`Spi4`, full/half duplex, modes 0..3, RAII CS. | [`docs/spi/examples/`](docs/spi/examples/) |
+| **I2C Subsystem** | [📖 `docs/i2c/README.md`](docs/i2c/README.md) | `I2c1`..`I2c3`, 100/400 kHz, bus scanner, recovery. | [`docs/i2c/examples/`](docs/i2c/examples/) |
+| **ADC Subsystem** | [📖 `docs/adc/README.md`](docs/adc/README.md) | `Adc1`..`Adc3`, 12-bit, scan mode, Temp/VREF, AWD. | [`docs/adc/examples/`](docs/adc/examples/) |
+| **Common Utilities** | [📖 `docs/common/README.md`](docs/common/README.md) | `reg::` templates, static `RingBuffer`, `Callback`. | — |
 
 ---
 
-## 4. Code Snippets
+## 3. Directory Layout
+
+```
+STM32_Library/
+├── docs/                      <-- Modular Peripheral Documentation Subtrees
+│   ├── rcc/                   <-- RCC documentation & examples
+│   ├── systick/               <-- SysTick monotonic timebase documentation & examples
+│   ├── gpio/                  <-- GPIO pins & Alternate Function documentation & examples
+│   ├── exti/                  <-- EXTI line interrupts documentation & examples
+│   ├── timer/                 <-- Hardware Timers, PWM & Input Capture documentation & examples
+│   ├── uart/                  <-- UART/USART buffered serial documentation & examples
+│   ├── spi/                   <-- SPI full/half duplex documentation & examples
+│   ├── i2c/                   <-- I2C master, scanner & recovery documentation & examples
+│   ├── adc/                   <-- ADC analog conversion & watchdog documentation & examples
+│   └── common/                <-- Register templates & RingBuffer documentation
+├── Inc/stm32/                 <-- C++17 Header Implementations
+│   ├── common/                <-- Bitwise register templates, RCC, SysTick, RingBuffer, Callback
+│   ├── gpio/                  <-- DigitalOutput, DigitalInput, InterruptInput, AF traits
+│   ├── exti/                  <-- ExtiManager, line routing, ISR handlers
+│   ├── timer/                 <-- Timebase, PWM, OutputCompare, InputCapture, OnePulse
+│   ├── uart/                  <-- UartHandler, RingBuffers, interrupt dispatcher
+│   ├── spi/                   <-- SpiHandler, ChipSelectGuard, interrupt dispatcher
+│   ├── i2c/                   <-- I2cMaster, bus scanner, recovery, interrupt dispatcher
+│   └── adc/                   <-- AdcHandler, internal temperature, watchdog, interrupt dispatcher
+└── Src/
+    └── main.cpp               <-- Unified integration verification test
+```
+
+---
+
+## 4. Quickstart Code Snippets
 
 ### Hardware ADC Voltage & Internal Temperature
 ```cpp
@@ -69,17 +75,11 @@ using namespace gpio;
 
 int main()
 {
-    // Initialize 12-bit ADC1 on APB2
-    Adc1 adc;
+    Adc1 adc;               // Initialize 12-bit ADC1 on APB2
+    adc.enableChannel(PA0); // Automatically sets PA0 to Analog Mode
 
-    // Enable analog channel on PA0 (Automatically switches PA0 to Analog Mode)
-    adc.enableChannel(PA0);
-
-    // Read voltage on PA0 (0.0V to 3.3V)
-    float volts = adc.readVoltage(PA0, 3.3f);
-
-    // Read internal die temperature in degrees Celsius
-    float tempC = adc.readInternalTemperature(3.3f);
+    float volts = adc.readVoltage(PA0, 3.3f);        // 0.0V to 3.3V
+    float tempC = adc.readInternalTemperature(3.3f); // Die temp in °C
 
     while(true) {}
 }
@@ -107,6 +107,31 @@ int main()
 }
 ```
 
+### Hardware SPI Master
+```cpp
+#include "stm32/spi/spi.hpp"
+#include "stm32/gpio/gpio.hpp"
+
+using namespace spi;
+using namespace gpio;
+
+int main()
+{
+    // Initialize SPI1 at 10 MHz in Mode 0 (Auto-configures PA5 SCK, PA6 MISO, PA7 MOSI)
+    Spi1 spi(10'000'000, SpiMode::Mode0);
+
+    // Full-duplex single byte exchange
+    std::uint8_t rx = spi.transfer(0x55);
+
+    // Buffer transfer
+    std::uint8_t tx[4] = {0x01, 0x02, 0x03, 0x04};
+    std::uint8_t rxBuf[4];
+    spi.transfer(tx, rxBuf, 4);
+
+    while(true) {}
+}
+```
+
 ---
 
 ## 5. Development Roadmap
@@ -125,3 +150,4 @@ int main()
 | **Phase 9** | **I2C Subsystem** | 🟢 Complete | `I2C1`..`I2C3`, 100/400 kHz, auto-timing, timeout guard, scanner |
 | **Phase 10** | **ADC Subsystem** | 🟢 Complete | `ADC1`..`ADC3`, 12-bit, auto-analog GPIO, scan, Temp/VREF, AWD |
 | **Phase 11** | **DMA Subsystem** | ⚪ Planned | High-speed streams for UART, SPI, I2C, ADC |
+| **Phase 12** | **DAC Subsystem** | ⚪ Planned | Dual 12-bit DAC channels on APB1 |

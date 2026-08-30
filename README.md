@@ -29,6 +29,7 @@ Each peripheral subsystem has its own exhaustive guide covering hardware archite
 | **Common Utilities** | [📖 `docs/07_common_utilities.md`](docs/07_common_utilities.md) | `reg::` helpers, static `RingBuffer<T, N>`, standard `stm32::Callback`. |
 | **SPI Subsystem** | [📖 `docs/08_spi.md`](docs/08_spi.md) | `Spi1`..`Spi4`, full/half duplex, modes 0..3, 8/16-bit, auto-baud, RAII `ChipSelectGuard`. |
 | **I2C Subsystem** | [📖 `docs/09_i2c.md`](docs/09_i2c.md) | `I2c1`..`I2c3`, 100/400 kHz, auto-timing, timeout guarding, bus scanner, recovery. |
+| **ADC Subsystem** | [📖 `docs/10_adc.md`](docs/10_adc.md) | `Adc1`..`Adc3`, 12-bit, auto-analog GPIO, scan/continuous, internal Temp/VREF, AWD. |
 
 ---
 
@@ -50,10 +51,39 @@ Standalone, copy-pasteable bare-metal example applications located in the `Examp
 | 10 | **SPI Sensor / Flash** | [`Examples/10_spi_sensor_read/main.cpp`](Examples/10_spi_sensor_read/main.cpp) | SPI device register read with RAII `ChipSelectGuard`. |
 | 11 | **I2C Bus Scanner** | [`Examples/11_i2c_scanner/main.cpp`](Examples/11_i2c_scanner/main.cpp) | Active 7-bit bus scanner (`0x08`–`0x77`) with serial reporting. |
 | 12 | **I2C Sensor Read** | [`Examples/12_i2c_sensor_read/main.cpp`](Examples/12_i2c_sensor_read/main.cpp) | 400 kHz Fast Mode sensor register read / write operations. |
+| 13 | **ADC Single Channel** | [`Examples/13_adc_single_channel/main.cpp`](Examples/13_adc_single_channel/main.cpp) | 12-bit analog voltage conversion on PA0 with floating-point calculation. |
+| 14 | **ADC Internal Sensors**| [`Examples/14_adc_internal_temperature/main.cpp`](Examples/14_adc_internal_temperature/main.cpp) | MCU die temperature sensor & internal $V_{\text{REFINT}}$ measurement. |
+| 15 | **ADC Analog Watchdog** | [`Examples/15_adc_analog_watchdog/main.cpp`](Examples/15_adc_analog_watchdog/main.cpp) | Hardware out-of-bounds voltage monitoring with interrupt alert. |
 
 ---
 
 ## 4. Code Snippets
+
+### Hardware ADC Voltage & Internal Temperature
+```cpp
+#include "stm32/adc/adc.hpp"
+#include "stm32/gpio/gpio.hpp"
+
+using namespace adc;
+using namespace gpio;
+
+int main()
+{
+    // Initialize 12-bit ADC1 on APB2
+    Adc1 adc;
+
+    // Enable analog channel on PA0 (Automatically switches PA0 to Analog Mode)
+    adc.enableChannel(PA0);
+
+    // Read voltage on PA0 (0.0V to 3.3V)
+    float volts = adc.readVoltage(PA0, 3.3f);
+
+    // Read internal die temperature in degrees Celsius
+    float tempC = adc.readInternalTemperature(3.3f);
+
+    while(true) {}
+}
+```
 
 ### Hardware I2C Master & Sensor Read
 ```cpp
@@ -77,31 +107,6 @@ int main()
 }
 ```
 
-### Hardware SPI Master
-```cpp
-#include "stm32/spi/spi.hpp"
-#include "stm32/gpio/gpio.hpp"
-
-using namespace spi;
-using namespace gpio;
-
-int main()
-{
-    // Initialize SPI1 at 10 MHz in Mode 0 (Auto-configures PA5 SCK, PA6 MISO, PA7 MOSI)
-    Spi1 spi(10'000'000, SpiMode::Mode0);
-
-    // Full-duplex single byte exchange
-    std::uint8_t rx = spi.transfer(0x55);
-
-    // Buffer transfer
-    std::uint8_t tx[4] = {0x01, 0x02, 0x03, 0x04};
-    std::uint8_t rxBuf[4];
-    spi.transfer(tx, rxBuf, 4);
-
-    while(true) {}
-}
-```
-
 ---
 
 ## 5. Development Roadmap
@@ -118,5 +123,5 @@ int main()
 | **Phase 7** | **UART / USART** | 🟢 Complete | Full buffered interrupt TX/RX, parity, oversampling |
 | **Phase 8** | **SPI Subsystem** | 🟢 Complete | `SPI1`..`SPI4`, modes 0..3, 8/16-bit, polling/async, RAII CS |
 | **Phase 9** | **I2C Subsystem** | 🟢 Complete | `I2C1`..`I2C3`, 100/400 kHz, auto-timing, timeout guard, scanner |
-| **Phase 10** | **ADC Subsystem** | ⚪ Planned | Single channel, scan mode, continuous conversion |
+| **Phase 10** | **ADC Subsystem** | 🟢 Complete | `ADC1`..`ADC3`, 12-bit, auto-analog GPIO, scan, Temp/VREF, AWD |
 | **Phase 11** | **DMA Subsystem** | ⚪ Planned | High-speed streams for UART, SPI, I2C, ADC |

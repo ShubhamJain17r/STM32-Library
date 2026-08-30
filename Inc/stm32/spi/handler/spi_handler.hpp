@@ -272,13 +272,20 @@ template<Instance I>
 std::uint8_t SpiHandler<I>::transfer(std::uint8_t data) noexcept
 {
     auto* spi = Traits<I>::peripheral();
+    systick::Timeout to(20);
 
     // Wait until TX buffer is empty
-    while(!helper::isTxEmpty(spi));
+    while(!helper::isTxEmpty(spi))
+    {
+        if(to.expired()) return 0;
+    }
     helper::write8(spi, data);
 
     // Wait until RX buffer is not empty
-    while(!helper::isRxNotEmpty(spi));
+    while(!helper::isRxNotEmpty(spi))
+    {
+        if(to.expired()) return 0;
+    }
     return helper::read8(spi);
 }
 
@@ -286,11 +293,18 @@ template<Instance I>
 std::uint16_t SpiHandler<I>::transfer16(std::uint16_t data) noexcept
 {
     auto* spi = Traits<I>::peripheral();
+    systick::Timeout to(20);
 
-    while(!helper::isTxEmpty(spi));
+    while(!helper::isTxEmpty(spi))
+    {
+        if(to.expired()) return 0;
+    }
     helper::write16(spi, data);
 
-    while(!helper::isRxNotEmpty(spi));
+    while(!helper::isRxNotEmpty(spi))
+    {
+        if(to.expired()) return 0;
+    }
     return helper::read16(spi);
 }
 
@@ -301,7 +315,8 @@ void SpiHandler<I>::transmit(const std::uint8_t* data, std::size_t length) noexc
     {
         transfer(*data++);
     }
-    while(isBusy());
+    systick::Timeout to(20);
+    while(isBusy() && !to.expired());
 }
 
 template<Instance I>
@@ -311,7 +326,8 @@ void SpiHandler<I>::transmit16(const std::uint16_t* data, std::size_t length) no
     {
         transfer16(*data++);
     }
-    while(isBusy());
+    systick::Timeout to(20);
+    while(isBusy() && !to.expired());
 }
 
 template<Instance I>
@@ -321,7 +337,8 @@ void SpiHandler<I>::receive(std::uint8_t* data, std::size_t length, std::uint8_t
     {
         *data++ = transfer(dummy);
     }
-    while(isBusy());
+    systick::Timeout to(20);
+    while(isBusy() && !to.expired());
 }
 
 template<Instance I>
@@ -331,7 +348,8 @@ void SpiHandler<I>::receive16(std::uint16_t* data, std::size_t length, std::uint
     {
         *data++ = transfer16(dummy);
     }
-    while(isBusy());
+    systick::Timeout to(20);
+    while(isBusy() && !to.expired());
 }
 
 template<Instance I>
@@ -346,7 +364,8 @@ void SpiHandler<I>::transfer(const std::uint8_t* txBuf, std::uint8_t* rxBuf, std
             rxBuf[i] = rxByte;
         }
     }
-    while(isBusy());
+    systick::Timeout to(20);
+    while(isBusy() && !to.expired());
 }
 
 template<Instance I>
@@ -361,7 +380,8 @@ void SpiHandler<I>::transfer16(const std::uint16_t* txBuf, std::uint16_t* rxBuf,
             rxBuf[i] = rxWord;
         }
     }
-    while(isBusy());
+    systick::Timeout to(20);
+    while(isBusy() && !to.expired());
 }
 
 template<Instance I>

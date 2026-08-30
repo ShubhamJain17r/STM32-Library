@@ -626,13 +626,18 @@ bool I2cMaster<I>::readRegister16(std::uint8_t devAddr, std::uint16_t regAddr, s
 template<Instance I>
 bool I2cMaster<I>::isDeviceReady(std::uint8_t address, std::uint32_t trials, std::uint32_t timeoutMs) noexcept
 {
+    auto* i2c = Traits<I>::peripheral();
     while(trials--)
     {
         systick::Timeout to(timeoutMs);
         if(startAddress(address, false, to))
         {
-            helper::clearAddressFlag(Traits<I>::peripheral());
-            helper::generateStop(Traits<I>::peripheral());
+            helper::clearAddressFlag(i2c);
+            helper::generateStop(i2c);
+
+            // Allow STOP bit to settle on physical bus
+            systick::Timeout stopTo(5);
+            while(helper::isBusBusy(i2c) && !stopTo.expired());
             return true;
         }
     }

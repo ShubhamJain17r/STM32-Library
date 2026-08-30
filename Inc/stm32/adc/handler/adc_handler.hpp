@@ -203,6 +203,9 @@ std::uint16_t AdcHandler<I>::readRaw(Channel ch) noexcept
 {
     auto* adc = Traits<I>::peripheral();
 
+    // Ensure channel has default sampling time configured
+    helper::setChannelSamplingTime(adc, ch, config_.defaultSamplingTime);
+
     // Configure single conversion on channel
     helper::setSequenceLength(adc, 1);
     helper::setSequenceChannel(adc, 1, ch);
@@ -254,6 +257,8 @@ float AdcHandler<I>::readInternalTemperature(float vref) noexcept
         return 0.0f; // Internal temperature sensor is only connected to ADC1
     }
 
+    // Ensure VBAT is disabled so temperature sensor connects to Channel 18
+    helper::disableVbat(Traits<I>::common());
     helper::enableTemperatureAndVref(Traits<I>::common());
     helper::setChannelSamplingTime(Traits<I>::peripheral(), Channel::Temperature, SamplingTime::Cycles480);
 
@@ -293,6 +298,8 @@ float AdcHandler<I>::readVbat(float vref) noexcept
         return 0.0f;
     }
 
+    // Ensure temperature sensor is disabled before enabling VBAT
+    helper::disableTemperatureAndVref(Traits<I>::common());
     helper::enableVbat(Traits<I>::common());
     helper::setChannelSamplingTime(Traits<I>::peripheral(), Channel::Vbat, SamplingTime::Cycles480);
     systick::delayUs(20);

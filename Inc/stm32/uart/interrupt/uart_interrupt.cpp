@@ -88,6 +88,7 @@ static void handleInstance(Instance I, USART_TypeDef* uart, const EventCallbacks
 	// 3. TC (Transmission complete)
 	if((status & USART_SR_TC) && (control1 & USART_CR1_TCIE))
 	{
+		reg::clearBits(uart->SR, USART_SR_TC);
 		if(user.txComplete)
 		{
 			user.txComplete();

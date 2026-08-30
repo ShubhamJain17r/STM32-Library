@@ -76,6 +76,11 @@ public:
     void write(const std::uint8_t* data, std::size_t length) noexcept;
 
     /**
+     * @brief Non-blocking write of a single byte. Returns false immediately if TX buffer is full.
+     */
+    bool writeNonBlocking(std::uint8_t data) noexcept;
+
+    /**
      * @brief Reads a single character from the RX buffer (blocks if empty).
      */
     char read() noexcept;
@@ -192,6 +197,20 @@ void UartHandler<I, TxBufSize, RxBufSize>::handleIDLE() noexcept
 }
 
 template<Instance I, std::size_t TxBufSize, std::size_t RxBufSize>
+bool UartHandler<I, TxBufSize, RxBufSize>::writeNonBlocking(std::uint8_t data) noexcept
+{
+    __disable_irq();
+    const bool pushed = storage_.txBuf.push(data);
+    __enable_irq();
+
+    if(pushed)
+    {
+        interrupt::enableEvent(Traits<I>::peripheral(), interrupt::Event::TxEmpty);
+    }
+    return pushed;
+}
+
+template<Instance I, std::size_t TxBufSize, std::size_t RxBufSize>
 void UartHandler<I, TxBufSize, RxBufSize>::writeByte(std::uint8_t data) noexcept
 {
     while(true)
@@ -202,11 +221,13 @@ void UartHandler<I, TxBufSize, RxBufSize>::writeByte(std::uint8_t data) noexcept
 
         if(pushed)
         {
+            interrupt::enableEvent(Traits<I>::peripheral(), interrupt::Event::TxEmpty);
             break;
         }
-    }
 
-    interrupt::enableEvent(Traits<I>::peripheral(), interrupt::Event::TxEmpty);
+        // Ensure TX interrupt is enabled to drain buffer while waiting
+        interrupt::enableEvent(Traits<I>::peripheral(), interrupt::Event::TxEmpty);
+    }
 }
 
 template<Instance I, std::size_t TxBufSize, std::size_t RxBufSize>

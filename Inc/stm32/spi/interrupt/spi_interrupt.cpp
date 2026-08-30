@@ -97,5 +97,14 @@ void SpiEvent::handleEvent(Instance I) noexcept
     }
 }
 
+void SpiEvent::triggerTransferComplete(Instance I) noexcept
+{
+    const auto& user = userCallbacks_[index(I)];
+    if(user.transferComplete)
+    {
+        user.transferComplete();
+    }
+}
+
 } // namespace spi::interrupt
 

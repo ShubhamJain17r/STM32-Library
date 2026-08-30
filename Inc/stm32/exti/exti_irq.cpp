@@ -9,7 +9,6 @@ void EXTI0_IRQHandler(void)
 	if(exti::isPending(0))
 	{
 		exti::ExtiManager::handleInterrupt(0);
-		exti::clearPending(0);
 	}
 }
 
@@ -18,7 +17,6 @@ void EXTI1_IRQHandler(void)
 	if(exti::isPending(1))
 	{
 		exti::ExtiManager::handleInterrupt(1);
-		exti::clearPending(1);
 	}
 }
 
@@ -27,7 +25,6 @@ void EXTI2_IRQHandler(void)
 	if(exti::isPending(2))
 	{
 		exti::ExtiManager::handleInterrupt(2);
-		exti::clearPending(2);
 	}
 }
 
@@ -36,7 +33,6 @@ void EXTI3_IRQHandler(void)
 	if(exti::isPending(3))
 	{
 		exti::ExtiManager::handleInterrupt(3);
-		exti::clearPending(3);
 	}
 }
 
@@ -45,7 +41,6 @@ void EXTI4_IRQHandler(void)
 	if(exti::isPending(4))
 	{
 		exti::ExtiManager::handleInterrupt(4);
-		exti::clearPending(4);
 	}
 }
 
@@ -56,7 +51,6 @@ void EXTI9_5_IRQHandler(void)
 		if(exti::isPending(line))
 		{
 			exti::ExtiManager::handleInterrupt(line);
-			exti::clearPending(line);
 		}
 	}
 }
@@ -68,7 +62,6 @@ void EXTI15_10_IRQHandler(void)
 		if(exti::isPending(line))
 		{
 			exti::ExtiManager::handleInterrupt(line);
-			exti::clearPending(line);
 		}
 	}
 }

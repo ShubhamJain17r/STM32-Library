@@ -61,7 +61,6 @@ int main()
 
                 case 't':
                 case 'T':
-                case 't':
                     led.toggle();
                     serial.write(" -> LED Toggled\r\n");
                     break;

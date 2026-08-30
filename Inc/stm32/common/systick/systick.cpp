@@ -34,6 +34,12 @@ std::uint32_t micros() noexcept
     load = reg::read(SysTick->LOAD);
     if(load == 0) return ms * 1000u;
 
+    // If a SysTick interrupt is pending and the counter wrapped, compensate ms
+    if((SCB->ICSR & SCB_ICSR_PENDSTSET_Msk) && (val < (load / 2u)))
+    {
+        ms++;
+    }
+
     const std::uint32_t elapsedSubTicks = load - val;
     const std::uint32_t usFraction = (elapsedSubTicks * 1000u) / (load + 1u);
 
@@ -51,4 +57,3 @@ void SysTick_Handler()
 }
 
 } // extern "C"
-

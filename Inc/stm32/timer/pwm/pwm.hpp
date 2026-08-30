@@ -125,6 +125,7 @@ void PwmHandler<I>::setFrequency(std::uint32_t frequencyHz) noexcept
     helper::setPrescaler(Traits<I>::peripheral(), psc);
     helper::setAutoReload(Traits<I>::peripheral(), arr);
     helper::generateUpdate(Traits<I>::peripheral());
+    helper::clearUpdateFlag(Traits<I>::peripheral());
 }
 
 template<Instance I>

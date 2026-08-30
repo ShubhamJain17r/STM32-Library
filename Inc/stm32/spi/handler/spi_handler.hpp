@@ -424,7 +424,7 @@ void SpiHandler<I>::handleRxAsync() noexcept
         asyncState_.busy = false;
 
         // Trigger user callback
-        interrupt::SpiEvent::handleEvent(I);
+        interrupt::SpiEvent::triggerTransferComplete(I);
     }
 }
 

@@ -38,6 +38,7 @@ public:
     static void setUserCallback(Instance I, Event ev, stm32::Callback cb) noexcept;
 
     static void handleEvent(Instance I) noexcept;
+    static void triggerTransferComplete(Instance I) noexcept;
 
 private:
     inline static SpiCallbacks developerCallbacks_[4];

@@ -55,6 +55,16 @@ public:
         reg::write(pin_.port->BSRR, pin_.mask() << 16u);
     }
 
+    inline void setHigh() const noexcept
+    {
+        high();
+    }
+
+    inline void setLow() const noexcept
+    {
+        low();
+    }
+
     inline void toggle() const noexcept
     {
         reg::write(pin_.port->ODR, reg::read(pin_.port->ODR) ^ pin_.mask());

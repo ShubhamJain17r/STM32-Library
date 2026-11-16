@@ -49,8 +49,6 @@ private:
     static void handleTXE()  noexcept;
     static void handleIDLE() noexcept;
 
-    static void writeByte(std::uint8_t data) noexcept;
-
 public:
     ~UartHandler() = default;
 
@@ -64,6 +62,11 @@ public:
     explicit UartHandler(gpio::Pin tx, gpio::Pin rx);
     explicit UartHandler(gpio::Pin tx, gpio::Pin rx, std::uint32_t baud);
     explicit UartHandler(const uartConfig<I>& config);
+
+    /**
+     * @brief Writes a single byte to the TX buffer (blocks if full).
+     */
+    static void writeByte(std::uint8_t data) noexcept;
 
     /**
      * @brief Writes a null-terminated string to the TX buffer.
@@ -96,9 +99,9 @@ public:
     void read(std::uint8_t* buf, std::size_t length) noexcept;
 
     /**
-     * @brief Returns true if one or more bytes are available in the RX buffer.
+     * @brief Returns number of bytes available in the RX buffer (evaluates to true if > 0).
      */
-    bool available() const noexcept;
+    std::size_t available() const noexcept;
 
     void enable()  noexcept;
     void disable() noexcept;
@@ -282,12 +285,12 @@ void UartHandler<I, TxBufSize, RxBufSize>::read(std::uint8_t* buf, std::size_t l
 }
 
 template<Instance I, std::size_t TxBufSize, std::size_t RxBufSize>
-bool UartHandler<I, TxBufSize, RxBufSize>::available() const noexcept
+std::size_t UartHandler<I, TxBufSize, RxBufSize>::available() const noexcept
 {
     __disable_irq();
-    const bool notEmpty = !storage_.rxBuf.empty();
+    const std::size_t count = storage_.rxBuf.size();
     __enable_irq();
-    return notEmpty;
+    return count;
 }
 
 template<Instance I, std::size_t TxBufSize, std::size_t RxBufSize>

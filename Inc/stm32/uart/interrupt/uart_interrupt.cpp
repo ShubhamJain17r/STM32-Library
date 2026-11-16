@@ -109,7 +109,7 @@ static void handleInstance(Instance I, USART_TypeDef* uart, const EventCallbacks
 	}
 }
 
-void UartEvent::handleEvent(Instance I)
+void UartEvent::handleEvent(Instance I) noexcept
 {
 	auto* uart = getPeripheral(I);
 	if(!uart) return;

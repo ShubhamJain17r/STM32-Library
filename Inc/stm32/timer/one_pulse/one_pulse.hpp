@@ -54,24 +54,37 @@ public:
 
     bool enableChannel(Channel ch, gpio::Pin pin, Polarity polarity = Polarity::ActiveHigh) noexcept
     {
-        if(!af::isChannelValid<I>(ch, pin))
+        if(static_cast<std::uint8_t>(ch) > Traits<I>::channelCount)
+        {
+            return false;
+        }
+
+        gpio::af::AlternateFunction afVal = gpio::af::AlternateFunction::INVALID;
+        switch(ch)
+        {
+            case Channel::CH1: afVal = af::alternateFunction<I, Channel::CH1>(pin); break;
+            case Channel::CH2: afVal = af::alternateFunction<I, Channel::CH2>(pin); break;
+            case Channel::CH3: afVal = af::alternateFunction<I, Channel::CH3>(pin); break;
+            case Channel::CH4: afVal = af::alternateFunction<I, Channel::CH4>(pin); break;
+        }
+
+        if(afVal == gpio::af::AlternateFunction::INVALID)
         {
             return false;
         }
 
         pin.enableClock();
-        const auto afVal = af::getTimerAF<I>(ch, pin);
-        gpio::helper::setAlternateFunction(pin, afVal);
+        gpio::af::setAlternateFunction(pin, afVal);
         gpio::helper::setOutputType(pin, gpio::OutputType::PUSH_PULL);
-        gpio::helper::setOutputSpeed(pin, gpio::OutputSpeed::VERY_HIGH);
+        gpio::helper::setOutputSpeed(pin, gpio::OutputSpeed::HIGH);
         gpio::helper::setPull(pin, gpio::Pull::NONE);
         gpio::helper::setMode(pin, gpio::Mode::ALTERNATE);
 
         auto* tim = Traits<I>::peripheral();
-        helper::configureOutputCompare(tim, ch, OutputCompareMode::PwmMode2, polarity);
+        helper::configureOutputCompare(tim, ch, OutputCompareMode::Pwm2, polarity);
         helper::enableChannelOutput(tim, ch);
 
-        if constexpr (Traits<I>::isAdvanced)
+        if constexpr(Traits<I>::isAdvanced)
         {
             helper::enableMainOutput(tim);
         }

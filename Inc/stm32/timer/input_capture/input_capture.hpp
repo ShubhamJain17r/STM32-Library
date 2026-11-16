@@ -33,7 +33,6 @@ public:
     static_assert(!Traits<I>::isBasic,
         "Basic timers (TIM6/TIM7) do not support Input Capture. Use a General Purpose or Advanced timer.");
 
-    InputCaptureHandler() = delete;
     ~InputCaptureHandler();
 
     InputCaptureHandler(const InputCaptureHandler&) = delete;

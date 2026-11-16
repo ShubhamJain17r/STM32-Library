@@ -37,9 +37,9 @@ inline void configureBaudRate(USART_TypeDef* uart, std::uint32_t baud, rcc::Bus 
 
 	if(over8)
 	{
-		const std::uint32_t usartdiv = ((freq * 2u) + baud) / (baud * 2u);
-		const std::uint32_t mantissa = (usartdiv >> 4u);
-		const std::uint32_t fraction = (usartdiv & 0xFu) >> 1u;
+		const std::uint32_t div_x8 = ((freq * 2u) + baud) / (baud * 2u);
+		const std::uint32_t mantissa = (div_x8 >> 3u);
+		const std::uint32_t fraction = (div_x8 & 0x07u);
 		reg::write(uart->BRR, (mantissa << 4u) | fraction);
 	}
 	else

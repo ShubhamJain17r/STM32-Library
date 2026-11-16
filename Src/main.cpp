@@ -43,12 +43,12 @@ int main()
     systick::init();
 
     // 2. Configure Green User LED (PA5)
-    DigitalOutput led(PA5, DigitalOutputConfig{
-        .outputType  = OutputType::PUSH_PULL,
-        .outputSpeed = OutputSpeed::HIGH,
-        .pull        = Pull::NONE,
-        .initialState= PinState::LOW
-    });
+    DigitalOutputConfig ledConfig{};
+    ledConfig.outputType   = OutputType::PUSH_PULL;
+    ledConfig.outputSpeed  = OutputSpeed::HIGH;
+    ledConfig.pull         = Pull::NONE;
+    ledConfig.initialState = PinState::LOW;
+    DigitalOutput led(PA5, ledConfig);
     pLed = &led;
 
     // 3. Configure Blue User Button (PC13) with falling-edge EXTI interrupt

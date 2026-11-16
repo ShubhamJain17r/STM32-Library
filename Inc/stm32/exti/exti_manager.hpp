@@ -113,6 +113,23 @@ inline void softwareTrigger(std::uint8_t line) noexcept
     reg::setBits(EXTI->SWIER, 1U << line);
 }
 
+inline void triggerSoftware(std::uint8_t line) noexcept
+{
+    softwareTrigger(line);
+}
+
+inline void enableLine(std::uint8_t line) noexcept
+{
+    reg::setBits(EXTI->IMR, 1U << line);
+    NVIC_EnableIRQ(detail::extiIRQ(line));
+}
+
+inline void disableLine(std::uint8_t line) noexcept
+{
+    reg::clearBits(EXTI->IMR, 1U << line);
+    NVIC_DisableIRQ(detail::extiIRQ(line));
+}
+
 inline void enableIRQ(const gpio::Pin& pin) noexcept
 {
 	NVIC_EnableIRQ(detail::extiIRQ(pin.number));
@@ -140,9 +157,13 @@ public:
     static void unregisterPin(const gpio::Pin& pin) noexcept;
 
     static void setCallback(const gpio::Pin& pin, stm32::Callback cb) noexcept;
+    static void setCallback(std::uint8_t line, stm32::Callback cb) noexcept;
     static void setEdgeCallback(const gpio::Pin& pin, EdgeCallback cb) noexcept;
     static void setRisingCallback(const gpio::Pin& pin, stm32::Callback cb) noexcept;
     static void setFallingCallback(const gpio::Pin& pin, stm32::Callback cb) noexcept;
+
+    static void enableLine(std::uint8_t line) noexcept;
+    static void triggerSoftware(std::uint8_t line) noexcept;
 
     static void handleInterrupt(std::uint8_t line) noexcept;
 

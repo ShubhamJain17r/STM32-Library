@@ -43,6 +43,24 @@ void ExtiManager::setCallback(const gpio::Pin& pin, stm32::Callback cb) noexcept
     }
 }
 
+void ExtiManager::setCallback(std::uint8_t line, stm32::Callback cb) noexcept
+{
+    if(line < 16)
+    {
+        table[line].callback = cb;
+    }
+}
+
+void ExtiManager::enableLine(std::uint8_t line) noexcept
+{
+    exti::enableLine(line);
+}
+
+void ExtiManager::triggerSoftware(std::uint8_t line) noexcept
+{
+    exti::softwareTrigger(line);
+}
+
 void ExtiManager::setEdgeCallback(const gpio::Pin& pin, EdgeCallback cb) noexcept
 {
     if(pin.number < 16)
@@ -83,6 +101,7 @@ void ExtiManager::handleInterrupt(std::uint8_t line) noexcept
 
     if(!entry.port)
     {
+        if(entry.callback) entry.callback();
         return;
     }
 

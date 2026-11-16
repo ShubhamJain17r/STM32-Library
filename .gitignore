@@ -114,7 +114,15 @@ CMakeFiles/
 CMakeCache.txt
 cmake_install.cmake
 compile_commands.json
+# Ignore generated Makefiles in subdirectories, but track root Makefile
 Makefile
+!/Makefile
+
+###############################################################################
+# Reference Documentation (Large binaries)
+###############################################################################
+
+docs/*.pdf
 
 ###############################################################################
 # Generated documentation

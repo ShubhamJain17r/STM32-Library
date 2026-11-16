@@ -47,18 +47,18 @@ using namespace gpio;
 
 // 1. Digital Output
 DigitalOutput led(PA5);
-led.setHigh();
-led.setLow();
+led.setHigh(); // or led.high();
+led.setLow();  // or led.low();
 led.toggle();
 led.write(PinState::HIGH);
 
 // Custom Output Config
-DigitalOutput ledCustom(PA5, DigitalOutputConfig{
-    .outputType   = OutputType::OPEN_DRAIN,
-    .outputSpeed  = OutputSpeed::MEDIUM,
-    .pull         = Pull::UP,
-    .initialState = PinState::HIGH
-});
+DigitalOutputConfig ledCfg{};
+ledCfg.outputType   = OutputType::OPEN_DRAIN;
+ledCfg.outputSpeed  = OutputSpeed::MEDIUM;
+ledCfg.pull         = Pull::UP;
+ledCfg.initialState = PinState::HIGH;
+DigitalOutput ledCustom(PA5, ledCfg);
 
 // 2. Digital Input
 DigitalInput button(PC13, Pull::UP);

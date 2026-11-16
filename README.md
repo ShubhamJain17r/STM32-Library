@@ -1,6 +1,6 @@
 # STM32 Bare-Metal C++17 Hardware Abstraction Library
 
-A modern, type-safe, zero-cost, and modular C++17 peripheral library for STM32 microcontrollers (targeting **STM32F446RE**), engineered from scratch for bare-metal embedded applications in **STM32CubeIDE**.
+A modern, type-safe, zero-cost, and modular C++17 peripheral library for STM32 microcontrollers (targeting **STM32F446RE**), engineered from scratch for bare-metal embedded applications. Supported on both **Linux** (GNU Makefile, CMake, standalone GCC toolchain) and **Windows** (STM32CubeIDE).
 
 ---
 
@@ -10,7 +10,7 @@ A modern, type-safe, zero-cost, and modular C++17 peripheral library for STM32 m
 2. **Compile-Time Safety**: Strong type system, scoped enums, `constexpr`, template metaprogramming, and traits to prevent invalid states at compile time.
 3. **Ergonomic Simplicity**: Common use cases in 1–2 lines; full configuration available for advanced cases.
 4. **Clean Peripheral Ownership**: Peripherals own and configure their Alternate Function GPIO pins internally.
-5. **Deterministic & Embedded-Friendly**: No dynamic memory allocation (`new`/`delete`), no exceptions, no RTTI, static memory footprints.
+5. **Deterministic & Embedded-Friendly**: No dynamic memory allocation (`new`/`delete`, heap is 0 bytes), no exceptions (`-fno-exceptions`), no RTTI (`-fno-rtti`), static memory footprints.
 
 ---
 
@@ -20,16 +20,18 @@ Each peripheral subsystem has its own dedicated directory containing comprehensi
 
 | Peripheral Subsystem | Documentation Guide | Key Features | Examples Included |
 | :--- | :--- | :--- | :--- |
-| **RCC & Clocks** | [📖 `docs/rcc/README.md`](docs/rcc/README.md) | Dynamic SYSCLK, HCLK, PCLK1/2, and timer multipliers. | [`docs/rcc/examples/`](docs/rcc/examples/) |
+| **Linux Portability** | [📖 `docs/linux/README.md`](docs/linux/README.md) | GCC toolchain, Makefile, CMake, OpenOCD/st-flash. | — |
+| **RCC & Clocks** | [📖 `docs/rcc/README.md`](docs/rcc/README.md) | Dynamic SYSCLK, HCLK, PCLK1/2, AHB3, and timer multipliers. | [`docs/rcc/examples/`](docs/rcc/examples/) |
 | **SysTick Timebase** | [📖 `docs/systick/README.md`](docs/systick/README.md) | Monotonic `millis()`, `micros()`, delays, `Timeout`. | [`docs/systick/examples/`](docs/systick/examples/) |
 | **GPIO Subsystem** | [📖 `docs/gpio/README.md`](docs/gpio/README.md) | `DigitalOutput`, `DigitalInput`, `InterruptInput`, AF. | [`docs/gpio/examples/`](docs/gpio/examples/) |
-| **EXTI Interrupts** | [📖 `docs/exti/README.md`](docs/exti/README.md) | Race-free line tracking, collision safety, edge callbacks. | [`docs/exti/examples/`](docs/exti/examples/) |
-| **Timers & PWM** | [📖 `docs/timer/README.md`](docs/timer/README.md) | All 14 timers, Timebase, PWM, OC, Input Capture, OPM. | [`docs/timer/examples/`](docs/timer/examples/) |
-| **UART / USART** | [📖 `docs/uart/README.md`](docs/uart/README.md) | `Uart1`..`Uart6`, buffered interrupt TX/RX, parity. | [`docs/uart/examples/`](docs/uart/examples/) |
-| **SPI Subsystem** | [📖 `docs/spi/README.md`](docs/spi/README.md) | `Spi1`..`Spi4`, full/half duplex, modes 0..3, RAII CS. | [`docs/spi/examples/`](docs/spi/examples/) |
+| **EXTI Interrupts** | [📖 `docs/exti/README.md`](docs/exti/README.md) | Race-free line tracking, collision safety, edge & software triggers. | [`docs/exti/examples/`](docs/exti/examples/) |
+| **Timers & PWM** | [📖 `docs/timer/README.md`](docs/timer/README.md) | All 14 timers, Timebase, PWM, OC, Input Capture, One-Pulse Mode. | [`docs/timer/examples/`](docs/timer/examples/) |
+| **UART / USART** | [📖 `docs/uart/README.md`](docs/uart/README.md) | `Uart1`..`Uart6`, buffered interrupt TX/RX, OVER8/16, parity. | [`docs/uart/examples/`](docs/uart/examples/) |
+| **SPI Subsystem** | [📖 `docs/spi/README.md`](docs/spi/README.md) | `Spi1`..`Spi4`, full/half duplex, modes 0..3, RAII CS guard. | [`docs/spi/examples/`](docs/spi/examples/) |
 | **I2C Subsystem** | [📖 `docs/i2c/README.md`](docs/i2c/README.md) | `I2c1`..`I2c3`, 100/400 kHz, bus scanner, recovery. | [`docs/i2c/examples/`](docs/i2c/examples/) |
 | **ADC Subsystem** | [📖 `docs/adc/README.md`](docs/adc/README.md) | `Adc1`..`Adc3`, 12-bit, scan mode, Temp/VREF, AWD. | [`docs/adc/examples/`](docs/adc/examples/) |
 | **Common Utilities** | [📖 `docs/common/README.md`](docs/common/README.md) | `reg::` templates, static `RingBuffer`, `Callback`. | — |
+| **LLM Audit Briefing**| [📖 `docs/AUDIT_PROMPT.md`](docs/AUDIT_PROMPT.md) | Complete prompt for peer review and external LLM auditing. | — |
 
 ---
 
@@ -37,33 +39,78 @@ Each peripheral subsystem has its own dedicated directory containing comprehensi
 
 ```
 STM32_Library/
-├── docs/                      <-- Modular Peripheral Documentation Subtrees
-│   ├── rcc/                   <-- RCC documentation & examples
-│   ├── systick/               <-- SysTick monotonic timebase documentation & examples
-│   ├── gpio/                  <-- GPIO pins & Alternate Function documentation & examples
-│   ├── exti/                  <-- EXTI line interrupts documentation & examples
-│   ├── timer/                 <-- Hardware Timers, PWM & Input Capture documentation & examples
-│   ├── uart/                  <-- UART/USART buffered serial documentation & examples
-│   ├── spi/                   <-- SPI full/half duplex documentation & examples
-│   ├── i2c/                   <-- I2C master, scanner & recovery documentation & examples
-│   ├── adc/                   <-- ADC analog conversion & watchdog documentation & examples
-│   └── common/                <-- Register templates & RingBuffer documentation
-├── Inc/stm32/                 <-- C++17 Header Implementations
-│   ├── common/                <-- Bitwise register templates, RCC, SysTick, RingBuffer, Callback
-│   ├── gpio/                  <-- DigitalOutput, DigitalInput, InterruptInput, AF traits
-│   ├── exti/                  <-- ExtiManager, line routing, ISR handlers
-│   ├── timer/                 <-- Timebase, PWM, OutputCompare, InputCapture, OnePulse
-│   ├── uart/                  <-- UartHandler, RingBuffers, interrupt dispatcher
-│   ├── spi/                   <-- SpiHandler, ChipSelectGuard, interrupt dispatcher
-│   ├── i2c/                   <-- I2cMaster, bus scanner, recovery, interrupt dispatcher
-│   └── adc/                   <-- AdcHandler, internal temperature, watchdog, interrupt dispatcher
+├── CMakeLists.txt                         # Root CMake build configuration
+├── Makefile                               # Standalone GNU Makefile (compile, flash, debug)
+├── cmake/
+│   └── arm-none-eabi-gcc.cmake            # Toolchain file for cross-compilation
+├── STM32F446RETX_FLASH.ld                 # Universal GNU Linker script (Flash target)
+├── STM32F446RETX_RAM.ld                   # Universal GNU Linker script (SRAM target)
+├── Drivers/CMSIS/                         # Official CMSIS Core and STM32F4 Device headers
+├── Startup/
+│   └── startup_stm32f446retx.s            # Vector table, Reset_Handler, FPU init, weak IRQs
+├── docs/                                  # Modular Peripheral Documentation Subtrees
+│   ├── linux/                             # Linux build, toolchain & flash guide
+│   ├── rcc/                               # RCC documentation & examples
+│   ├── systick/                           # SysTick monotonic timebase documentation & examples
+│   ├── gpio/                              # GPIO pins & Alternate Function documentation & examples
+│   ├── exti/                              # EXTI line interrupts documentation & examples
+│   ├── timer/                             # Timers, PWM, IC & One-Pulse Mode documentation & examples
+│   ├── uart/                              # UART/USART buffered serial documentation & examples
+│   ├── spi/                               # SPI full/half duplex documentation & examples
+│   ├── i2c/                               # I2C master, scanner & recovery documentation & examples
+│   ├── adc/                               # ADC analog conversion & watchdog documentation & examples
+│   ├── common/                            # Register templates & RingBuffer documentation
+│   └── AUDIT_PROMPT.md                    # Peer review & LLM audit briefing prompt
+├── Inc/stm32/                             # C++17 Header Implementations & Peripheral Translation Units
+│   ├── common/                            # Bitwise register templates, RCC, SysTick, RingBuffer, Callback
+│   ├── gpio/                              # DigitalOutput, DigitalInput, InterruptInput, AF traits
+│   ├── exti/                              # ExtiManager, line routing, ISR handlers
+│   ├── timer/                             # Timebase, PWM, OutputCompare, InputCapture, OnePulse
+│   ├── uart/                              # UartHandler, RingBuffers, interrupt dispatcher
+│   ├── spi/                               # SpiHandler, ChipSelectGuard, interrupt dispatcher
+│   ├── i2c/                               # I2cMaster, bus scanner, recovery, interrupt dispatcher
+│   └── adc/                               # AdcHandler, internal temperature, watchdog, interrupt dispatcher
 └── Src/
-    └── main.cpp               <-- Unified integration verification test
+    ├── main.cpp                           # Unified integration verification test application
+    ├── syscalls.c                         # Minimal newlib POSIX stubs (re-entrant, C++ safe)
+    └── sysmem.c                           # _sbrk memory boundary stub
 ```
 
 ---
 
-## 4. Quickstart Code Snippets
+## 4. Building & Flashing (Linux)
+
+See [📖 `docs/linux/README.md`](docs/linux/README.md) for full instructions.
+
+### Prerequisites
+```bash
+sudo apt-get install gcc-arm-none-eabi binutils-arm-none-eabi gdb-arm-none-eabi openocd
+```
+
+### Build with GNU Make
+```bash
+make -j$(nproc)
+```
+Generates `build/stm32_library.elf`, `build/stm32_library.bin`, and `build/stm32_library.hex`.
+
+### Build with CMake
+```bash
+cmake -B build -DCMAKE_TOOLCHAIN_FILE=cmake/arm-none-eabi-gcc.cmake -DCMAKE_BUILD_TYPE=Release
+cmake --build build -j$(nproc)
+```
+
+### Flash to NUCLEO-F446RE
+```bash
+# Via OpenOCD (ST-LINK)
+make flash
+
+# Or via st-flash
+make flash-stlink
+```
+
+---
+
+## 5. Quickstart Code Snippets
 
 ### Hardware ADC Voltage & Internal Temperature
 ```cpp
@@ -134,20 +181,20 @@ int main()
 
 ---
 
-## 5. Development Roadmap
+## 6. Development Roadmap & Status
 
 | Phase | Module | Status | Highlights |
 | :--- | :--- | :--- | :--- |
 | **Phase 0** | **Architecture & Types** | 🟢 Complete | Modular namespaces, type-safe traits, static callbacks |
-| **Phase 1** | **Core Infrastructure** | 🟢 Complete | `reg::` helpers, `RingBuffer`, `Callback` |
-| **Phase 2** | **RCC & Clock Tree** | 🟢 Complete | Dynamic PLL/HSE/HSI decoding, bus & timer multipliers |
+| **Phase 1** | **Core Infrastructure** | 🟢 Complete | `reg::` helpers, volatile `RingBuffer`, `Callback` |
+| **Phase 2** | **RCC & Clock Tree** | 🟢 Complete | Dynamic PLL/HSE/HSI decoding, bus & timer multipliers, `__DSB()` |
 | **Phase 3** | **GPIO Subsystem** | 🟢 Complete | `DigitalOutput`, `DigitalInput`, `PinMap`, `AF` traits |
 | **Phase 4** | **SysTick & Delays** | 🟢 Complete | Monotonic timebase, `delayMs`, `delayUs`, `Timeout` |
-| **Phase 5** | **EXTI & Events** | 🟢 Complete | Trigger tracking, edge-aware callbacks, collision safety |
-| **Phase 6** | **Timers & PWM** | 🟢 Complete | All 14 timers, Timebase, OPM, multi-channel PWM, OC, IC |
-| **Phase 7** | **UART / USART** | 🟢 Complete | Full buffered interrupt TX/RX, parity, oversampling |
+| **Phase 5** | **EXTI & Events** | 🟢 Complete | Trigger tracking, edge-aware callbacks, software triggers |
+| **Phase 6** | **Timers & PWM** | 🟢 Complete | All 14 timers, Timebase, PWM, OC, Input Capture, One-Pulse Mode |
+| **Phase 7** | **UART / USART** | 🟢 Complete | Full buffered interrupt TX/RX, parity, OVER8/16 exact baud |
 | **Phase 8** | **SPI Subsystem** | 🟢 Complete | `SPI1`..`SPI4`, modes 0..3, 8/16-bit, polling/async, RAII CS |
-| **Phase 9** | **I2C Subsystem** | 🟢 Complete | `I2C1`..`I2C3`, 100/400 kHz, auto-timing, timeout guard, scanner |
+| **Phase 9** | **I2C Subsystem** | 🟢 Complete | `I2C1`..`I2C3`, 100/400 kHz, auto-timing, timeout guard, scanner, recovery |
 | **Phase 10** | **ADC Subsystem** | 🟢 Complete | `ADC1`..`ADC3`, 12-bit, auto-analog GPIO, scan, Temp/VREF, AWD |
 | **Phase 11** | **DMA Subsystem** | ⚪ Planned | High-speed streams for UART, SPI, I2C, ADC |
 | **Phase 12** | **DAC Subsystem** | ⚪ Planned | Dual 12-bit DAC channels on APB1 |

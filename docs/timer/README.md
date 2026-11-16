@@ -62,6 +62,11 @@ pwm.start();
 Capture2 ic;
 ic.enableChannel(Channel::CH1, PA0);
 float freq = ic.readFrequency(Channel::CH1);
+
+// 4. One-Pulse Mode (OPM)
+Pulse4 opm;
+opm.enableChannel(Channel::CH1, PB6);
+opm.triggerPulse(Channel::CH1, 100, 500); // 100 us delay, 500 us pulse
 ```
 
 ---

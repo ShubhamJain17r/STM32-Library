@@ -154,6 +154,10 @@ class ExtiManager
 {
 public:
     static bool registerPin(const gpio::Pin& pin, Trigger trigger, stm32::Callback cb = nullptr, EdgeCallback edgeCb = nullptr) noexcept;
+    inline static bool configurePin(const gpio::Pin& pin, Trigger trigger) noexcept
+    {
+        return registerPin(pin, trigger);
+    }
     static void unregisterPin(const gpio::Pin& pin) noexcept;
 
     static void setCallback(const gpio::Pin& pin, stm32::Callback cb) noexcept;

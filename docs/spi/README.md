@@ -32,7 +32,7 @@ The STM32F446RE contains **4 hardware SPI controllers**:
 * **`SpiConfig<Instance>` Defaults**:
   * `baudRateHz`: `1'000'000` (1 MHz)
   * `spiMode`: `SpiMode::Mode0` (CPOL=0, CPHA=0)
-  * `dataFrame`: `DataFrameFormat::Bits8`
+  * `dataFrame`: `DataSize::Bits8`
   * `bitOrder`: `BitOrder::MsbFirst`
   * `slaveSelect`: `SlaveSelect::Software`
 

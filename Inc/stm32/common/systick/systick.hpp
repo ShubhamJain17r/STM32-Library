@@ -109,6 +109,16 @@ public:
         start_ = millis();
     }
 
+    void reset(std::uint32_t newDurationMs) noexcept
+    {
+        restart(newDurationMs);
+    }
+
+    void reset() noexcept
+    {
+        restart();
+    }
+
     /**
      * @brief Returns the elapsed time in milliseconds since the timeout started.
      */

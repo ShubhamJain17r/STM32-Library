@@ -91,6 +91,6 @@ adc.enableAnalogWatchdog(Channel::IN0, 1000, 3000, [](){
 
 1. [📖 `01_single_channel_analog_read.cpp`](examples/01_single_channel_analog_read.cpp): 12-bit voltage conversion on PA0 with UART telemetry.
 2. [📖 `02_internal_temperature_and_vref.cpp`](examples/02_internal_temperature_and_vref.cpp): Reading MCU die temperature and internal $V_{\text{REFINT}}$ bandgap reference.
-3. [📖 `03_multi_channel_scan_sequence.cpp`](examples/03_multi_channel_scan_sequence.cpp): Multi-channel sequential scanning on PA0, PA1, and PA2.
+3. [📖 `03_multi_channel_scan_sequence.cpp`](examples/03_multi_channel_scan_sequence.cpp): Multi-channel sequential scanning on PA0, PA1, and PA4.
 4. [📖 `04_analog_watchdog_interrupt.cpp`](examples/04_analog_watchdog_interrupt.cpp): Out-of-bounds voltage monitoring using the hardware Analog Watchdog.
 

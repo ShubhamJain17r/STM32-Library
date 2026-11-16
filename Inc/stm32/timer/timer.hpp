@@ -13,4 +13,5 @@
 #include "stm32/timer/timebase/timer.hpp"
 #include "stm32/timer/pwm/pwm.hpp"
 #include "stm32/timer/input_capture/input_capture.hpp"
+#include "stm32/timer/one_pulse/one_pulse.hpp"
 #include "stm32/timer/interrupt/timer_interrupt.hpp"

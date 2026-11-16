@@ -34,6 +34,7 @@ enum class Bus : std::uint8_t
 {
     AHB1,
     AHB2,
+    AHB3,
     APB1,
     APB2
 };
@@ -129,6 +130,7 @@ inline std::uint32_t frequency(Bus bus) noexcept
     {
         case Bus::AHB1:
         case Bus::AHB2:
+        case Bus::AHB3:
             return getHCLK();
 
         case Bus::APB1:
@@ -161,6 +163,19 @@ inline std::uint32_t getTimerFrequency(Bus bus) noexcept
     }
 
     return getHCLK();
+}
+
+/**
+ * @brief Convenient inline aliases matching documentation and examples
+ */
+inline std::uint32_t getSYSCLK() noexcept
+{
+    return getSystemClock();
+}
+
+inline std::uint32_t getTimerClock(Bus bus) noexcept
+{
+    return getTimerFrequency(bus);
 }
 
 } // namespace rcc

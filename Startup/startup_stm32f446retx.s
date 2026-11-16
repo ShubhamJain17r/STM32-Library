@@ -535,6 +535,19 @@ g_pfnVectors:
 	.weak	FMPI2C1_error_IRQHandler
 	.thumb_set FMPI2C1_error_IRQHandler,Default_Handler
 
+/* Provide safe default SystemInit fallback if not defined elsewhere (enables CP10/CP11 FPU) */
+  .section  .text.Default_SystemInit,"ax",%progbits
+Default_SystemInit:
+  ldr r0, =0xE000ED88        /* SCB->CPACR */
+  ldr r1, [r0]
+  orr r1, r1, #(0xF << 20)   /* Enable CP10 and CP11 Full Access */
+  str r1, [r0]
+  dsb
+  isb
+  bx  lr
+  .size  Default_SystemInit, .-Default_SystemInit
+
 	.weak	SystemInit
+	.thumb_set SystemInit,Default_SystemInit
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

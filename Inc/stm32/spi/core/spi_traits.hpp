@@ -81,6 +81,10 @@ struct Traits<Instance::spi4>
     static constexpr rcc::Bus bus = rcc::Bus::APB2;
     static constexpr IRQn_Type irq = SPI4_IRQn;
 
+    // Hardware Note (DS10693 Table 5 & UM1724 Table 19):
+    // Default SPI4 pins reside on Port E (PE2, PE4, PE5, PE6).
+    // Port E is NOT pinned out on the 64-pin package (STM32F446RET6 / NUCLEO-F446RE).
+    // SPI4 default pins are only physically accessible on 100-pin (LQFP100) and 144-pin (LQFP144) packages.
     static constexpr gpio::Pin defaultSck  = gpio::PE2;
     static constexpr gpio::Pin defaultMiso = gpio::PE5;
     static constexpr gpio::Pin defaultMosi = gpio::PE6;

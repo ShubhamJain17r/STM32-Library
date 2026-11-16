@@ -6,6 +6,7 @@
 #pragma once
 
 #include <cstdint>
+#include <cstddef>
 
 namespace buffer
 {
@@ -35,9 +36,9 @@ public:
 
 private:
     T buffer_[N];
-    std::size_t head_ = 0;
-    std::size_t tail_ = 0;
-    std::size_t count_ = 0;
+    volatile std::size_t head_ = 0;
+    volatile std::size_t tail_ = 0;
+    volatile std::size_t count_ = 0;
 };
 
 template<typename T, std::size_t N>

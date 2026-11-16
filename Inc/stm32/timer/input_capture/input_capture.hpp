@@ -53,6 +53,7 @@ public:
     void disableChannel(Channel ch) noexcept;
 
     std::uint32_t getCaptureValue(Channel ch) const noexcept;
+    float readFrequency(Channel ch) noexcept;
 
     void setCallback(Channel ch, interrupt::ChannelCallback callback) noexcept;
     void enableInterrupt(Channel ch) noexcept;
@@ -180,6 +181,42 @@ void InputCaptureHandler<I>::stop() noexcept
     helper::disableCounter(Traits<I>::peripheral());
 }
 
+template<Instance I>
+float InputCaptureHandler<I>::readFrequency(Channel ch) noexcept
+{
+    auto* tim = Traits<I>::peripheral();
+    std::uint32_t flag = 0;
+    switch(ch)
+    {
+        case Channel::CH1: flag = TIM_SR_CC1IF; break;
+        case Channel::CH2: flag = TIM_SR_CC2IF; break;
+        case Channel::CH3: flag = TIM_SR_CC3IF; break;
+        case Channel::CH4: flag = TIM_SR_CC4IF; break;
+    }
+
+    // Clear pending flag and wait for first edge
+    reg::clearBits(tim->SR, flag);
+    std::uint32_t timeout = 1000000u;
+    while(!reg::isAnyBitSet(tim->SR, flag) && --timeout) {}
+    if(timeout == 0) return 0.0f;
+    const std::uint32_t val1 = getCaptureValue(ch);
+
+    // Clear flag and wait for second edge
+    reg::clearBits(tim->SR, flag);
+    timeout = 1000000u;
+    while(!reg::isAnyBitSet(tim->SR, flag) && --timeout) {}
+    if(timeout == 0) return 0.0f;
+    const std::uint32_t val2 = getCaptureValue(ch);
+
+    const std::uint32_t arr = helper::getAutoReload(tim);
+    const std::uint32_t delta = (val2 >= val1) ? (val2 - val1) : (arr - val1 + val2 + 1u);
+    if(delta == 0) return 0.0f;
+
+    const std::uint32_t timerClk = rcc::getTimerFrequency(Traits<I>::bus);
+    const std::uint32_t psc = helper::getPrescaler(tim) + 1u;
+    return static_cast<float>(timerClk) / (static_cast<float>(psc) * static_cast<float>(delta));
+}
+
 using InputCapture1  = InputCaptureHandler<Instance::tim1>;
 using InputCapture2  = InputCaptureHandler<Instance::tim2>;
 using InputCapture3  = InputCaptureHandler<Instance::tim3>;
@@ -192,6 +229,22 @@ using InputCapture11 = InputCaptureHandler<Instance::tim11>;
 using InputCapture12 = InputCaptureHandler<Instance::tim12>;
 using InputCapture13 = InputCaptureHandler<Instance::tim13>;
 using InputCapture14 = InputCaptureHandler<Instance::tim14>;
+
+template<Instance I>
+using Capture = InputCaptureHandler<I>;
+
+using Capture1  = InputCapture1;
+using Capture2  = InputCapture2;
+using Capture3  = InputCapture3;
+using Capture4  = InputCapture4;
+using Capture5  = InputCapture5;
+using Capture8  = InputCapture8;
+using Capture9  = InputCapture9;
+using Capture10 = InputCapture10;
+using Capture11 = InputCapture11;
+using Capture12 = InputCapture12;
+using Capture13 = InputCapture13;
+using Capture14 = InputCapture14;
 
 } // namespace timer
 

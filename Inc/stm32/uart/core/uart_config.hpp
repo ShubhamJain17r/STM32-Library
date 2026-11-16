@@ -18,10 +18,20 @@ namespace uart
 template<Instance I>
 struct uartConfig
 {
-    gpio::Pin tx = Traits<I>::defaultTx;
-    gpio::Pin rx = Traits<I>::defaultRx;
+    union {
+        gpio::Pin tx;
+        gpio::Pin txPin;
+    };
 
-    std::uint32_t baud = 115200;
+    union {
+        gpio::Pin rx;
+        gpio::Pin rxPin;
+    };
+
+    union {
+        std::uint32_t baud;
+        std::uint32_t baudRate;
+    };
 
     gpio::af::AlternatePinConfig txPinConfig = {};
     gpio::af::AlternatePinConfig rxPinConfig = {};
@@ -32,22 +42,30 @@ struct uartConfig
     Parity parity = Parity::NONE;
     Oversampling oversampling = Oversampling::BY16;
 
-    constexpr uartConfig() = default;
-
-    constexpr explicit uartConfig(std::uint32_t baudRate)
-        : baud(baudRate)
+    constexpr uartConfig()
+        : tx(Traits<I>::defaultTx),
+          rx(Traits<I>::defaultRx),
+          baud(115200)
     {}
 
-    constexpr uartConfig(gpio::Pin txPin, gpio::Pin rxPin)
-        : tx(txPin), rx(rxPin)
+    constexpr explicit uartConfig(std::uint32_t baudRateVal)
+        : tx(Traits<I>::defaultTx),
+          rx(Traits<I>::defaultRx),
+          baud(baudRateVal)
     {}
 
-    constexpr uartConfig(gpio::Pin txPin,
-                         gpio::Pin rxPin,
-                         std::uint32_t baudRate)
-        : tx(txPin),
-          rx(rxPin),
-          baud(baudRate)
+    constexpr uartConfig(gpio::Pin txPinVal, gpio::Pin rxPinVal)
+        : tx(txPinVal),
+          rx(rxPinVal),
+          baud(115200)
+    {}
+
+    constexpr uartConfig(gpio::Pin txPinVal,
+                         gpio::Pin rxPinVal,
+                         std::uint32_t baudRateVal)
+        : tx(txPinVal),
+          rx(rxPinVal),
+          baud(baudRateVal)
     {}
 };
 

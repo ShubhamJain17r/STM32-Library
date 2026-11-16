@@ -22,7 +22,11 @@ enum class Instance
     usart3,
     uart4,
     uart5,
-    usart6
+    usart6,
+    uart1 = usart1,
+    uart2 = usart2,
+    uart3 = usart3,
+    uart6 = usart6
 };
 
 template<Instance I>

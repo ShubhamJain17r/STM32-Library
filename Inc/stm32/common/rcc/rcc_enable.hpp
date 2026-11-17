@@ -87,4 +87,11 @@ inline void enablePeripheralClock(ADC_TypeDef* adc) noexcept
 	__DSB();
 }
 
+inline void enablePeripheralClock(DMA_TypeDef* dma) noexcept
+{
+	if(dma == DMA1)      reg::setBits(RCC->AHB1ENR, RCC_AHB1ENR_DMA1EN);
+	else if(dma == DMA2) reg::setBits(RCC->AHB1ENR, RCC_AHB1ENR_DMA2EN);
+	__DSB();
+}
+
 } // namespace rcc

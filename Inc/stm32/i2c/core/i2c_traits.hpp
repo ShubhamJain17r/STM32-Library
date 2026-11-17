@@ -14,6 +14,8 @@
 #include "stm32/gpio/core/pin_map.hpp"
 #include "stm32/i2c/core/i2c_types.hpp"
 
+#include "stm32/dma/core/dma_types.hpp"
+
 namespace i2c
 {
 
@@ -69,6 +71,45 @@ struct Traits<Instance::i2c3>
     {
         rcc::enablePeripheralClock(I2C3);
     }
+};
+
+template<Instance I>
+struct DmaTraits;
+
+template<>
+struct DmaTraits<Instance::i2c1>
+{
+    static constexpr dma::Controller txController = dma::Controller::Dma1;
+    static constexpr dma::StreamId   txStream     = dma::StreamId::Stream6;
+    static constexpr dma::ChannelId  txChannel    = dma::ChannelId::Channel1;
+
+    static constexpr dma::Controller rxController = dma::Controller::Dma1;
+    static constexpr dma::StreamId   rxStream     = dma::StreamId::Stream0;
+    static constexpr dma::ChannelId  rxChannel    = dma::ChannelId::Channel1;
+};
+
+template<>
+struct DmaTraits<Instance::i2c2>
+{
+    static constexpr dma::Controller txController = dma::Controller::Dma1;
+    static constexpr dma::StreamId   txStream     = dma::StreamId::Stream7;
+    static constexpr dma::ChannelId  txChannel    = dma::ChannelId::Channel7;
+
+    static constexpr dma::Controller rxController = dma::Controller::Dma1;
+    static constexpr dma::StreamId   rxStream     = dma::StreamId::Stream2;
+    static constexpr dma::ChannelId  rxChannel    = dma::ChannelId::Channel7;
+};
+
+template<>
+struct DmaTraits<Instance::i2c3>
+{
+    static constexpr dma::Controller txController = dma::Controller::Dma1;
+    static constexpr dma::StreamId   txStream     = dma::StreamId::Stream4;
+    static constexpr dma::ChannelId  txChannel    = dma::ChannelId::Channel3;
+
+    static constexpr dma::Controller rxController = dma::Controller::Dma1;
+    static constexpr dma::StreamId   rxStream     = dma::StreamId::Stream2;
+    static constexpr dma::ChannelId  rxChannel    = dma::ChannelId::Channel3;
 };
 
 } // namespace i2c

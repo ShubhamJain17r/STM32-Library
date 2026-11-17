@@ -29,7 +29,7 @@ The STM32F446RE contains **3 hardware I2C peripherals** on APB1 (up to 45 MHz bu
 | **Bus Recovery Helper** | SCL Clock Pulsing | `recoverBus()` (9 clock pulses to free stuck SDA) | 🟢 Implemented |
 | **I2C Bus Scanner** | Address probing 0x08..0x77 | `scanBus()` & `isDeviceReady()` | 🟢 Implemented |
 | **8-Bit & 16-Bit Register Helpers**| Sub-addressing | `readRegister()`, `writeRegister()`, 16-bit overloads | 🟢 Implemented |
-| **DMA Direct Memory Access**| DMA1 Streams | Planned (Phase 11) | ⚪ Future Scope |
+| **DMA Direct Memory Access**| DMA1 Streams | `writeDma()`, `readDma()` with synchronous and ISR callbacks | 🟢 Implemented |
 
 ---
 
@@ -69,7 +69,12 @@ std::uint8_t rx[4];
 i2c.write(0x50, tx, 2);
 i2c.read(0x50, rx, 4);
 
-// 5. Bus Recovery
+// 5. Zero-CPU DMA Master Transfer
+std::uint8_t dmaBuf[16] = {0x01, 0x02};
+i2c.writeDma(0x50, dmaBuf, 16);
+i2c.readDma(0x50, dmaBuf, 16);
+
+// 6. Bus Recovery
 if(!i2c.isDeviceReady(0x68)) {
     i2c.recoverBus();
 }
@@ -81,6 +86,7 @@ if(!i2c.isDeviceReady(0x68)) {
 
 * **External vs Internal Pull-Ups**: While the library can enable internal pull-up resistors, standard $4.7\text{ k}\Omega$ external pull-up resistors are strongly recommended for Fast Mode 400 kHz buses.
 * **Repeated START in Register Read**: `readRegister()` automatically transmits the sub-register address with a repeated START (leaving the bus owned), ensuring thread-safe reads on multi-master buses.
+* **DMA Channel Routing**: I2C1 routes on DMA1 Stream 6 (TX) / Stream 0 (RX) Channel 1; I2C2 on Stream 7 / Stream 2 Channel 7; I2C3 on Stream 4 / Stream 2 Channel 3 according to RM0390 Table 28.
 
 ---
 
@@ -90,4 +96,6 @@ if(!i2c.isDeviceReady(0x68)) {
 2. [📖 `02_sensor_register_read_write.cpp`](examples/02_sensor_register_read_write.cpp): Register write/read operations with an MPU6050 sensor.
 3. [📖 `03_custom_pins_fast_mode.cpp`](examples/03_custom_pins_fast_mode.cpp): 400 kHz Fast Mode on alternate pins PB6 (SCL) and PB7 (SDA).
 4. [📖 `04_bus_recovery_stuck_slave.cpp`](examples/04_bus_recovery_stuck_slave.cpp): Unsticking a bus where SDA was held low by an interrupted transaction.
+5. [📖 `05_dma_master_transfer.cpp`](examples/05_dma_master_transfer.cpp): Zero-CPU high-speed master transmit & receive using DMA1.
+
 

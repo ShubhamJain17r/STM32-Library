@@ -26,6 +26,7 @@
 #include "stm32/i2c/core/i2c_config.hpp"
 #include "stm32/i2c/core/i2c_helper.hpp"
 #include "stm32/i2c/interrupt/i2c_interrupt.hpp"
+#include "stm32/dma/dma.hpp"
 
 namespace i2c
 {
@@ -53,6 +54,10 @@ public:
 
     bool read(std::uint8_t devAddr, std::uint8_t* data, std::size_t length, std::uint32_t timeoutMs = 50) noexcept;
     bool read(std::uint8_t devAddr, std::uint8_t& byte, std::uint32_t timeoutMs = 50) noexcept;
+
+    // High-Speed DMA Transmit & Receive
+    bool writeDma(std::uint8_t devAddr, const std::uint8_t* data, std::size_t length, bool sendStop = true, stm32::Callback onComplete = nullptr, std::uint32_t timeoutMs = 100) noexcept;
+    bool readDma(std::uint8_t devAddr, std::uint8_t* data, std::size_t length, stm32::Callback onComplete = nullptr, std::uint32_t timeoutMs = 100) noexcept;
 
     // Register-Level Sensor Read / Write Helpers
     bool writeRegister(std::uint8_t devAddr, std::uint8_t regAddr, std::uint8_t value, std::uint32_t timeoutMs = 50) noexcept;
@@ -519,6 +524,128 @@ template<Instance I>
 bool I2cMaster<I>::read(std::uint8_t devAddr, std::uint8_t& byte, std::uint32_t timeoutMs) noexcept
 {
     return read(devAddr, &byte, 1, timeoutMs);
+}
+
+template<Instance I>
+bool I2cMaster<I>::writeDma(std::uint8_t devAddr, const std::uint8_t* data, std::size_t length, bool sendStop, stm32::Callback onComplete, std::uint32_t timeoutMs) noexcept
+{
+    if(length == 0 || !data) return false;
+
+    auto* i2c = Traits<I>::peripheral();
+    systick::Timeout to(timeoutMs);
+
+    using TxStream = dma::DmaStream<DmaTraits<I>::txController, DmaTraits<I>::txStream>;
+    static TxStream txDma(dma::DmaStreamConfig::memoryToPeripheral(DmaTraits<I>::txChannel));
+
+    if(onComplete)
+    {
+        txDma.attachCompleteCallback(onComplete);
+    }
+
+    if(!startAddress(devAddr, false, to))
+    {
+        return false;
+    }
+
+    // Enable DMA on I2C
+    helper::enableDma(i2c);
+
+    // Setup & start DMA transfer to DR
+    txDma.startTransfer(data, const_cast<void*>(reinterpret_cast<const volatile void*>(&i2c->DR)), length);
+
+    // Clear ADDR flag so transfer commences
+    helper::clearAddressFlag(i2c);
+
+    if(onComplete == nullptr)
+    {
+        if(!txDma.waitForCompletion(timeoutMs))
+        {
+            txDma.abort();
+            helper::disableDma(i2c);
+            helper::generateStop(i2c);
+            lastStatus_ = I2cStatus::Timeout;
+            return false;
+        }
+
+        // Wait for BTF (Byte Transfer Finished) to ensure last byte is transmitted
+        while(!helper::isByteTransferFinished(i2c))
+        {
+            if(to.expired())
+            {
+                helper::disableDma(i2c);
+                helper::generateStop(i2c);
+                lastStatus_ = I2cStatus::Timeout;
+                return false;
+            }
+        }
+
+        if(sendStop)
+        {
+            helper::generateStop(i2c);
+        }
+
+        helper::disableDma(i2c);
+    }
+
+    lastStatus_ = I2cStatus::Success;
+    return true;
+}
+
+template<Instance I>
+bool I2cMaster<I>::readDma(std::uint8_t devAddr, std::uint8_t* data, std::size_t length, stm32::Callback onComplete, std::uint32_t timeoutMs) noexcept
+{
+    if(length == 0 || !data) return false;
+
+    auto* i2c = Traits<I>::peripheral();
+    systick::Timeout to(timeoutMs);
+
+    using RxStream = dma::DmaStream<DmaTraits<I>::rxController, DmaTraits<I>::rxStream>;
+    static RxStream rxDma(dma::DmaStreamConfig::peripheralToMemory(DmaTraits<I>::rxChannel));
+
+    if(onComplete)
+    {
+        rxDma.attachCompleteCallback(onComplete);
+    }
+
+    // Enable DMA and LAST bit in CR2
+    helper::enableDma(i2c);
+    helper::setLastDmaTransfer(i2c, true);
+    helper::enableAck(i2c);
+
+    // Setup DMA transfer from DR to destination buffer
+    rxDma.startTransfer(const_cast<void*>(reinterpret_cast<const volatile void*>(&i2c->DR)), data, length);
+
+    // Send START and device address in read mode
+    if(!startAddress(devAddr, true, to))
+    {
+        rxDma.abort();
+        helper::disableDma(i2c);
+        helper::setLastDmaTransfer(i2c, false);
+        return false;
+    }
+
+    // Clear ADDR flag to begin reception
+    helper::clearAddressFlag(i2c);
+
+    if(onComplete == nullptr)
+    {
+        if(!rxDma.waitForCompletion(timeoutMs))
+        {
+            rxDma.abort();
+            helper::disableDma(i2c);
+            helper::setLastDmaTransfer(i2c, false);
+            helper::generateStop(i2c);
+            lastStatus_ = I2cStatus::Timeout;
+            return false;
+        }
+
+        helper::generateStop(i2c);
+        helper::disableDma(i2c);
+        helper::setLastDmaTransfer(i2c, false);
+    }
+
+    lastStatus_ = I2cStatus::Success;
+    return true;
 }
 
 template<Instance I>

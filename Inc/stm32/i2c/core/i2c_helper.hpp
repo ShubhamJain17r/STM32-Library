@@ -199,5 +199,23 @@ inline void disableErrorInterrupt(I2C_TypeDef* i2c) noexcept
     reg::clearBits(i2c->CR2, I2C_CR2_ITERREN);
 }
 
+inline void enableDma(I2C_TypeDef* i2c) noexcept
+{
+    reg::setBits(i2c->CR2, I2C_CR2_DMAEN);
+}
+
+inline void disableDma(I2C_TypeDef* i2c) noexcept
+{
+    reg::clearBits(i2c->CR2, I2C_CR2_DMAEN);
+}
+
+inline void setLastDmaTransfer(I2C_TypeDef* i2c, bool isLast = true) noexcept
+{
+    if(isLast)
+        reg::setBits(i2c->CR2, I2C_CR2_LAST);
+    else
+        reg::clearBits(i2c->CR2, I2C_CR2_LAST);
+}
+
 } // namespace i2c::helper
 

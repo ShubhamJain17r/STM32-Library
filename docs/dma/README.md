@@ -30,7 +30,7 @@ The STM32F446RE contains **two independent multi-master DMA controllers** (`DMA1
 | **Double-Buffer Mode (DBM)** | `DBM` bit with `M0AR` / `M1AR` | `setDoubleBuffer()` with active target query | 🟢 Implemented |
 | **FIFO Mode & Thresholds** | 4-word FIFO per stream | Configurable `FifoThreshold::Quarter`..`Full` | 🟢 Implemented |
 | **Zero-Allocation ISR Dispatch** | 16 hardware vector handlers | Static type-safe `DmaEvent` callback tables | 🟢 Implemented |
-| **Peripheral Integration** | Hardware request gating | Seamless non-blocking methods in `Uart2`, `Spi1`, `Adc1` | 🟢 Implemented |
+| **Peripheral Integration** | Hardware request gating | Seamless non-blocking methods in `Uart2`, `Spi1`, `I2c1`, `Adc1` | 🟢 Implemented |
 
 ---
 
@@ -58,6 +58,7 @@ The STM32F446RE contains **two independent multi-master DMA controllers** (`DMA1
 #include "stm32/dma/dma.hpp"
 #include "stm32/uart/uart.hpp"
 #include "stm32/spi/spi.hpp"
+#include "stm32/i2c/i2c.hpp"
 #include "stm32/adc/adc.hpp"
 
 using namespace dma;
@@ -104,6 +105,14 @@ static std::uint8_t rx[4];
 spi.transferDma(tx, rx, 4, []() {
     // Both TX and RX complete
 });
+
+// ===========================================================================
+// 5. High-Speed I2C Master Transmit & Receive via DMA
+// ===========================================================================
+i2c::I2c1 i2c(400'000);
+
+static const std::uint8_t i2cPayload[16] = {0x00, 0x01, 0x02};
+i2c.writeDma(0x50, i2cPayload, sizeof(i2cPayload));
 ```
 
 ---
@@ -123,3 +132,5 @@ spi.transferDma(tx, rx, 4, []() {
 2. [📖 `02_uart_tx_dma.cpp`](examples/02_uart_tx_dma.cpp): Asynchronous non-blocking UART transmission with DMA completion callback.
 3. [📖 `03_adc_multi_channel_circular_dma.cpp`](examples/03_adc_multi_channel_circular_dma.cpp): Continuous ADC scan sampling into circular RAM buffer.
 4. [📖 `04_spi_duplex_dma.cpp`](examples/04_spi_duplex_dma.cpp): High-speed full-duplex SPI buffer exchange using dual DMA streams.
+5. [📖 `05_dma_master_transfer.cpp`](../i2c/examples/05_dma_master_transfer.cpp): High-speed I2C master transmit & receive using DMA1.
+

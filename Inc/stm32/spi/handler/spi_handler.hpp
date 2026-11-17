@@ -26,6 +26,7 @@
 #include "stm32/spi/core/spi_config.hpp"
 #include "stm32/spi/core/spi_helper.hpp"
 #include "stm32/spi/interrupt/spi_interrupt.hpp"
+#include "stm32/dma/dma.hpp"
 
 namespace spi
 {
@@ -102,6 +103,15 @@ public:
     bool transferAsync(const std::uint8_t* txBuf, std::uint8_t* rxBuf, std::size_t length) noexcept;
     bool isAsyncBusy() const noexcept;
     void attachTransferCompleteCallback(stm32::Callback cb) noexcept;
+
+    /**
+     * @brief High-speed full-duplex transfer using paired TX and RX DMA streams.
+     * @param txBuf Source buffer to transmit (or nullptr to send dummy bytes)
+     * @param rxBuf Destination buffer to receive (or nullptr to discard received bytes)
+     * @param length Number of bytes to exchange
+     * @param onComplete Callback invoked when all bytes have been transmitted and received
+     */
+    void transferDma(const std::uint8_t* txBuf, std::uint8_t* rxBuf, std::size_t length, stm32::Callback onComplete = nullptr) noexcept;
 
     void enable() noexcept;
     void disable() noexcept;
@@ -526,6 +536,54 @@ void SpiHandler<I>::setBitOrder(BitOrder order) noexcept
     helper::setBitOrder(Traits<I>::peripheral(), order);
 
     if(wasEnabled) enable();
+}
+
+template<Instance I>
+void SpiHandler<I>::transferDma(const std::uint8_t* txBuf, std::uint8_t* rxBuf, std::size_t length, stm32::Callback onComplete) noexcept
+{
+    if(length == 0) return;
+
+    auto* spi = Traits<I>::peripheral();
+
+    static const std::uint8_t dummyTx = 0xFF;
+    static std::uint8_t dummyRx = 0;
+
+    using RxStream = dma::DmaStream<DmaTraits<I>::rxController, DmaTraits<I>::rxStream>;
+    dma::DmaStreamConfig rxCfg = dma::DmaStreamConfig::peripheralToMemory(
+        DmaTraits<I>::rxChannel,
+        dma::DataSize::Byte,
+        dma::Mode::Normal
+    );
+    if(!rxBuf) rxCfg.dstInc = false;
+    static RxStream rxDma(rxCfg);
+
+    if(onComplete)
+    {
+        rxDma.attachCompleteCallback(onComplete);
+    }
+
+    using TxStream = dma::DmaStream<DmaTraits<I>::txController, DmaTraits<I>::txStream>;
+    dma::DmaStreamConfig txCfg = dma::DmaStreamConfig::memoryToPeripheral(
+        DmaTraits<I>::txChannel,
+        dma::DataSize::Byte
+    );
+    if(!txBuf) txCfg.srcInc = false;
+    static TxStream txDma(txCfg);
+
+    reg::setBits(spi->CR2, SPI_CR2_RXDMAEN | SPI_CR2_TXDMAEN);
+    enable();
+
+    rxDma.startTransfer(
+        const_cast<void*>(reinterpret_cast<const volatile void*>(&spi->DR)),
+        rxBuf ? rxBuf : &dummyRx,
+        length
+    );
+
+    txDma.startTransfer(
+        txBuf ? txBuf : &dummyTx,
+        const_cast<void*>(reinterpret_cast<const volatile void*>(&spi->DR)),
+        length
+    );
 }
 
 } // namespace spi

@@ -13,6 +13,7 @@
 #include "stm32/gpio/core/pin.hpp"
 #include "stm32/gpio/core/pin_map.hpp"
 #include "stm32/spi/core/spi_types.hpp"
+#include "stm32/dma/core/dma_types.hpp"
 
 namespace spi
 {
@@ -94,6 +95,57 @@ struct Traits<Instance::spi4>
     {
         rcc::enablePeripheralClock(SPI4);
     }
+};
+
+template<Instance I>
+struct DmaTraits;
+
+template<>
+struct DmaTraits<Instance::spi1>
+{
+    static constexpr dma::Controller txController = dma::Controller::Dma2;
+    static constexpr dma::StreamId   txStream     = dma::StreamId::Stream3;
+    static constexpr dma::ChannelId  txChannel    = dma::ChannelId::Channel3;
+
+    static constexpr dma::Controller rxController = dma::Controller::Dma2;
+    static constexpr dma::StreamId   rxStream     = dma::StreamId::Stream0;
+    static constexpr dma::ChannelId  rxChannel    = dma::ChannelId::Channel3;
+};
+
+template<>
+struct DmaTraits<Instance::spi2>
+{
+    static constexpr dma::Controller txController = dma::Controller::Dma1;
+    static constexpr dma::StreamId   txStream     = dma::StreamId::Stream4;
+    static constexpr dma::ChannelId  txChannel    = dma::ChannelId::Channel0;
+
+    static constexpr dma::Controller rxController = dma::Controller::Dma1;
+    static constexpr dma::StreamId   rxStream     = dma::StreamId::Stream3;
+    static constexpr dma::ChannelId  rxChannel    = dma::ChannelId::Channel0;
+};
+
+template<>
+struct DmaTraits<Instance::spi3>
+{
+    static constexpr dma::Controller txController = dma::Controller::Dma1;
+    static constexpr dma::StreamId   txStream     = dma::StreamId::Stream5;
+    static constexpr dma::ChannelId  txChannel    = dma::ChannelId::Channel0;
+
+    static constexpr dma::Controller rxController = dma::Controller::Dma1;
+    static constexpr dma::StreamId   rxStream     = dma::StreamId::Stream2;
+    static constexpr dma::ChannelId  rxChannel    = dma::ChannelId::Channel0;
+};
+
+template<>
+struct DmaTraits<Instance::spi4>
+{
+    static constexpr dma::Controller txController = dma::Controller::Dma2;
+    static constexpr dma::StreamId   txStream     = dma::StreamId::Stream1;
+    static constexpr dma::ChannelId  txChannel    = dma::ChannelId::Channel4;
+
+    static constexpr dma::Controller rxController = dma::Controller::Dma2;
+    static constexpr dma::StreamId   rxStream     = dma::StreamId::Stream0;
+    static constexpr dma::ChannelId  rxChannel    = dma::ChannelId::Channel4;
 };
 
 } // namespace spi

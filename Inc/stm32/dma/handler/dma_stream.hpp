@@ -210,7 +210,7 @@ public:
                 helper::clearErrorFlags(StreamTraits::controller(), S);
                 return false;
             }
-            if(timer.hasExpired())
+            if(timer.expired())
             {
                 return false;
             }

@@ -8,6 +8,7 @@
 #include "stm32/spi/spi.hpp"
 #include "stm32/i2c/i2c.hpp"
 #include "stm32/adc/adc.hpp"
+#include "stm32/dma/dma.hpp"
 
 using namespace gpio;
 using namespace uart;
@@ -15,6 +16,7 @@ using namespace timer;
 using namespace spi;
 using namespace i2c;
 using namespace adc;
+using namespace dma;
 
 // Pointers for ISR callbacks
 static DigitalOutput* pLed = nullptr;
@@ -92,7 +94,32 @@ int main()
     Adc1 adc;
     adc.enableChannel(PA0);
 
-    serial.write("[OK] SysTick, GPIO, EXTI, UART, Timer, PWM, SPI, I2C, and ADC initialized.\r\n");
+    // 10. Perform High-Speed Memory-to-Memory (M2M) DMA Transfer via DMA2 Stream 0
+    static const std::uint32_t m2mSrc[8] = {
+        0xDEADBEEF, 0xCAFEBABE, 0x01234567, 0x89ABCDEF,
+        0x55AA55AA, 0xA5A5A5A5, 0x11223344, 0x55667788
+    };
+    static std::uint32_t m2mDst[8] = {0};
+
+    Dma2Stream0 m2mDma;
+    m2mDma.startMemoryToMemory(m2mSrc, m2mDst, 8);
+    if(m2mDma.waitForCompletion(100))
+    {
+        bool match = true;
+        for(std::size_t i = 0; i < 8; ++i)
+        {
+            if(m2mDst[i] != m2mSrc[i]) { match = false; break; }
+        }
+        if(match)
+        {
+            serial.write("[OK] DMA2 Stream 0 M2M 32-bit transfer verified successfully.\r\n");
+        }
+    }
+
+    // 11. Transmit banner via USART2 TX DMA (DMA1 Stream 6)
+    serial.writeDma("[OK] USART2 TX DMA transfer initiated and running asynchronously.\r\n");
+
+    serial.write("[OK] All Subsystems (SysTick, GPIO, EXTI, UART, Timer, PWM, SPI, I2C, ADC, DMA) initialized.\r\n");
 
     systick::Timeout printTimer(1000); // Non-blocking 1s status report
 

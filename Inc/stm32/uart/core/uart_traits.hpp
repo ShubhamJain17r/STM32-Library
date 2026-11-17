@@ -119,11 +119,11 @@ struct DmaTraits<Instance::usart1>
 {
     static constexpr dma::Controller txController = dma::Controller::Dma2;
     static constexpr dma::StreamId   txStream     = dma::StreamId::Stream7;
-    static constexpr dma::ChannelId  txChannel    = dma::ChannelId::Channel5;
+    static constexpr dma::ChannelId  txChannel    = dma::ChannelId::Channel4;
 
     static constexpr dma::Controller rxController = dma::Controller::Dma2;
     static constexpr dma::StreamId   rxStream     = dma::StreamId::Stream2;
-    static constexpr dma::ChannelId  rxChannel    = dma::ChannelId::Channel5;
+    static constexpr dma::ChannelId  rxChannel    = dma::ChannelId::Channel4;
 };
 
 template<>

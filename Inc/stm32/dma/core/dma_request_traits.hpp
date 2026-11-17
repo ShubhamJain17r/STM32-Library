@@ -65,7 +65,7 @@ struct RequestTraits<Request::Usart1_Tx>
 {
     static constexpr Controller controller = Controller::Dma2;
     static constexpr StreamId   stream     = StreamId::Stream7;
-    static constexpr ChannelId  channel    = ChannelId::Channel5;
+    static constexpr ChannelId  channel    = ChannelId::Channel4;
     static constexpr Direction  direction  = Direction::MemoryToPeripheral;
 };
 
@@ -74,7 +74,7 @@ struct RequestTraits<Request::Usart1_Rx>
 {
     static constexpr Controller controller = Controller::Dma2;
     static constexpr StreamId   stream     = StreamId::Stream2;
-    static constexpr ChannelId  channel    = ChannelId::Channel5;
+    static constexpr ChannelId  channel    = ChannelId::Channel4;
     static constexpr Direction  direction  = Direction::PeripheralToMemory;
 };
 
@@ -297,7 +297,7 @@ template<>
 struct RequestTraits<Request::I2c3_Rx>
 {
     static constexpr Controller controller = Controller::Dma1;
-    static constexpr StreamId   stream     = StreamId::Stream1;
+    static constexpr StreamId   stream     = StreamId::Stream2;
     static constexpr ChannelId  channel    = ChannelId::Channel3;
     static constexpr Direction  direction  = Direction::PeripheralToMemory;
 };

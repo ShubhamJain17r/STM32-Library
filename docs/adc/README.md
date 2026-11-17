@@ -30,7 +30,7 @@ The STM32F446RE features **3 independent 12-bit successive-approximation ADCs** 
 | **Multi-Channel Sequence / Scan** | `SQR1`..`SQR3` (up to 16 ranks) | `configureSequence()` & `readSequence()` | 🟢 Implemented |
 | **Hardware Analog Watchdog** | `HTR` / `LTR` thresholds | `enableAnalogWatchdog()` with callback | 🟢 Implemented |
 | **Centralized Interrupt Dispatch**| Shared `ADC_IRQn` | `AdcEvent::handleInterrupt()` | 🟢 Implemented |
-| **DMA Multi-Channel Circular** | DMA2 Streams | Planned (Phase 11) | ⚪ Future Scope |
+| **DMA Multi-Channel Circular** | DMA2 Streams | `startDma()` continuous/single scan | 🟢 Implemented |
 
 ---
 

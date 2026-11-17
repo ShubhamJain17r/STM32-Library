@@ -22,7 +22,7 @@ The STM32F446RE contains **6 hardware serial peripherals**:
 | **Parity & Data Bits** | 8/9 bits, None/Even/Odd | Scoped enums `WordLength`, `Parity`, `StopBits` | 🟢 Implemented |
 | **Non-Blocking TX** | `writeNonBlocking()` | Zero-wait buffer push with immediate return | 🟢 Implemented |
 | **Hardware Flow Control** | RTS / CTS Hardware Flow | Planned (Phase 13) | ⚪ Future Scope |
-| **DMA Circular Mode** | DMA1/DMA2 Streams | Planned (Phase 11) | ⚪ Future Scope |
+| **DMA Circular Mode** | DMA1/DMA2 Streams | `writeDma()` / `startReceiveDma()` | 🟢 Implemented |
 
 ---
 

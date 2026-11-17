@@ -23,7 +23,7 @@ The STM32F446RE contains **4 hardware SPI controllers**:
 | **8-bit & 16-bit Data Formats** | `DFF` bit in CR1 | Configurable via `DataFrameFormat` enum | 🟢 Implemented |
 | **RAII Chip Select Guard** | Active-low / active-high CS | `spi::ChipSelectGuard` helper | 🟢 Implemented |
 | **Asynchronous Transfer** | RXNE / TXE interrupts | `transferAsync()` with completion callback | 🟢 Implemented |
-| **DMA Circular Mode** | DMA1/DMA2 Streams | Planned (Phase 11) | ⚪ Future Scope |
+| **DMA Circular Mode** | DMA1/DMA2 Streams | `transferDma()` paired streams | 🟢 Implemented |
 
 ---
 

@@ -30,6 +30,7 @@ Each peripheral subsystem has its own dedicated directory containing comprehensi
 | **SPI Subsystem** | [📖 `docs/spi/README.md`](docs/spi/README.md) | `Spi1`..`Spi4`, full/half duplex, modes 0..3, RAII CS guard. | [`docs/spi/examples/`](docs/spi/examples/) |
 | **I2C Subsystem** | [📖 `docs/i2c/README.md`](docs/i2c/README.md) | `I2c1`..`I2c3`, 100/400 kHz, bus scanner, recovery. | [`docs/i2c/examples/`](docs/i2c/examples/) |
 | **ADC Subsystem** | [📖 `docs/adc/README.md`](docs/adc/README.md) | `Adc1`..`Adc3`, 12-bit, scan mode, Temp/VREF, AWD. | [`docs/adc/examples/`](docs/adc/examples/) |
+| **DMA Subsystem** | [📖 `docs/dma/README.md`](docs/dma/README.md) | 16 streams, M2M (DMA2), M2P, P2M, circular, UART/SPI/ADC. | [`docs/dma/examples/`](docs/dma/examples/) |
 | **Common Utilities** | [📖 `docs/common/README.md`](docs/common/README.md) | `reg::` templates, static `RingBuffer`, `Callback`. | — |
 | **LLM Audit Briefing**| [📖 `docs/AUDIT_PROMPT.md`](docs/AUDIT_PROMPT.md) | Complete prompt for peer review and external LLM auditing. | — |
 
@@ -179,6 +180,30 @@ int main()
 }
 ```
 
+### Hardware DMA Memory-to-Memory & Peripheral Acceleration
+```cpp
+#include "stm32/dma/dma.hpp"
+#include "stm32/uart/uart.hpp"
+
+using namespace dma;
+using namespace uart;
+
+int main()
+{
+    // High-speed 32-bit SRAM-to-SRAM block copy (DMA2 only)
+    static const std::uint32_t src[16] = {0x11, 0x22, 0x33, 0x44};
+    static std::uint32_t dst[16];
+    Dma2Stream0 m2m;
+    m2m.startMemoryToMemory(src, dst, 16);
+
+    // Asynchronous UART transmission with zero CPU load
+    Uart2 serial(115200);
+    serial.writeDma("Asynchronous transfer via DMA1 Stream 6\r\n");
+
+    while(true) {}
+}
+```
+
 ---
 
 ## 6. Development Roadmap & Status
@@ -196,5 +221,5 @@ int main()
 | **Phase 8** | **SPI Subsystem** | 🟢 Complete | `SPI1`..`SPI4`, modes 0..3, 8/16-bit, polling/async, RAII CS |
 | **Phase 9** | **I2C Subsystem** | 🟢 Complete | `I2C1`..`I2C3`, 100/400 kHz, auto-timing, timeout guard, scanner, recovery |
 | **Phase 10** | **ADC Subsystem** | 🟢 Complete | `ADC1`..`ADC3`, 12-bit, auto-analog GPIO, scan, Temp/VREF, AWD |
-| **Phase 11** | **DMA Subsystem** | ⚪ Planned | High-speed streams for UART, SPI, I2C, ADC |
+| **Phase 11** | **DMA Subsystem** | 🟢 Complete | Dual DMA1/DMA2, 16 streams, M2M, circular, UART, SPI, ADC |
 | **Phase 12** | **DAC Subsystem** | ⚪ Planned | Dual 12-bit DAC channels on APB1 |

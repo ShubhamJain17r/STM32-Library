@@ -25,8 +25,8 @@ All evaluation and auditing must be cross-referenced against the official silico
    - Interrupt service routines route through hardware vector tables in assembly, then dispatch to static type-safe event tables without heap allocation or lambda captures.
    - Ring buffers utilize power-of-two / statically-sized storage with volatile head, tail, and count indices for lockless single-producer single-consumer concurrency.
 3. Strict Scope:
-   - Phases 0 through 10 are fully implemented.
-   - Phase 11 (DMA) is intentionally unstarted and out-of-scope.
+   - Phases 0 through 11 are fully implemented.
+   - Phase 12 (DAC) is planned.
 
 ---
 
@@ -84,10 +84,10 @@ The repository is engineered for cross-platform portability on Linux and Windows
 │   └── adc/                               # ADC1, ADC2, ADC3
 │       ├── core/                          # 12-bit conversion, multi-channel scan, VREFINT, Temp
 │       └── adc.hpp                        # AdcHandler (single read, sequence, analog watchdog)
-└── docs/                                  # Architectural docs and 31 working standalone examples
+└── docs/                                  # Architectural docs and 35 working standalone examples
 ```
 
-Note on Translation Units: 16 C++ translation units reside under Inc/stm32/** (e.g. Inc/stm32/uart/interrupt/uart_interrupt.cpp, Inc/stm32/exti/exti_manager.cpp). The build systems (Makefile and CMakeLists.txt) explicitly compile these source units alongside Src/*.cpp.
+Note on Translation Units: 18 C++ translation units reside under Inc/stm32/** (e.g. Inc/stm32/uart/interrupt/uart_interrupt.cpp, Inc/stm32/dma/interrupt/dma_interrupt.cpp, Inc/stm32/exti/exti_manager.cpp). The build systems (Makefile and CMakeLists.txt) explicitly compile these source units alongside Src/*.cpp.
 
 ---
 
@@ -147,17 +147,26 @@ Note on Translation Units: 16 C++ translation units reside under Inc/stm32/** (e
 - Dedicated drivers for internal Temperature Sensor (VSENSE) and Internal Reference Voltage (VREFINT = 1.21 V).
 - Configurable Hardware Analog Watchdog (AWD) with high/low threshold interrupts.
 
+### Phase 11: DMA Subsystem (Inc/stm32/dma/)
+- Dual multi-master controllers (`DMA1` on AHB1/APB1, `DMA2` on AHB1/2, APB1/2, SRAM, and Flash).
+- 16 total independent streams (`Stream0`..`Stream7`) and 8 channels per stream.
+- Zero-cost C++17 type-safe abstraction `DmaStream<Controller, StreamId>` with `Dma1Stream0`..`Dma2Stream7` aliases.
+- Hardware-enforced Memory-to-Memory (M2M on DMA2 only via `static_assert`), Peripheral-to-Memory, and Memory-to-Peripheral transfers.
+- Full support for Circular streaming mode and Double-Buffer mode (DBM).
+- Deterministic, zero-allocation ISR dispatching for all 16 stream interrupt vectors (`DMA1_Stream0_IRQHandler`..`DMA2_Stream7_IRQHandler`).
+- Seamless DMA acceleration integrated into `UartHandler` (`writeDma`, `startReceiveDma`), `SpiHandler` (`transferDma`), and `AdcHandler` (`startDma`).
+
 ---
 
 ## 5. Build, Memory, and Verification Metrics
 - Compiler: arm-none-eabi-g++ (GCC 7.2.1 through GCC 14.x)
 - Compilation Flags: -std=c++17 -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -Wall -Wextra -Wpedantic -ffunction-sections -fdata-sections -O2 -fno-exceptions -fno-rtti -fno-use-cxa-atexit
 - Linker Flags: -Wl,--gc-sections -specs=nano.specs -specs=nosys.specs
-- Memory Footprint (Full application exercising SysTick, GPIO, EXTI, UART, Timer, SPI, I2C, ADC):
-  - Flash: 11,436 bytes (2.2% of 512 KB)
-  - SRAM: 3,208 bytes (2.5% of 128 KB)
+- Memory Footprint (Full application exercising SysTick, GPIO, EXTI, UART, Timer, SPI, I2C, ADC, DMA):
+  - Flash: ~13.5 KB (2.6% of 512 KB)
+  - SRAM: ~3.6 KB (2.8% of 128 KB)
   - Heap: 0 bytes (zero dynamic allocation)
-- Test Coverage: All 31 documentation example files in docs/**/examples/*.cpp compile cleanly with 0 errors and 0 warnings.
+- Test Coverage: All 35 documentation example files in docs/**/examples/*.cpp compile cleanly with 0 errors and 0 warnings.
 
 ---
 
@@ -174,4 +183,4 @@ Please conduct a thorough, rigorous technical audit of this architecture focusin
    - Audit critical section protection (__disable_irq() / __enable_irq()) around shared ring buffers.
    - Check reentrancy and volatile semantics of ISR state variables.
 4. Architectural Constructive Criticism:
-   - Suggest potential optimizations or clean idioms for Phase 11 (DMA subsystem) integration when implemented in the future.
+   - Suggest potential optimizations or clean idioms for Phase 12 (DAC subsystem) integration when implemented in the future.

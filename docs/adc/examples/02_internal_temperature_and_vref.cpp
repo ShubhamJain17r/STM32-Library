@@ -44,6 +44,7 @@ int main()
     {
         const float tempC   = adc.readInternalTemperature(3.3f);
         const float vrefInt = adc.readVrefInternal(3.3f);
+        (void)vrefInt;
 
         serial.write("Die Temp: ");
         printNumber(serial, static_cast<std::uint32_t>(tempC));

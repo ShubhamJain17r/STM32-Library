@@ -22,6 +22,7 @@ int main()
     // Calculate prescaler for 1 MHz timer tick on APB1
     const std::uint32_t apb1TimerClock = rcc::getTimerClock(rcc::Bus::APB1);
     const std::uint32_t pscFor1Mhz = (apb1TimerClock / 1'000'000U) - 1U;
+    (void)pscFor1Mhz;
 
     serial.write("APB1 Timer Input Clock: ");
     char buf[16];

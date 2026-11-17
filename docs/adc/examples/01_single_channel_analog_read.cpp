@@ -45,6 +45,7 @@ int main()
     {
         const std::uint16_t raw = adc.readRaw(PA0);
         const float voltage     = adc.readVoltage(PA0, 3.3f);
+        (void)voltage;
 
         serial.write("PA0 Raw: ");
         printNumber(serial, raw);

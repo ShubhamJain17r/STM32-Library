@@ -83,6 +83,8 @@ set(SOURCES
     Inc/stm32/i2c/interrupt/i2c_irq.cpp
     Inc/stm32/adc/interrupt/adc_interrupt.cpp
     Inc/stm32/adc/interrupt/adc_irq.cpp
+    Inc/stm32/dma/interrupt/dma_interrupt.cpp
+    Inc/stm32/dma/interrupt/dma_irq.cpp
 )
 
 set(LINKER_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/STM32F446RETX_FLASH.ld")

@@ -65,7 +65,9 @@ CPP_SOURCES = \
     Inc/stm32/i2c/interrupt/i2c_interrupt.cpp \
     Inc/stm32/i2c/interrupt/i2c_irq.cpp \
     Inc/stm32/adc/interrupt/adc_interrupt.cpp \
-    Inc/stm32/adc/interrupt/adc_irq.cpp
+    Inc/stm32/adc/interrupt/adc_irq.cpp \
+    Inc/stm32/dma/interrupt/dma_interrupt.cpp \
+    Inc/stm32/dma/interrupt/dma_irq.cpp
 
 ASM_SOURCES = \
     Startup/startup_stm32f446retx.s

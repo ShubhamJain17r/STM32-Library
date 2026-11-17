@@ -26,6 +26,7 @@
 #include "stm32/uart/core/uart_config.hpp"
 #include "stm32/uart/core/uart_helper.hpp"
 #include "stm32/uart/interrupt/uart_interrupt.hpp"
+#include "stm32/dma/dma.hpp"
 
 namespace uart
 {
@@ -108,6 +109,21 @@ public:
 
     void attachTransferCompleteCallback(stm32::Callback cb) noexcept;
     void attachReceiveCompleteCallback(stm32::Callback cb)  noexcept;
+
+    /**
+     * @brief Transmits a byte buffer asynchronously using DMA.
+     */
+    void writeDma(const std::uint8_t* data, std::size_t length, stm32::Callback onComplete = nullptr) noexcept;
+
+    /**
+     * @brief Transmits a null-terminated string asynchronously using DMA.
+     */
+    void writeDma(const char* str, stm32::Callback onComplete = nullptr) noexcept;
+
+    /**
+     * @brief Receives into a buffer asynchronously using DMA.
+     */
+    void startReceiveDma(std::uint8_t* buffer, std::size_t length, stm32::Callback onComplete = nullptr, bool circular = false) noexcept;
 };
 
 // ---------------------------------------------------------------------------
@@ -315,6 +331,54 @@ template<Instance I, std::size_t TxBufSize, std::size_t RxBufSize>
 void UartHandler<I, TxBufSize, RxBufSize>::attachReceiveCompleteCallback(stm32::Callback cb) noexcept
 {
     interrupt::UartEvent::setUserCallback(I, interrupt::Event::IdleState, cb);
+}
+
+template<Instance I, std::size_t TxBufSize, std::size_t RxBufSize>
+void UartHandler<I, TxBufSize, RxBufSize>::writeDma(const std::uint8_t* data, std::size_t length, stm32::Callback onComplete) noexcept
+{
+    auto* uart = Traits<I>::peripheral();
+    reg::setBits(uart->CR3, USART_CR3_DMAT);
+
+    using TxStream = dma::DmaStream<DmaTraits<I>::txController, DmaTraits<I>::txStream>;
+    static TxStream txDma(dma::DmaStreamConfig::memoryToPeripheral(DmaTraits<I>::txChannel));
+
+    if(onComplete)
+    {
+        txDma.attachCompleteCallback(onComplete);
+    }
+
+    txDma.startTransfer(data, const_cast<void*>(reinterpret_cast<const volatile void*>(&uart->DR)), length);
+}
+
+template<Instance I, std::size_t TxBufSize, std::size_t RxBufSize>
+void UartHandler<I, TxBufSize, RxBufSize>::writeDma(const char* str, stm32::Callback onComplete) noexcept
+{
+    if(!str) return;
+    std::size_t len = 0;
+    while(str[len] != '\0') ++len;
+    writeDma(reinterpret_cast<const std::uint8_t*>(str), len, onComplete);
+}
+
+template<Instance I, std::size_t TxBufSize, std::size_t RxBufSize>
+void UartHandler<I, TxBufSize, RxBufSize>::startReceiveDma(std::uint8_t* buffer, std::size_t length, stm32::Callback onComplete, bool circular) noexcept
+{
+    auto* uart = Traits<I>::peripheral();
+    reg::setBits(uart->CR3, USART_CR3_DMAR);
+
+    using RxStream = dma::DmaStream<DmaTraits<I>::rxController, DmaTraits<I>::rxStream>;
+    dma::DmaStreamConfig cfg = dma::DmaStreamConfig::peripheralToMemory(
+        DmaTraits<I>::rxChannel,
+        dma::DataSize::Byte,
+        circular ? dma::Mode::Circular : dma::Mode::Normal
+    );
+    static RxStream rxDma(cfg);
+
+    if(onComplete)
+    {
+        rxDma.attachCompleteCallback(onComplete);
+    }
+
+    rxDma.startTransfer(const_cast<void*>(reinterpret_cast<const volatile void*>(&uart->DR)), buffer, length);
 }
 
 // ---------------------------------------------------------------------------

@@ -11,6 +11,7 @@
 #include "stm32/common/rcc/rcc.hpp"
 #include "stm32/common/rcc/rcc_enable.hpp"
 #include "stm32/gpio/af/af_traits.hpp"
+#include "stm32/dma/core/dma_types.hpp"
 
 namespace uart
 {
@@ -108,6 +109,81 @@ struct Traits<Instance::usart6>
     static constexpr gpio::Pin defaultTx = gpio::af::Traits<txSignal>::pins[0];
     static constexpr gpio::Pin defaultRx = gpio::af::Traits<rxSignal>::pins[0];
     static void enableClock() noexcept { rcc::enablePeripheralClock(peripheral()); }
+};
+
+template<Instance I>
+struct DmaTraits;
+
+template<>
+struct DmaTraits<Instance::usart1>
+{
+    static constexpr dma::Controller txController = dma::Controller::Dma2;
+    static constexpr dma::StreamId   txStream     = dma::StreamId::Stream7;
+    static constexpr dma::ChannelId  txChannel    = dma::ChannelId::Channel5;
+
+    static constexpr dma::Controller rxController = dma::Controller::Dma2;
+    static constexpr dma::StreamId   rxStream     = dma::StreamId::Stream2;
+    static constexpr dma::ChannelId  rxChannel    = dma::ChannelId::Channel5;
+};
+
+template<>
+struct DmaTraits<Instance::usart2>
+{
+    static constexpr dma::Controller txController = dma::Controller::Dma1;
+    static constexpr dma::StreamId   txStream     = dma::StreamId::Stream6;
+    static constexpr dma::ChannelId  txChannel    = dma::ChannelId::Channel4;
+
+    static constexpr dma::Controller rxController = dma::Controller::Dma1;
+    static constexpr dma::StreamId   rxStream     = dma::StreamId::Stream5;
+    static constexpr dma::ChannelId  rxChannel    = dma::ChannelId::Channel4;
+};
+
+template<>
+struct DmaTraits<Instance::usart3>
+{
+    static constexpr dma::Controller txController = dma::Controller::Dma1;
+    static constexpr dma::StreamId   txStream     = dma::StreamId::Stream3;
+    static constexpr dma::ChannelId  txChannel    = dma::ChannelId::Channel4;
+
+    static constexpr dma::Controller rxController = dma::Controller::Dma1;
+    static constexpr dma::StreamId   rxStream     = dma::StreamId::Stream1;
+    static constexpr dma::ChannelId  rxChannel    = dma::ChannelId::Channel4;
+};
+
+template<>
+struct DmaTraits<Instance::uart4>
+{
+    static constexpr dma::Controller txController = dma::Controller::Dma1;
+    static constexpr dma::StreamId   txStream     = dma::StreamId::Stream4;
+    static constexpr dma::ChannelId  txChannel    = dma::ChannelId::Channel4;
+
+    static constexpr dma::Controller rxController = dma::Controller::Dma1;
+    static constexpr dma::StreamId   rxStream     = dma::StreamId::Stream2;
+    static constexpr dma::ChannelId  rxChannel    = dma::ChannelId::Channel4;
+};
+
+template<>
+struct DmaTraits<Instance::uart5>
+{
+    static constexpr dma::Controller txController = dma::Controller::Dma1;
+    static constexpr dma::StreamId   txStream     = dma::StreamId::Stream7;
+    static constexpr dma::ChannelId  txChannel    = dma::ChannelId::Channel4;
+
+    static constexpr dma::Controller rxController = dma::Controller::Dma1;
+    static constexpr dma::StreamId   rxStream     = dma::StreamId::Stream0;
+    static constexpr dma::ChannelId  rxChannel    = dma::ChannelId::Channel4;
+};
+
+template<>
+struct DmaTraits<Instance::usart6>
+{
+    static constexpr dma::Controller txController = dma::Controller::Dma2;
+    static constexpr dma::StreamId   txStream     = dma::StreamId::Stream6;
+    static constexpr dma::ChannelId  txChannel    = dma::ChannelId::Channel5;
+
+    static constexpr dma::Controller rxController = dma::Controller::Dma2;
+    static constexpr dma::StreamId   rxStream     = dma::StreamId::Stream1;
+    static constexpr dma::ChannelId  rxChannel    = dma::ChannelId::Channel5;
 };
 
 } // namespace uart

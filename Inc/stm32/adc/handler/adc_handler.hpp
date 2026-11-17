@@ -24,6 +24,7 @@
 #include "stm32/adc/core/adc_config.hpp"
 #include "stm32/adc/core/adc_helper.hpp"
 #include "stm32/adc/interrupt/adc_interrupt.hpp"
+#include "stm32/dma/dma.hpp"
 
 namespace adc
 {
@@ -70,6 +71,20 @@ public:
     // Callbacks & Interrupts
     void attachConversionCompleteCallback(stm32::Callback cb) noexcept;
     void attachWatchdogCallback(stm32::Callback cb) noexcept;
+
+    /**
+     * @brief Starts continuous or single-shot multi-channel sampling using DMA.
+     * @param buffer Memory buffer to receive conversion results
+     * @param count Number of conversions / channel items in sequence
+     * @param onComplete Callback invoked when DMA transfer buffer is filled
+     * @param circular If true, continuously fills the buffer in circular mode
+     */
+    void startDma(std::uint16_t* buffer, std::size_t count, stm32::Callback onComplete = nullptr, bool circular = true) noexcept;
+
+    /**
+     * @brief Stops ongoing DMA conversions and disables DMA mode on ADC.
+     */
+    void stopDma() noexcept;
 
     void enable() noexcept;
     void disable() noexcept;
@@ -387,6 +402,53 @@ template<Instance I>
 void AdcHandler<I>::attachWatchdogCallback(stm32::Callback cb) noexcept
 {
     interrupt::AdcEvent::setUserCallback(I, interrupt::Event::Watchdog, cb);
+}
+
+template<Instance I>
+void AdcHandler<I>::startDma(std::uint16_t* buffer, std::size_t count, stm32::Callback onComplete, bool circular) noexcept
+{
+    if(!buffer || count == 0) return;
+
+    auto* adc = Traits<I>::peripheral();
+
+    using Stream = dma::DmaStream<DmaTraits<I>::controller, DmaTraits<I>::stream>;
+    dma::DmaStreamConfig cfg = dma::DmaStreamConfig::peripheralToMemory(
+        DmaTraits<I>::channel,
+        dma::DataSize::HalfWord,
+        circular ? dma::Mode::Circular : dma::Mode::Normal
+    );
+    static Stream dmaStream(cfg);
+
+    if(onComplete)
+    {
+        dmaStream.attachCompleteCallback(onComplete);
+    }
+
+    std::uint32_t cr2Set = ADC_CR2_DMA;
+    if(circular)
+    {
+        cr2Set |= (ADC_CR2_DDS | ADC_CR2_CONT);
+    }
+    reg::setBits(adc->CR2, cr2Set);
+
+    dmaStream.startTransfer(
+        const_cast<void*>(reinterpret_cast<const volatile void*>(&adc->DR)),
+        buffer,
+        count
+    );
+
+    start();
+}
+
+template<Instance I>
+void AdcHandler<I>::stopDma() noexcept
+{
+    auto* adc = Traits<I>::peripheral();
+    reg::clearBits(adc->CR2, ADC_CR2_DMA | ADC_CR2_DDS | ADC_CR2_CONT);
+
+    using Stream = dma::DmaStream<DmaTraits<I>::controller, DmaTraits<I>::stream>;
+    static Stream dmaStream{};
+    dmaStream.abort();
 }
 
 } // namespace adc

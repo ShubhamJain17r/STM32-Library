@@ -11,6 +11,7 @@
 #include "stm32/common/rcc/rcc.hpp"
 #include "stm32/common/rcc/rcc_enable.hpp"
 #include "stm32/adc/core/adc_types.hpp"
+#include "stm32/dma/core/dma_types.hpp"
 
 namespace adc
 {
@@ -58,6 +59,33 @@ struct Traits<Instance::adc3>
     {
         rcc::enablePeripheralClock(ADC3);
     }
+};
+
+template<Instance I>
+struct DmaTraits;
+
+template<>
+struct DmaTraits<Instance::adc1>
+{
+    static constexpr dma::Controller controller = dma::Controller::Dma2;
+    static constexpr dma::StreamId   stream     = dma::StreamId::Stream0;
+    static constexpr dma::ChannelId  channel    = dma::ChannelId::Channel0;
+};
+
+template<>
+struct DmaTraits<Instance::adc2>
+{
+    static constexpr dma::Controller controller = dma::Controller::Dma2;
+    static constexpr dma::StreamId   stream     = dma::StreamId::Stream2;
+    static constexpr dma::ChannelId  channel    = dma::ChannelId::Channel1;
+};
+
+template<>
+struct DmaTraits<Instance::adc3>
+{
+    static constexpr dma::Controller controller = dma::Controller::Dma2;
+    static constexpr dma::StreamId   stream     = dma::StreamId::Stream1;
+    static constexpr dma::ChannelId  channel    = dma::ChannelId::Channel2;
 };
 
 } // namespace adc

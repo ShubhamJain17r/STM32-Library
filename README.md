@@ -26,13 +26,12 @@ Each peripheral subsystem has its own dedicated directory containing comprehensi
 | **GPIO Subsystem** | [📖 `docs/gpio/README.md`](docs/gpio/README.md) | `DigitalOutput`, `DigitalInput`, `InterruptInput`, AF. | [`docs/gpio/examples/`](docs/gpio/examples/) |
 | **EXTI Interrupts** | [📖 `docs/exti/README.md`](docs/exti/README.md) | Race-free line tracking, collision safety, edge & software triggers. | [`docs/exti/examples/`](docs/exti/examples/) |
 | **Timers & PWM** | [📖 `docs/timer/README.md`](docs/timer/README.md) | All 14 timers, Timebase, PWM, OC, Input Capture, One-Pulse Mode. | [`docs/timer/examples/`](docs/timer/examples/) |
-| **UART / USART** | [📖 `docs/uart/README.md`](docs/uart/README.md) | `Uart1`..`Uart6`, buffered interrupt TX/RX, OVER8/16, parity. | [`docs/uart/examples/`](docs/uart/examples/) |
-| **SPI Subsystem** | [📖 `docs/spi/README.md`](docs/spi/README.md) | `Spi1`..`Spi4`, full/half duplex, modes 0..3, RAII CS guard. | [`docs/spi/examples/`](docs/spi/examples/) |
-| **I2C Subsystem** | [📖 `docs/i2c/README.md`](docs/i2c/README.md) | `I2c1`..`I2c3`, 100/400 kHz, bus scanner, recovery. | [`docs/i2c/examples/`](docs/i2c/examples/) |
-| **ADC Subsystem** | [📖 `docs/adc/README.md`](docs/adc/README.md) | `Adc1`..`Adc3`, 12-bit, scan mode, Temp/VREF, AWD. | [`docs/adc/examples/`](docs/adc/examples/) |
-| **DMA Subsystem** | [📖 `docs/dma/README.md`](docs/dma/README.md) | 16 streams, M2M (DMA2), M2P, P2M, circular, UART/SPI/ADC. | [`docs/dma/examples/`](docs/dma/examples/) |
+| **UART / USART** | [📖 `docs/uart/README.md`](docs/uart/README.md) | `Uart1`..`Uart6`, buffered interrupt TX/RX, OVER8/16, parity, DMA. | [`docs/uart/examples/`](docs/uart/examples/) |
+| **SPI Subsystem** | [📖 `docs/spi/README.md`](docs/spi/README.md) | `Spi1`..`Spi4`, full/half duplex, modes 0..3, RAII CS guard, DMA. | [`docs/spi/examples/`](docs/spi/examples/) |
+| **I2C Subsystem** | [📖 `docs/i2c/README.md`](docs/i2c/README.md) | `I2c1`..`I2c3`, 100/400 kHz, bus scanner, recovery, DMA. | [`docs/i2c/examples/`](docs/i2c/examples/) |
+| **ADC Subsystem** | [📖 `docs/adc/README.md`](docs/adc/README.md) | `Adc1`..`Adc3`, 12-bit, scan mode, Temp/VREF, AWD, DMA. | [`docs/adc/examples/`](docs/adc/examples/) |
+| **DMA Subsystem** | [📖 `docs/dma/README.md`](docs/dma/README.md) | 16 streams, M2M (DMA2), M2P, P2M, circular, UART/SPI/I2C/ADC. | [`docs/dma/examples/`](docs/dma/examples/) |
 | **Common Utilities** | [📖 `docs/common/README.md`](docs/common/README.md) | `reg::` templates, static `RingBuffer`, `Callback`. | — |
-| **LLM Audit Briefing**| [📖 `docs/AUDIT_PROMPT.md`](docs/AUDIT_PROMPT.md) | Complete prompt for peer review and external LLM auditing. | — |
 
 ---
 
@@ -60,8 +59,8 @@ STM32_Library/
 │   ├── spi/                               # SPI full/half duplex documentation & examples
 │   ├── i2c/                               # I2C master, scanner & recovery documentation & examples
 │   ├── adc/                               # ADC analog conversion & watchdog documentation & examples
-│   ├── common/                            # Register templates & RingBuffer documentation
-│   └── AUDIT_PROMPT.md                    # Peer review & LLM audit briefing prompt
+│   ├── dma/                               # DMA direct memory access documentation & examples
+│   └── common/                            # Register templates & RingBuffer documentation
 ├── Inc/stm32/                             # C++17 Header Implementations & Peripheral Translation Units
 │   ├── common/                            # Bitwise register templates, RCC, SysTick, RingBuffer, Callback
 │   ├── gpio/                              # DigitalOutput, DigitalInput, InterruptInput, AF traits
@@ -70,7 +69,8 @@ STM32_Library/
 │   ├── uart/                              # UartHandler, RingBuffers, interrupt dispatcher
 │   ├── spi/                               # SpiHandler, ChipSelectGuard, interrupt dispatcher
 │   ├── i2c/                               # I2cMaster, bus scanner, recovery, interrupt dispatcher
-│   └── adc/                               # AdcHandler, internal temperature, watchdog, interrupt dispatcher
+│   ├── adc/                               # AdcHandler, internal temperature, watchdog, interrupt dispatcher
+│   └── dma/                               # DmaStream, hardware request routing, stream ISR dispatcher
 └── Src/
     ├── main.cpp                           # Unified integration verification test application
     ├── syscalls.c                         # Minimal newlib POSIX stubs (re-entrant, C++ safe)

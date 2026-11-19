@@ -39,8 +39,9 @@ Each peripheral subsystem has its own dedicated directory containing comprehensi
 
 ```
 STM32_Library/
-├── CMakeLists.txt                         # Root CMake build configuration
+├── CMakeLists.txt                         # Root CMake build configuration (exports stm32_hal / stm32::hal)
 ├── Makefile                               # Standalone GNU Makefile (compile, flash, debug)
+├── stm32_sources.mk                       # Exported Makefile source & include fragment for downstreams
 ├── cmake/
 │   └── arm-none-eabi-gcc.cmake            # Toolchain file for cross-compilation
 ├── STM32F446RETX_FLASH.ld                 # Universal GNU Linker script (Flash target)
@@ -98,6 +99,30 @@ Generates `build/stm32_library.elf`, `build/stm32_library.bin`, and `build/stm32
 ```bash
 cmake -B build -DCMAKE_TOOLCHAIN_FILE=cmake/arm-none-eabi-gcc.cmake -DCMAKE_BUILD_TYPE=Release
 cmake --build build -j$(nproc)
+```
+
+### Downstream Integration (Tier 1 HAL Engine)
+
+#### Via Modern CMake (`stm32::hal`)
+In corporate robotics ecosystems, downstream components (Tier 2) and applications (Tier 4) consume `STM32-Library` directly:
+```cmake
+add_subdirectory(path/to/STM32-Library)
+
+# Downstream target automatically inherits all includes, processor flags, and defines:
+target_link_libraries(my_robot_app PRIVATE stm32::hal)
+```
+
+#### Via Makefile Fragment (`stm32_sources.mk`)
+For Make-based builds, include `stm32_sources.mk`:
+```makefile
+LIB_DIR = path/to/STM32-Library
+include $(LIB_DIR)/stm32_sources.mk
+
+# Automatically provides:
+#   $(STM32_LIB_SOURCES)      - Full list of HAL C, C++, and ASM source files
+#   $(STM32_LIB_INCLUDES)     - Compiler include flags (-I...)
+#   $(STM32_LINKER_SCRIPT)    - STM32F446RETX_FLASH.ld path
+#   $(STM32_MCU_FLAGS)        - Target architecture flags (-mcpu=cortex-m4 -mthumb ...)
 ```
 
 ### Flash to NUCLEO-F446RE

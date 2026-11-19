@@ -20,17 +20,17 @@ SZ      = $(PREFIX)size
 HEX     = $(CP) -O ihex
 BIN     = $(CP) -O binary -S
 
+# Include Tier 1 Bare-Metal Silicon HAL Engine Sources & Configuration
+include stm32_sources.mk
+
 # Target Architecture Flags (Cortex-M4F)
-MCU = -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard
+MCU = $(STM32_MCU_FLAGS)
 
 # Hardware Defines
-DEFS = -DSTM32F446xx
+DEFS = $(STM32_DEFS)
 
 # Include Paths
-INCLUDES = \
-    -IInc \
-    -IDrivers/CMSIS/Device/ST/STM32F4xx/Include \
-    -IDrivers/CMSIS/Include
+INCLUDES = $(STM32_LIB_INCLUDES)
 
 # Compiler Flags
 COMMON_FLAGS = $(MCU) $(DEFS) $(INCLUDES) -Wall -Wextra -Wpedantic -ffunction-sections -fdata-sections -O2 -g3
@@ -39,38 +39,13 @@ CXXFLAGS = $(COMMON_FLAGS) -std=c++17 -fno-exceptions -fno-rtti -fno-use-cxa-ate
 ASFLAGS  = $(MCU) $(DEFS) $(INCLUDES) -Wall -fdata-sections -ffunction-sections
 
 # Linker Flags
-LDSCRIPT = STM32F446RETX_FLASH.ld
+LDSCRIPT = $(STM32_LINKER_SCRIPT)
 LDFLAGS = $(MCU) -T$(LDSCRIPT) -Wl,-Map=$(BUILD_DIR)/$(TARGET).map,--cref -Wl,--gc-sections -specs=nano.specs -specs=nosys.specs
 
 # Source Files
-C_SOURCES = \
-    Src/syscalls.c \
-    Src/sysmem.c \
-    Drivers/CMSIS/Device/ST/STM32F4xx/Source/Templates/system_stm32f4xx.c
-
-CPP_SOURCES = \
-    Src/main.cpp \
-    Inc/stm32/common/systick/systick.cpp \
-    Inc/stm32/gpio/digital_input/digital_input.cpp \
-    Inc/stm32/gpio/digital_output/digital_output.cpp \
-    Inc/stm32/gpio/interrupt_input/interrupt_input.cpp \
-    Inc/stm32/exti/exti_manager.cpp \
-    Inc/stm32/exti/exti_irq.cpp \
-    Inc/stm32/timer/interrupt/timer_interrupt.cpp \
-    Inc/stm32/timer/interrupt/timer_irq.cpp \
-    Inc/stm32/uart/interrupt/uart_interrupt.cpp \
-    Inc/stm32/uart/interrupt/uart_irq.cpp \
-    Inc/stm32/spi/interrupt/spi_interrupt.cpp \
-    Inc/stm32/spi/interrupt/spi_irq.cpp \
-    Inc/stm32/i2c/interrupt/i2c_interrupt.cpp \
-    Inc/stm32/i2c/interrupt/i2c_irq.cpp \
-    Inc/stm32/adc/interrupt/adc_interrupt.cpp \
-    Inc/stm32/adc/interrupt/adc_irq.cpp \
-    Inc/stm32/dma/interrupt/dma_interrupt.cpp \
-    Inc/stm32/dma/interrupt/dma_irq.cpp
-
-ASM_SOURCES = \
-    Startup/startup_stm32f446retx.s
+C_SOURCES   = $(STM32_LIB_C_SOURCES)
+CPP_SOURCES = Src/main.cpp $(STM32_LIB_CPP_SOURCES)
+ASM_SOURCES = $(STM32_LIB_ASM_SOURCES)
 
 # Object List
 OBJECTS = $(addprefix $(BUILD_DIR)/,$(notdir $(C_SOURCES:.c=.o)))

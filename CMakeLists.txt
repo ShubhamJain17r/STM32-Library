@@ -44,55 +44,80 @@ set(CMAKE_CXX_FLAGS_DEBUG "-O0 -g3 -DDEBUG")
 set(CMAKE_C_FLAGS_RELEASE "-O2 -g0 -DNDEBUG")
 set(CMAKE_CXX_FLAGS_RELEASE "-O2 -g0 -DNDEBUG")
 
-# Hardware definitions
-add_definitions(-DSTM32F446xx)
+# ------------------------------------------------------------------------------
+# Tier 1 Bare-Metal Silicon HAL Engine Library: stm32_hal (alias stm32::hal)
+# ------------------------------------------------------------------------------
 
-# Include paths
-include_directories(
-    Inc
-    Drivers/CMSIS/Device/ST/STM32F4xx/Include
-    Drivers/CMSIS/Include
-)
+set(STM32_HAL_SOURCES
+    # Syscalls & CMSIS system initialization
+    ${CMAKE_CURRENT_SOURCE_DIR}/Src/syscalls.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/Src/sysmem.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/Drivers/CMSIS/Device/ST/STM32F4xx/Source/Templates/system_stm32f4xx.c
 
-# Translation units: Core, Startup, CMSIS, and peripheral sources
-# Explicitly lists the translation units residing under Inc/stm32/**
-set(SOURCES
-    # Application entry point & syscalls
-    Src/main.cpp
-    Src/syscalls.c
-    Src/sysmem.c
-
-    # Cortex-M4 Startup assembly & CMSIS system initialization
-    Startup/startup_stm32f446retx.s
-    Drivers/CMSIS/Device/ST/STM32F4xx/Source/Templates/system_stm32f4xx.c
+    # Cortex-M4 Startup assembly
+    ${CMAKE_CURRENT_SOURCE_DIR}/Startup/startup_stm32f446retx.s
 
     # Peripheral Translation Units (located under Inc/stm32/)
-    Inc/stm32/common/systick/systick.cpp
-    Inc/stm32/gpio/digital_input/digital_input.cpp
-    Inc/stm32/gpio/digital_output/digital_output.cpp
-    Inc/stm32/gpio/interrupt_input/interrupt_input.cpp
-    Inc/stm32/exti/exti_manager.cpp
-    Inc/stm32/exti/exti_irq.cpp
-    Inc/stm32/timer/interrupt/timer_interrupt.cpp
-    Inc/stm32/timer/interrupt/timer_irq.cpp
-    Inc/stm32/uart/interrupt/uart_interrupt.cpp
-    Inc/stm32/uart/interrupt/uart_irq.cpp
-    Inc/stm32/spi/interrupt/spi_interrupt.cpp
-    Inc/stm32/spi/interrupt/spi_irq.cpp
-    Inc/stm32/i2c/interrupt/i2c_interrupt.cpp
-    Inc/stm32/i2c/interrupt/i2c_irq.cpp
-    Inc/stm32/adc/interrupt/adc_interrupt.cpp
-    Inc/stm32/adc/interrupt/adc_irq.cpp
-    Inc/stm32/dma/interrupt/dma_interrupt.cpp
-    Inc/stm32/dma/interrupt/dma_irq.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Inc/stm32/common/systick/systick.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Inc/stm32/gpio/digital_input/digital_input.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Inc/stm32/gpio/digital_output/digital_output.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Inc/stm32/gpio/interrupt_input/interrupt_input.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Inc/stm32/exti/exti_manager.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Inc/stm32/exti/exti_irq.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Inc/stm32/timer/interrupt/timer_interrupt.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Inc/stm32/timer/interrupt/timer_irq.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Inc/stm32/uart/interrupt/uart_interrupt.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Inc/stm32/uart/interrupt/uart_irq.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Inc/stm32/spi/interrupt/spi_interrupt.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Inc/stm32/spi/interrupt/spi_irq.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Inc/stm32/i2c/interrupt/i2c_interrupt.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Inc/stm32/i2c/interrupt/i2c_irq.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Inc/stm32/adc/interrupt/adc_interrupt.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Inc/stm32/adc/interrupt/adc_irq.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Inc/stm32/dma/interrupt/dma_interrupt.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Inc/stm32/dma/interrupt/dma_irq.cpp
 )
+
+add_library(stm32_hal STATIC ${STM32_HAL_SOURCES})
+add_library(stm32::hal ALIAS stm32_hal)
+
+# Propagate C++17 and C11 standards
+target_compile_features(stm32_hal PUBLIC cxx_std_17 c_std_11)
+
+# Ensure all public include directories are marked PUBLIC
+target_include_directories(stm32_hal PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/Inc
+    ${CMAKE_CURRENT_SOURCE_DIR}/Drivers/CMSIS/Device/ST/STM32F4xx/Include
+    ${CMAKE_CURRENT_SOURCE_DIR}/Drivers/CMSIS/Include
+)
+
+# Hardware definition
+target_compile_definitions(stm32_hal PUBLIC STM32F446xx)
+
+# Propagate processor flags via target_compile_options and target_link_options
+target_compile_options(stm32_hal PUBLIC
+    ${MCU_FLAGS}
+)
+
+target_link_options(stm32_hal PUBLIC
+    ${MCU_FLAGS}
+)
+
+# ------------------------------------------------------------------------------
+# Demonstration / Standalone Firmware Target
+# ------------------------------------------------------------------------------
 
 set(LINKER_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/STM32F446RETX_FLASH.ld")
 
-add_executable(${PROJECT_NAME}.elf ${SOURCES})
+add_executable(${PROJECT_NAME}.elf Src/main.cpp)
+
+target_link_libraries(${PROJECT_NAME}.elf PRIVATE
+    "-Wl,--whole-archive"
+    stm32::hal
+    "-Wl,--no-whole-archive"
+)
 
 target_link_options(${PROJECT_NAME}.elf PRIVATE
-    ${MCU_FLAGS}
     -T${LINKER_SCRIPT}
     -Wl,-Map=${PROJECT_NAME}.map,--cref
     -Wl,--gc-sections

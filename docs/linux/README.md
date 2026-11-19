@@ -55,10 +55,11 @@ The repository contains:
 * **`Src/`**: Application entry point (`main.cpp`), Newlib syscall stubs (`syscalls.c`), and heap allocator (`sysmem.c`).
 * **`Startup/`**: Cortex-M4 vector table and assembly reset handler (`startup_stm32f446retx.s`).
 * **`Drivers/CMSIS/`**: Standard ARM Cortex-M4 Core and STMicroelectronics device headers (`stm32f446xx.h`, `core_cm4.h`, etc.) and system clock initialization (`system_stm32f4xx.c`).
+* **`stm32_sources.mk`**: Exported GNU Makefile include fragment defining HAL source paths, includes, and linker script for downstreams.
 
 > [!NOTE]
-> **Implementation Files under `Inc/stm32/**`**:
-> Because implementation files (`.cpp`) reside in the `Inc/stm32/` hierarchy (e.g. `Inc/stm32/gpio/digital_output/digital_output.cpp`, `Inc/stm32/uart/interrupt/uart_interrupt.cpp`), both the CMake configuration and GNU `Makefile` explicitly list and compile each peripheral translation unit rather than assuming `Src/*.cpp` contains all sources.
+> **Tier 1 Bare-Metal Silicon HAL Engine Architecture**:
+> In a multi-tier robotics software ecosystem, `STM32-Library` serves as Tier 1. It encapsulates all bare-metal silicon drivers and exports them cleanly as a modern CMake static library target (`stm32_hal` / `stm32::hal`) and a GNU Make fragment (`stm32_sources.mk`), eliminating the need for downstream consumers to re-enumerate the 20+ peripheral translation units.
 
 ---
 
@@ -76,8 +77,9 @@ cmake -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build -j$(nproc)
 ```
 
-The build produces three target artifacts inside `build/`:
-* `stm32_library.elf`: Executable and Linkable Format binary with full symbols for GDB.
+The build produces the following target artifacts inside `build/`:
+* `libstm32_hal.a`: Static HAL engine library archive exporting all silicon peripheral drivers.
+* `stm32_library.elf`: Standalone executable and linkable format binary with full symbols for GDB.
 * `stm32_library.bin`: Raw flash binary for direct programmer flashing.
 * `stm32_library.hex`: Intel HEX format binary.
 * `stm32_library.map`: Linker symbol map and memory distribution report.
@@ -103,7 +105,40 @@ make ARM_TOOLCHAIN_DIR=/opt/arm-gnu-toolchain/bin
 
 ---
 
-## 5. Flashing to STM32 Nucleo-F446RE
+## 5. Downstream Integration (Tier 1 Architecture)
+
+### A. Consuming via Modern CMake (`stm32::hal`)
+In downstream components (Tier 2, such as sensor/actuator drivers) or product repositories (Tier 4):
+```cmake
+add_subdirectory(path/to/STM32-Library)
+
+# Downstream target automatically inherits includes, defines, standards, and flags:
+target_link_libraries(my_robot_app PRIVATE stm32::hal)
+```
+
+Target properties automatically propagated:
+* **Include Directories**: `${STM32_LIB_DIR}/Inc`, CMSIS Core, CMSIS STM32F4xx headers (`PUBLIC`).
+* **Compiler Definitions**: `STM32F446xx` (`PUBLIC`).
+* **Target Architecture**: `-mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard` (`PUBLIC`).
+* **Standards**: `cxx_std_17`, `c_std_11` (`PUBLIC`).
+
+### B. Consuming via GNU Make Fragment (`stm32_sources.mk`)
+Downstream Makefiles can simply include the source fragment without duplicating source lists:
+```makefile
+LIB_DIR = path/to/STM32-Library
+include $(LIB_DIR)/stm32_sources.mk
+
+# Automatically provides:
+#   $(STM32_LIB_SOURCES)      - All 22 HAL C, C++, and ASM source files
+#   $(STM32_LIB_INCLUDES)     - Compiler include flags (-I...)
+#   $(STM32_LINKER_SCRIPT)    - STM32F446RETX_FLASH.ld path
+#   $(STM32_MCU_FLAGS)        - Target architecture flags (-mcpu=cortex-m4 ...)
+#   $(STM32_DEFS)             - Target hardware defines (-DSTM32F446xx)
+```
+
+---
+
+## 6. Flashing to STM32 Nucleo-F446RE
 
 Connect the Nucleo-64 board to your Linux host via Mini-USB (CN1).
 
@@ -141,7 +176,7 @@ The ST-LINK LED will flash red/green during programming and turn solid green upo
 
 ---
 
-## 6. On-Target Hardware Debugging with GDB
+## 7. On-Target Hardware Debugging with GDB
 
 ### Terminal 1: Launch OpenOCD GDB Server
 ```bash
@@ -167,7 +202,7 @@ gdb-multiarch build/stm32_library.elf \
 
 ---
 
-## 7. Serial Telemetry & Console
+## 8. Serial Telemetry & Console
 
 The default `main.cpp` communicates over **USART2** (PA2 TX, PA3 RX) at **115200 baud, 8N1**, which is wired directly to the ST-LINK Virtual COM Port (`/dev/ttyACM0`):
 
